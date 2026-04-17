@@ -1,0 +1,161 @@
+<div class="perfil-page">
+  <!-- Header -->
+  <div class="page-header">
+    <h1 class="page-title">Meu Perfil</h1>
+    @if (!editMode) {
+      <button class="btn-outline" (click)="enterEditMode()">
+        <span class="material-icons-outlined">edit</span>
+        Editar perfil
+      </button>
+    }
+  </div>
+
+  @if (saveSuccess) {
+    <div class="save-banner">
+      <span class="material-icons-outlined">check_circle</span>
+      Perfil atualizado com sucesso!
+    </div>
+  }
+
+  @if (usuario) {
+    <!-- Profile Card (dados do Google — somente leitura) -->
+    <div class="profile-card" [class.edit-active]="editMode">
+      <div class="profile-avatar-wrap">
+        @if (usuario.avatar) {
+          <img class="profile-avatar-img" [src]="usuario.avatar" [alt]="usuario.nome" />
+        } @else {
+          <div class="profile-avatar">{{ usuario.iniciais }}</div>
+        }
+        <span class="google-badge" title="Dados sincronizados com o Google">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        </span>
+      </div>
+      <div class="profile-info">
+        <h2 class="profile-name">{{ usuario.nome }}</h2>
+        <span class="profile-role">{{ usuario.funcao }}</span>
+        <p class="profile-email">
+          <span class="material-icons-outlined email-icon">mail_outline</span>
+          {{ usuario.email }}
+        </p>
+        <p class="profile-ministerio">
+          <span class="material-icons-outlined">church</span>
+          {{ usuario.ministerio }}
+        </p>
+      </div>
+      @if (editMode) {
+        <div class="google-notice">
+          <span class="material-icons-outlined">lock_outline</span>
+          Nome, e-mail e foto são gerenciados pelo Google
+        </div>
+      }
+    </div>
+
+    <!-- Stats -->
+    @if (!editMode) {
+      <div class="profile-stats">
+        @for (stat of stats; track stat.label) {
+          <div class="profile-stat-card">
+            <span class="profile-stat-value">{{ stat.value }}</span>
+            <span class="profile-stat-label">{{ stat.label }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- VIEW MODE: Informações -->
+    @if (!editMode) {
+      <div class="profile-details">
+        <h3 class="section-title">Informações</h3>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Instrumento(s)</span>
+            @if (usuario.instrumentos && usuario.instrumentos.length > 0) {
+              <div class="detail-tags">
+                @for (inst of usuario.instrumentos; track inst) {
+                  <span class="detail-tag">{{ inst }}</span>
+                }
+              </div>
+            } @else {
+              <span class="detail-value detail-empty">Nenhum instrumento cadastrado</span>
+            }
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Membro desde</span>
+            <span class="detail-value">{{ formatDataMembro(usuario.dataMembro) }}</span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- EDIT MODE: Formulário -->
+    @if (editMode) {
+      <form [formGroup]="form" (ngSubmit)="saveEdit()" novalidate>
+        <div class="edit-section">
+          <h3 class="section-title">Editar informações</h3>
+
+          <!-- Instrumento(s) -->
+          <div class="field-group">
+            <label class="field-label">
+              Instrumento(s) que você toca
+              <span class="field-required">*</span>
+            </label>
+            <p class="field-hint">Selecione um ou mais instrumentos.</p>
+            <div class="instrument-chips">
+              @for (inst of INSTRUMENTOS_DISPONIVEIS; track inst) {
+                <button
+                  type="button"
+                  class="chip"
+                  [class.selected]="editInstrumentos.has(inst)"
+                  (click)="toggleInstrumento(inst)"
+                >
+                  {{ inst }}
+                </button>
+              }
+            </div>
+            @if (noInstrumentoError) {
+              <span class="field-error">Selecione ao menos um instrumento.</span>
+            }
+          </div>
+
+          <!-- Data de membro -->
+          <div class="field-group">
+            <label class="field-label" for="dataMembro">
+              Membro desde
+              <span class="field-required">*</span>
+            </label>
+            <p class="field-hint">Data em que você entrou para o ministério.</p>
+            <div class="input-wrapper">
+              <span class="input-icon material-icons-outlined">calendar_today</span>
+              <input
+                id="dataMembro"
+                type="date"
+                class="field-input"
+                [class.invalid]="form.get('dataMembro')?.invalid && form.get('dataMembro')?.touched"
+                formControlName="dataMembro"
+              />
+            </div>
+            @if (form.get('dataMembro')?.invalid && form.get('dataMembro')?.touched) {
+              <span class="field-error">Informe a data de entrada no ministério.</span>
+            }
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="edit-actions">
+          <button type="button" class="btn-cancel" (click)="cancelEdit()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-save" [disabled]="isSaving">
+            @if (isSaving) {
+              <span class="material-icons-outlined spinning">autorenew</span>
+              Salvando…
+            } @else {
+              <span class="material-icons-outlined">check</span>
+              Salvar alterações
+            }
+          </button>
+        </div>
+      </form>
+    }
+  }
+</div>

@@ -1,0 +1,103 @@
+<div class="repertorios-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Repertórios</h1>
+      <p class="page-subtitle">Todos os cultos organizados por data. Clique para ver detalhes ou confirmar sua participação.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-outline" (click)="goToNovaMusica()">
+        <span class="material-icons-outlined">add</span>
+        Nova Música
+      </button>
+      <button class="btn-primary" (click)="goToNovoRepertorio()">
+        <span class="material-icons-outlined">add</span>
+        Novo Repertório
+      </button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <span class="material-icons-outlined search-icon">search</span>
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Buscar repertório..."
+      [(ngModel)]="searchQuery"
+    />
+    @if (searchQuery) {
+      <button class="search-clear" (click)="searchQuery = ''">
+        <span class="material-icons-outlined">close</span>
+      </button>
+    }
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button
+      class="tab"
+      [class.active]="activeTab === 'proximos'"
+      (click)="setTab('proximos')"
+    >
+      Próximos ({{ proximosCount }})
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'passados'"
+      (click)="setTab('passados')"
+    >
+      Passados ({{ passadosCount }})
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <span class="material-icons-outlined spinning">autorenew</span>
+      Carregando dados…
+    </div>
+  }
+
+  <!-- Repertórios List -->
+  @if (!isLoading) {
+    <div class="repertorio-list">
+      @for (rep of filteredRepertorios; track rep.id) {
+        <div class="repertorio-card" (click)="openRepertorio(rep)">
+          <div class="date-block">
+            <span class="date-mes">{{ getDateParts(rep.dataCulto).mes }}</span>
+            <span class="date-dia">{{ getDateParts(rep.dataCulto).dia }}</span>
+            <span class="date-ano">{{ getDateParts(rep.dataCulto).ano }}</span>
+          </div>
+          <div class="repertorio-info">
+            <div class="repertorio-top">
+              <span class="repertorio-name">{{ rep.nome }}</span>
+              <span class="repertorio-status" [class]="getStatusClass(rep.status)">
+                {{ getStatusLabel(rep.status) }}
+              </span>
+            </div>
+            <div class="repertorio-meta-row">
+              <span class="material-icons-outlined meta-icon">location_on</span>
+              <span class="meta-item">{{ rep.localCulto }}</span>
+              <span class="meta-sep">·</span>
+              <span class="meta-item">{{ rep.musicasIds.length }} músicas</span>
+              <span class="meta-sep">·</span>
+              <span class="meta-item">{{ rep.horario }}</span>
+              <span class="meta-sep">·</span>
+              <span class="meta-item">{{ getParticipacoes(rep.id) }} participação(ões)</span>
+            </div>
+          </div>
+          <span class="material-icons-outlined card-arrow">chevron_right</span>
+        </div>
+      }
+
+      @if (filteredRepertorios.length === 0) {
+        <div class="empty-state">
+          <span class="material-icons-outlined empty-icon">search_off</span>
+          <p class="empty-text">Nenhum repertório encontrado.</p>
+        </div>
+      }
+    </div>
+  }
+</div>
+

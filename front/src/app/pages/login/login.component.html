@@ -1,0 +1,86 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <!-- Logo -->
+    <div class="login-logo">
+      <div class="logo-icon">
+        <span class="material-icons-outlined">music_note</span>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">LouvorHub</span>
+        <span class="logo-subtitle">MINISTÉRIO</span>
+      </div>
+    </div>
+
+    <div class="login-header">
+      <h1 class="login-title">Bem-vindo de volta</h1>
+      <p class="login-desc">Entre com sua conta para acessar o ministério.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <!-- Email -->
+      <div class="field-group">
+        <label class="field-label" for="email">E-mail</label>
+        <div class="input-wrapper">
+          <span class="input-icon material-icons-outlined">mail_outline</span>
+          <input
+            id="email"
+            type="email"
+            class="field-input"
+            [class.invalid]="emailControl?.invalid && emailControl?.touched"
+            formControlName="email"
+            placeholder="seu@email.com"
+            autocomplete="email"
+          />
+        </div>
+        @if (emailControl?.invalid && emailControl?.touched) {
+          <span class="field-error">
+            @if (emailControl?.errors?.['required']) { E-mail é obrigatório. }
+            @else if (emailControl?.errors?.['email']) { E-mail inválido. }
+          </span>
+        }
+      </div>
+
+      <!-- Senha -->
+      <div class="field-group">
+        <label class="field-label" for="senha">Senha</label>
+        <div class="input-wrapper">
+          <span class="input-icon material-icons-outlined">lock_outline</span>
+          <input
+            id="senha"
+            [type]="showPassword ? 'text' : 'password'"
+            class="field-input"
+            [class.invalid]="senhaControl?.invalid && senhaControl?.touched"
+            formControlName="senha"
+            placeholder="Mínimo 6 caracteres"
+            autocomplete="current-password"
+          />
+          <button type="button" class="toggle-password" (click)="togglePassword()">
+            <span class="material-icons-outlined">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        @if (senhaControl?.invalid && senhaControl?.touched) {
+          <span class="field-error">
+            @if (senhaControl?.errors?.['required']) { Senha é obrigatória. }
+            @else if (senhaControl?.errors?.['minlength']) { Mínimo de 6 caracteres. }
+          </span>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <div class="login-error">
+          <span class="material-icons-outlined">error_outline</span>
+          {{ errorMessage }}
+        </div>
+      }
+
+      <button type="submit" class="btn-login" [disabled]="isSubmitting">
+        @if (isSubmitting) {
+          <span class="material-icons-outlined spinning">autorenew</span>
+          Entrando…
+        } @else {
+          Entrar
+        }
+      </button>
+    </form>
+  </div>
+</div>
