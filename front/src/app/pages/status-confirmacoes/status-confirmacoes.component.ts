@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { EscalacaoService } from '../../services/escalacao.service';
 import { RepertorioService } from '../../services/repertorio.service';
 import { MockApiService } from '../../services/mock-api.service';
+import { UsuarioService } from '../../services/usuario.service';
 import {
   Repertorio,
   VisaoGeralConfirmacoes,
@@ -38,6 +39,7 @@ interface ConfirmacaoDeMusica {
   styleUrl: './status-confirmacoes.component.scss',
 })
 export class StatusConfirmacoesComponent implements OnInit {
+  usuario: Usuario | null = null;
   repertorio: Repertorio | null = null;
   visaoGeral: VisaoGeralConfirmacoes | null = null;
   porMusica: ConfirmacaoDeMusica[] = [];
@@ -50,6 +52,7 @@ export class StatusConfirmacoesComponent implements OnInit {
   constructor(
     private escalacaoService: EscalacaoService,
     private repertorioService: RepertorioService,
+    private usuarioService: UsuarioService,
     private api: MockApiService,
     private router: Router,
     private route: ActivatedRoute,
@@ -58,6 +61,7 @@ export class StatusConfirmacoesComponent implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.api.getTags().subscribe(res => { this.tags = res.data; });
+    this.usuarioService.getUsuarioLogado().subscribe(res => { this.usuario = res.data; });
 
     this.repertorioService.getRepertorioById(id).subscribe(res => {
       if (!res.sucesso) { this.isLoading = false; return; }
@@ -119,8 +123,20 @@ export class StatusConfirmacoesComponent implements OnInit {
     return ordenados.length > 0 ? ordenados : Array.from(map.values());
   }
 
+  get isAdm(): boolean {
+    return this.usuario?.perfil === 'ADM';
+  }
+
   get podeEnviarAprovacao(): boolean {
     if (!this.repertorio) return false;
+    // ADM tem permissão geral: pode enviar de qualquer status,
+    // exceto quando já está em fluxo ativo de aprovação ou já aprovado.
+    if (this.isAdm) {
+      return (
+        this.repertorio.status !== 'aguardando_aprovacao' &&
+        this.repertorio.status !== 'aprovado'
+      );
+    }
     return (
       this.repertorio.status === 'publicado' ||
       this.repertorio.status === 'reprovado'
