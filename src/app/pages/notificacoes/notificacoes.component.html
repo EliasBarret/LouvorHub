@@ -1,0 +1,34 @@
+<div class="notificacoes-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Notificações</h1>
+      <p class="page-subtitle">Você tem {{ unreadCount }} notificações não lidas.</p>
+    </div>
+    @if (unreadCount > 0) {
+      <button class="btn-outline" (click)="markAllAsRead()">
+        <span class="material-icons-outlined">done_all</span>
+        Marcar todas como lidas
+      </button>
+    }
+  </div>
+
+  <div class="notificacoes-list">
+    @for (notif of notificacoes; track notif.id) {
+      <div class="notif-card" [class.unread]="!notif.read" (click)="markAsRead(notif)">
+        <div class="notif-icon" [class]="'notif-icon-' + notif.type">
+          <span class="material-icons-outlined">{{ getIcon(notif.type) }}</span>
+        </div>
+        <div class="notif-content">
+          <div class="notif-top">
+            <span class="notif-title">{{ notif.title }}</span>
+            <span class="notif-time">{{ notif.time }}</span>
+          </div>
+          <p class="notif-message">{{ notif.message }}</p>
+        </div>
+        @if (!notif.read) {
+          <div class="unread-dot"></div>
+        }
+      </div>
+    }
+  </div>
+</div>
