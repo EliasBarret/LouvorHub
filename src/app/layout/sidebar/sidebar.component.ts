@@ -1,5 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import { Component, OnInit, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { MockApiService } from '../../services/mock-api.service';
+import { Usuario } from '../../models';
 
 @Component({
   selector: 'app-sidebar',
@@ -7,7 +9,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   isOpen = input(false);
   closed = output<void>();
 
@@ -18,9 +20,13 @@ export class SidebarComponent {
     { label: 'Meu Perfil', icon: 'settings', route: '/meu-perfil' },
   ];
 
-  user = {
-    name: 'Elias Barreto',
-    email: 'eliaspensador@gmail.com',
-    initials: 'E'
-  };
+  usuario: Usuario | null = null;
+
+  constructor(private api: MockApiService) {}
+
+  ngOnInit(): void {
+    this.api.getUsuarioLogado().subscribe(res => {
+      this.usuario = res.data;
+    });
+  }
 }

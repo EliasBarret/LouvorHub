@@ -1,48 +1,30 @@
-import { Component } from '@angular/core';
-
-interface Escalacao {
-  month: string;
-  day: number;
-  title: string;
-  musicCount: number;
-  participationCount: number;
-  time: string;
-}
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MockApiService } from '../../services/mock-api.service';
+import { Usuario, Stat, Escalacao } from '../../models';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
-  userName = 'Elias';
-  userFullName = 'Elias Barreto';
-  userRole = 'Músico';
-  userInitials = 'E';
+export class HomeComponent implements OnInit {
+  usuario: Usuario | null = null;
+  stats: Stat[] = [];
+  escalacoes: Escalacao[] = [];
 
-  stats = [
-    { icon: 'calendar_today', label: 'PRÓXIMOS CULTOS', value: 2, color: '#8B5FC0' },
-    { icon: 'music_note', label: 'MÚSICAS ESCALADAS', value: 6, color: '#8B5FC0' },
-    { icon: 'schedule', label: 'AGUARDANDO CONFIRMAÇÃO', value: 0, color: '#C9A84C' },
-  ];
+  constructor(private api: MockApiService) {}
 
-  escalacoes: Escalacao[] = [
-    {
-      month: 'ABR',
-      day: 23,
-      title: 'Culto de Quarta — Oração',
-      musicCount: 2,
-      participationCount: 1,
-      time: '19:30',
-    },
-    {
-      month: 'ABR',
-      day: 20,
-      title: 'Culto de Domingo — Manhã',
-      musicCount: 5,
-      participationCount: 5,
-      time: '10:00',
-    },
-  ];
+  ngOnInit(): void {
+    this.api.getUsuarioLogado().subscribe(res => {
+      this.usuario = res.data;
+    });
+    this.api.getStats().subscribe(res => {
+      this.stats = res.data;
+    });
+    this.api.getEscalacoes().subscribe(res => {
+      this.escalacoes = res.data;
+    });
+  }
 }

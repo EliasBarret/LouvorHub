@@ -33,13 +33,15 @@
 
   <!-- User section -->
   <div class="sidebar-bottom">
-    <div class="user-info">
-      <div class="user-avatar">{{ user.initials }}</div>
-      <div class="user-details">
-        <span class="user-name">{{ user.name }}</span>
-        <span class="user-email">{{ user.email }}</span>
+    @if (usuario) {
+      <div class="user-info">
+        <div class="user-avatar">{{ usuario.iniciais }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ usuario.nome }}</span>
+          <span class="user-email">{{ usuario.email }}</span>
+        </div>
       </div>
-    </div>
+    }
     <div class="user-actions">
       <button class="action-btn" title="Sair">
         <span class="material-icons-outlined">logout</span>

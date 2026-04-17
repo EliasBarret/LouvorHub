@@ -1,0 +1,247 @@
+<div class="cadastro-page">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn" (click)="onCancel()">
+      <span class="material-icons-outlined">arrow_back</span>
+    </button>
+    <div>
+      <h1 class="page-title">Novo Repertório</h1>
+      <p class="page-subtitle">Monte o repertório do culto e escale as músicas.</p>
+    </div>
+  </div>
+
+  <!-- Success Banner -->
+  @if (submitSuccess) {
+    <div class="alert alert-success">
+      <span class="material-icons-outlined">check_circle</span>
+      Repertório criado com sucesso! Redirecionando…
+    </div>
+  }
+
+  <!-- Error Banner -->
+  @if (submitError) {
+    <div class="alert alert-error">
+      <span class="material-icons-outlined">error_outline</span>
+      {{ submitError }}
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- Dados do Culto -->
+    <div class="form-card">
+      <h2 class="section-title">
+        <span class="material-icons-outlined section-icon">event</span>
+        Dados do Culto
+      </h2>
+
+      <div class="form-row">
+        <!-- Tipo de culto -->
+        <div class="form-group col-2">
+          <label class="form-label" for="tipoCulto">
+            Tipo de Culto <span class="required">*</span>
+          </label>
+          <select
+            id="tipoCulto"
+            class="form-control"
+            [class.error]="f['tipoCulto'].invalid && f['tipoCulto'].touched"
+            formControlName="tipoCulto"
+            (change)="onTipoCultoChange(f['tipoCulto'].value)"
+          >
+            <option value="">Selecione o tipo</option>
+            @for (tipo of tiposCulto; track tipo) {
+              <option [value]="tipo">{{ tipo }}</option>
+            }
+          </select>
+          @if (f['tipoCulto'].invalid && f['tipoCulto'].touched) {
+            <span class="field-error">Selecione o tipo de culto.</span>
+          }
+        </div>
+
+        <!-- Data -->
+        <div class="form-group col-2">
+          <label class="form-label" for="dataCulto">
+            Data do Culto <span class="required">*</span>
+          </label>
+          <input
+            id="dataCulto"
+            type="date"
+            class="form-control"
+            [class.error]="f['dataCulto'].invalid && f['dataCulto'].touched"
+            formControlName="dataCulto"
+          />
+          @if (f['dataCulto'].invalid && f['dataCulto'].touched) {
+            <span class="field-error">Data obrigatória.</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Nome -->
+        <div class="form-group col-2">
+          <label class="form-label" for="nome">
+            Nome do Repertório <span class="required">*</span>
+          </label>
+          <input
+            id="nome"
+            type="text"
+            class="form-control"
+            [class.error]="f['nome'].invalid && f['nome'].touched"
+            formControlName="nome"
+            placeholder="Ex: Culto de Domingo — Manhã"
+            autocomplete="off"
+          />
+          @if (f['nome'].invalid && f['nome'].touched) {
+            <span class="field-error">Nome obrigatório (mínimo 3 caracteres).</span>
+          }
+        </div>
+
+        <!-- Status -->
+        <div class="form-group col-2">
+          <label class="form-label" for="status">Status</label>
+          <div class="status-group">
+            @for (opt of [
+              { value: 'rascunho',   label: 'Rascunho',   icon: 'edit_note' },
+              { value: 'pendente',   label: 'Pendente',   icon: 'schedule' },
+              { value: 'confirmado', label: 'Confirmado', icon: 'check_circle' }
+            ]; track opt.value) {
+              <label
+                class="status-option"
+                [class.active]="f['status'].value === opt.value"
+                [class]="'status-option status-' + opt.value + (f['status'].value === opt.value ? ' active' : '')"
+              >
+                <input
+                  type="radio"
+                  formControlName="status"
+                  [value]="opt.value"
+                  hidden
+                />
+                <span class="material-icons-outlined status-icon">{{ opt.icon }}</span>
+                {{ opt.label }}
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Músicas do Repertório -->
+    <div class="form-card">
+      <h2 class="section-title">
+        <span class="material-icons-outlined section-icon">queue_music</span>
+        Músicas do Repertório
+        <span class="count-badge">{{ musicasSelecionadas.length }}</span>
+      </h2>
+
+      <!-- Search -->
+      <div class="musica-search-wrapper">
+        <span class="material-icons-outlined search-icon">search</span>
+        <input
+          type="text"
+          class="musica-search"
+          placeholder="Buscar música por título, artista ou tom…"
+          [(ngModel)]="buscaMusica"
+          [ngModelOptions]="{ standalone: true }"
+          (input)="filtrarMusicas()"
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Search Results -->
+      @if (buscaMusica.length > 0 || musicasBuscadas.length < todasMusicas.length) {
+        <div class="search-results">
+          @if (isLoadingMusicas) {
+            <div class="loading-state">
+              <span class="material-icons-outlined spinning">autorenew</span>
+              Carregando músicas…
+            </div>
+          } @else if (musicasBuscadas.length === 0) {
+            <div class="empty-search">
+              <span class="material-icons-outlined">search_off</span>
+              Nenhuma música encontrada.
+            </div>
+          } @else {
+            @for (musica of musicasBuscadas.slice(0, 6); track musica.id) {
+              <div class="search-item" (click)="adicionarMusica(musica)">
+                <div class="search-item-icon">
+                  <span class="material-icons-outlined">music_note</span>
+                </div>
+                <div class="search-item-info">
+                  <span class="search-item-title">{{ musica.titulo }}</span>
+                  <span class="search-item-meta">{{ musica.artista }} · {{ musica.tom }} · {{ musica.bpm }} BPM</span>
+                </div>
+                <div class="search-item-tags">
+                  @for (tag of musica.tags; track tag) {
+                    <span class="tag-pill" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">
+                      {{ tag }}
+                    </span>
+                  }
+                </div>
+                <button type="button" class="add-btn">
+                  <span class="material-icons-outlined">add</span>
+                </button>
+              </div>
+            }
+          }
+        </div>
+      }
+
+      <!-- Selected Musicas -->
+      @if (musicasSelecionadas.length > 0) {
+        <div class="selected-list">
+          <p class="selected-label">Músicas adicionadas</p>
+          @for (musica of musicasSelecionadas; track musica.id; let i = $index) {
+            <div class="selected-item">
+              <span class="selected-order">{{ i + 1 }}</span>
+              <div class="selected-icon">
+                <span class="material-icons-outlined">music_note</span>
+              </div>
+              <div class="selected-info">
+                <span class="selected-title">{{ musica.titulo }}</span>
+                <span class="selected-meta">{{ musica.artista }} · {{ musica.tom }} · {{ musica.bpm }} BPM</span>
+              </div>
+              <div class="selected-tags">
+                @for (tag of musica.tags; track tag) {
+                  <span class="tag-pill" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">
+                    {{ tag }}
+                  </span>
+                }
+              </div>
+              <div class="selected-actions">
+                <button type="button" class="order-btn" [disabled]="i === 0" (click)="moverMusica(i, 'up')">
+                  <span class="material-icons-outlined">keyboard_arrow_up</span>
+                </button>
+                <button type="button" class="order-btn" [disabled]="i === musicasSelecionadas.length - 1" (click)="moverMusica(i, 'down')">
+                  <span class="material-icons-outlined">keyboard_arrow_down</span>
+                </button>
+                <button type="button" class="remove-btn" (click)="removerMusica(musica.id)">
+                  <span class="material-icons-outlined">close</span>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-musicas">
+          <span class="material-icons-outlined">library_music</span>
+          <p>Nenhuma música adicionada ainda.</p>
+          <span>Use a busca acima para adicionar músicas ao repertório.</span>
+        </div>
+      }
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn-ghost" (click)="onCancel()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+        @if (isSubmitting) {
+          <span class="material-icons-outlined spinning">autorenew</span>
+          Salvando…
+        } @else {
+          <span class="material-icons-outlined">save</span>
+          Criar Repertório
+        }
+      </button>
+    </div>
+  </form>
+</div>

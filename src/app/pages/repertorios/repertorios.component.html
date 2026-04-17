@@ -6,18 +6,24 @@
         <span class="material-icons-outlined">arrow_back</span>
       </button>
       <div>
-        <h1 class="page-title">{{ selectedRepertorio.name }}</h1>
-        <p class="page-subtitle">{{ selectedRepertorio.date }} · {{ selectedRepertorio.musicCount }} músicas</p>
+        <h1 class="page-title">{{ selectedRepertorio.nome }}</h1>
+        <p class="page-subtitle">{{ selectedRepertorio.dataCulto }} · {{ selectedRepertorio.musicasIds.length }} músicas</p>
       </div>
     } @else {
       <div>
         <h1 class="page-title">Repertórios</h1>
         <p class="page-subtitle">Gerencie seus repertórios e músicas do ministério.</p>
       </div>
-      <button class="btn-primary">
-        <span class="material-icons-outlined">add</span>
-        Novo Repertório
-      </button>
+      <div class="header-actions">
+        <button class="btn-outline" (click)="goToNovaMusica()">
+          <span class="material-icons-outlined">music_note</span>
+          Nova Música
+        </button>
+        <button class="btn-primary" (click)="goToNovoRepertorio()">
+          <span class="material-icons-outlined">add</span>
+          Novo Repertório
+        </button>
+      </div>
     }
   </div>
 
@@ -58,8 +64,16 @@
       }
     </div>
 
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="loading-state">
+        <span class="material-icons-outlined spinning">autorenew</span>
+        Carregando dados…
+      </div>
+    }
+
     <!-- Repertórios List -->
-    @if (activeTab === 'repertorios') {
+    @if (activeTab === 'repertorios' && !isLoading) {
       <div class="repertorio-list">
         @for (rep of filteredRepertorios; track rep.id) {
           <div class="repertorio-card" (click)="openRepertorio(rep)">
@@ -68,12 +82,12 @@
             </div>
             <div class="repertorio-info">
               <div class="repertorio-top">
-                <span class="repertorio-name">{{ rep.name }}</span>
+                <span class="repertorio-name">{{ rep.nome }}</span>
                 <span class="repertorio-status" [class]="getStatusClass(rep.status)">
                   {{ getStatusLabel(rep.status) }}
                 </span>
               </div>
-              <span class="repertorio-meta">{{ rep.date }} · {{ rep.musicCount }} músicas</span>
+              <span class="repertorio-meta">{{ rep.dataCulto }} · {{ rep.musicasIds.length }} músicas</span>
             </div>
             <button class="repertorio-arrow">
               <span class="material-icons-outlined">chevron_right</span>
@@ -91,7 +105,7 @@
     }
 
     <!-- Músicas List -->
-    @if (activeTab === 'musicas') {
+    @if (activeTab === 'musicas' && !isLoading) {
       <div class="musicas-list">
         <div class="musicas-table">
           <div class="table-header">
@@ -108,18 +122,18 @@
                   <span class="material-icons-outlined">music_note</span>
                 </div>
                 <div class="music-info">
-                  <span class="music-name">{{ musica.title }}</span>
-                  <span class="music-artist">{{ musica.artist }}</span>
+                  <span class="music-name">{{ musica.titulo }}</span>
+                  <span class="music-artist">{{ musica.artista }}</span>
                 </div>
               </div>
               <span class="td-tom">{{ musica.tom }}</span>
               <span class="td-bpm">{{ musica.bpm }}</span>
               <div class="td-tags">
                 @for (tag of musica.tags; track tag) {
-                  <span class="tag">{{ tag }}</span>
+                  <span class="tag" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">{{ tag }}</span>
                 }
               </div>
-              <span class="td-used">{{ musica.lastUsed || '—' }}</span>
+              <span class="td-used">{{ musica.ultimoUso ?? '—' }}</span>
             </div>
           }
         </div>
@@ -146,13 +160,13 @@
       <div class="detail-musicas">
         <div class="detail-section-header">
           <h3>Músicas do Repertório</h3>
-          <button class="btn-outline-sm">
+          <button class="btn-outline-sm" (click)="goToNovaMusica()">
             <span class="material-icons-outlined">add</span>
             Adicionar
           </button>
         </div>
 
-        @if (selectedRepertorio.musicas.length > 0) {
+        @if (selectedRepertorio.musicas && selectedRepertorio.musicas.length > 0) {
           <div class="detail-music-list">
             @for (musica of selectedRepertorio.musicas; track musica.id; let i = $index) {
               <div class="detail-music-item">
@@ -161,8 +175,8 @@
                   <span class="material-icons-outlined">music_note</span>
                 </div>
                 <div class="music-info">
-                  <span class="music-name">{{ musica.title }}</span>
-                  <span class="music-artist">{{ musica.artist }}</span>
+                  <span class="music-name">{{ musica.titulo }}</span>
+                  <span class="music-artist">{{ musica.artista }}</span>
                 </div>
                 <div class="music-meta">
                   <span class="meta-tom">Tom: {{ musica.tom }}</span>
@@ -170,7 +184,7 @@
                 </div>
                 <div class="music-tags">
                   @for (tag of musica.tags; track tag) {
-                    <span class="tag">{{ tag }}</span>
+                    <span class="tag" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">{{ tag }}</span>
                   }
                 </div>
                 <button class="music-actions-btn">
@@ -183,7 +197,7 @@
           <div class="empty-state">
             <span class="material-icons-outlined empty-icon">library_music</span>
             <p class="empty-text">Nenhuma música adicionada ainda.</p>
-            <button class="btn-outline">Adicionar músicas</button>
+            <button class="btn-outline" (click)="goToNovaMusica()">Adicionar músicas</button>
           </div>
         }
       </div>

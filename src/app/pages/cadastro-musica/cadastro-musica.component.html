@@ -1,0 +1,203 @@
+<div class="cadastro-page">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn" (click)="onCancel()">
+      <span class="material-icons-outlined">arrow_back</span>
+    </button>
+    <div>
+      <h1 class="page-title">Nova Música</h1>
+      <p class="page-subtitle">Adicione uma música ao banco do ministério.</p>
+    </div>
+  </div>
+
+  <!-- Success Banner -->
+  @if (submitSuccess) {
+    <div class="alert alert-success">
+      <span class="material-icons-outlined">check_circle</span>
+      Música cadastrada com sucesso! Redirecionando…
+    </div>
+  }
+
+  <!-- Error Banner -->
+  @if (submitError) {
+    <div class="alert alert-error">
+      <span class="material-icons-outlined">error_outline</span>
+      {{ submitError }}
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <div class="form-card">
+      <h2 class="section-title">
+        <span class="material-icons-outlined section-icon">music_note</span>
+        Informações da Música
+      </h2>
+
+      <div class="form-row">
+        <!-- Título -->
+        <div class="form-group col-2">
+          <label class="form-label" for="titulo">
+            Título <span class="required">*</span>
+          </label>
+          <input
+            id="titulo"
+            type="text"
+            class="form-control"
+            [class.error]="f['titulo'].invalid && f['titulo'].touched"
+            formControlName="titulo"
+            placeholder="Ex: Deus de Promessas"
+            autocomplete="off"
+          />
+          @if (f['titulo'].invalid && f['titulo'].touched) {
+            <span class="field-error">Título obrigatório (mínimo 2 caracteres).</span>
+          }
+        </div>
+
+        <!-- Artista -->
+        <div class="form-group col-2">
+          <label class="form-label" for="artista">
+            Artista / Banda <span class="required">*</span>
+          </label>
+          <input
+            id="artista"
+            type="text"
+            class="form-control"
+            [class.error]="f['artista'].invalid && f['artista'].touched"
+            formControlName="artista"
+            placeholder="Ex: Toque no Altar"
+            autocomplete="off"
+          />
+          @if (f['artista'].invalid && f['artista'].touched) {
+            <span class="field-error">Artista obrigatório (mínimo 2 caracteres).</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Tom -->
+        <div class="form-group col-3">
+          <label class="form-label" for="tom">
+            Tom <span class="required">*</span>
+          </label>
+          <select
+            id="tom"
+            class="form-control"
+            [class.error]="f['tom'].invalid && f['tom'].touched"
+            formControlName="tom"
+          >
+            <option value="">Selecione o tom</option>
+            @for (ton of tons; track ton) {
+              <option [value]="ton">{{ ton }}</option>
+            }
+          </select>
+          @if (f['tom'].invalid && f['tom'].touched) {
+            <span class="field-error">Tom obrigatório.</span>
+          }
+        </div>
+
+        <!-- BPM -->
+        <div class="form-group col-3">
+          <label class="form-label" for="bpm">BPM</label>
+          <input
+            id="bpm"
+            type="number"
+            class="form-control"
+            [class.error]="f['bpm'].invalid && f['bpm'].touched"
+            formControlName="bpm"
+            placeholder="Ex: 72"
+            min="20"
+            max="300"
+          />
+          @if (f['bpm'].invalid && f['bpm'].touched) {
+            <span class="field-error">BPM deve estar entre 20 e 300.</span>
+          }
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="form-group">
+        <label class="form-label">Tags</label>
+        <div class="tags-grid">
+          @for (tag of tags; track tag.id) {
+            <button
+              type="button"
+              class="tag-btn"
+              [class.selected]="isTagSelected(tag.nome)"
+              [style.--tag-cor]="tag.cor"
+              (click)="toggleTag(tag.nome)"
+            >
+              <span class="tag-dot"></span>
+              {{ tag.nome }}
+              @if (isTagSelected(tag.nome)) {
+                <span class="material-icons-outlined tag-check">check</span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Links Section -->
+    <div class="form-card">
+      <h2 class="section-title">
+        <span class="material-icons-outlined section-icon">link</span>
+        Links e Referências
+      </h2>
+
+      <div class="form-row">
+        <div class="form-group col-2">
+          <label class="form-label" for="linkYoutube">
+            <span class="material-icons-outlined link-icon yt">smart_display</span>
+            YouTube
+          </label>
+          <input
+            id="linkYoutube"
+            type="url"
+            class="form-control"
+            formControlName="linkYoutube"
+            placeholder="https://youtu.be/..."
+          />
+        </div>
+
+        <div class="form-group col-2">
+          <label class="form-label" for="linkSpotify">
+            <span class="material-icons-outlined link-icon sp">headphones</span>
+            Spotify
+          </label>
+          <input
+            id="linkSpotify"
+            type="url"
+            class="form-control"
+            formControlName="linkSpotify"
+            placeholder="https://open.spotify.com/track/..."
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="observacoes">Observações</label>
+        <textarea
+          id="observacoes"
+          class="form-control textarea"
+          formControlName="observacoes"
+          placeholder="Ex: Capo 2 no violão, tocar na versão ao vivo…"
+          rows="3"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn-ghost" (click)="onCancel()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+        @if (isSubmitting) {
+          <span class="material-icons-outlined spinning">autorenew</span>
+          Salvando…
+        } @else {
+          <span class="material-icons-outlined">save</span>
+          Salvar Música
+        }
+      </button>
+    </div>
+  </form>
+</div>
