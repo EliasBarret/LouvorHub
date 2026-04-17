@@ -9,6 +9,40 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+.topbar-left {
+  display: none;
+}
+
+.menu-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover {
+    background: var(--border-light);
+  }
+
+  .material-icons-outlined {
+    font-size: 24px;
+    color: var(--text-secondary);
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0 16px;
+    justify-content: space-between;
+  }
+
+  .topbar-left {
+    display: flex;
+  }
+}
+
 .topbar-right {
   display: flex;
   align-items: center;

@@ -1,4 +1,9 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.open]="isOpen()">
+  <div class="sidebar-close-mobile">
+    <button class="close-btn" (click)="closed.emit()">
+      <span class="material-icons-outlined">close</span>
+    </button>
+  </div>
   <div class="sidebar-top">
     <!-- Logo -->
     <div class="logo">

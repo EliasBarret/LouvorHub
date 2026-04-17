@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, output } from '@angular/core';
 
 @Component({
   selector: 'app-topbar',
@@ -8,4 +8,5 @@ import { Component } from '@angular/core';
 })
 export class TopbarComponent {
   notificationCount = 3;
+  toggleSidebar = output<void>();
 }

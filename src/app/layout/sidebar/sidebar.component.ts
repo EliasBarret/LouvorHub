@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
@@ -8,6 +8,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
+  isOpen = input(false);
+  closed = output<void>();
+
   navItems = [
     { label: 'Início', icon: 'home', route: '/inicio' },
     { label: 'Repertórios', icon: 'calendar_today', route: '/repertorios' },
