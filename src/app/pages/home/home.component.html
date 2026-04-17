@@ -1,0 +1,61 @@
+<div class="home-page">
+  <!-- Greeting -->
+  <div class="greeting-section">
+    <h1 class="greeting-title">Paz, {{ userName }}.</h1>
+    <p class="greeting-subtitle">Seu ministério em um só lugar. Prepare-se, escale e louve com excelência.</p>
+  </div>
+
+  <!-- User Card -->
+  <div class="user-card">
+    <div class="user-card-avatar">{{ userInitials }}</div>
+    <div class="user-card-info">
+      <span class="user-card-name">{{ userFullName }}</span>
+      <span class="user-card-role">{{ userRole }}</span>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    @for (stat of stats; track stat.label) {
+      <div class="stat-card">
+        <div class="stat-icon" [style.background]="stat.color + '18'" [style.color]="stat.color">
+          <span class="material-icons-outlined">{{ stat.icon }}</span>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">{{ stat.label }}</span>
+          <span class="stat-value">{{ stat.value }}</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Escalações Section -->
+  <div class="escalacoes-section">
+    <div class="escalacoes-header">
+      <h2 class="escalacoes-title">Minhas escalações</h2>
+      <a class="ver-todas" href="#">Ver todas <span class="material-icons-outlined arrow">arrow_forward</span></a>
+    </div>
+
+    <div class="escalacoes-list">
+      @for (esc of escalacoes; track esc.title) {
+        <div class="escalacao-card">
+          <div class="escalacao-date">
+            <span class="escalacao-month">{{ esc.month }}</span>
+            <span class="escalacao-day">{{ esc.day }}</span>
+          </div>
+          <div class="escalacao-info">
+            <span class="escalacao-title">{{ esc.title }}</span>
+            <span class="escalacao-details">
+              {{ esc.musicCount }} músicas · {{ esc.participationCount }}
+              {{ esc.participationCount === 1 ? 'participação' : 'participações' }}
+              · {{ esc.time }}
+            </span>
+          </div>
+          <button class="escalacao-arrow">
+            <span class="material-icons-outlined">arrow_forward</span>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

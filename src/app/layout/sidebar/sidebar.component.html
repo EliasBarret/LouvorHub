@@ -1,0 +1,48 @@
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-icon">
+        <span class="material-icons-outlined">music_note</span>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">LouvorHub</span>
+        <span class="logo-subtitle">MINISTÉRIO</span>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-menu">
+      @for (item of navItems; track item.route) {
+        <a
+          class="nav-item"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+        >
+          <span class="material-icons-outlined nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+
+  <!-- User section -->
+  <div class="sidebar-bottom">
+    <div class="user-info">
+      <div class="user-avatar">{{ user.initials }}</div>
+      <div class="user-details">
+        <span class="user-name">{{ user.name }}</span>
+        <span class="user-email">{{ user.email }}</span>
+      </div>
+    </div>
+    <div class="user-actions">
+      <button class="action-btn" title="Sair">
+        <span class="material-icons-outlined">logout</span>
+        <span>Sair</span>
+      </button>
+      <button class="action-btn theme-btn" title="Alternar tema">
+        <span class="material-icons-outlined">dark_mode</span>
+      </button>
+    </div>
+  </div>
+</aside>
