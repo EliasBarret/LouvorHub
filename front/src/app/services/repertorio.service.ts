@@ -166,14 +166,28 @@ export class RepertorioService {
 
   /**
    * Retorna os repertórios aguardando aprovação.
-   * Se filialId for fornecido, filtra pela filial do pastor.
+   * Se igrejaIds for fornecido, filtra pelas igrejas do pastor.
    */
-  getRepertoriosPendentesAprovacao(filialId?: number): Observable<ApiResponse<Repertorio[]>> {
+  getRepertoriosPendentesAprovacao(igrejaIds?: number[]): Observable<ApiResponse<Repertorio[]>> {
     const pendentes = this.repertorios
       .filter(r => r.status === 'aguardando_aprovacao')
-      .filter(r => !filialId || r.filialId === filialId)
+      .filter(r => !igrejaIds?.length || (r.igrejaId !== undefined && igrejaIds.includes(r.igrejaId)))
       .map(r => this.enrichRepertorio(r));
     return this.respond(pendentes);
+  }
+
+  /** Retorna repertórios visíveis para as igrejas informadas. */
+  getRepertoriosByIgrejas(igrejaIds: number[]): Observable<ApiResponse<PageResponse<Repertorio>>> {
+    const enriquecidos = this.repertorios
+      .filter(r => !r.igrejaId || igrejaIds.includes(r.igrejaId))
+      .map(r => this.enrichRepertorio(r));
+    const page: PageResponse<Repertorio> = {
+      conteudo: enriquecidos,
+      total: enriquecidos.length,
+      pagina: 0,
+      tamanhoPagina: 50,
+    };
+    return this.respond(page);
   }
 
   /** Pastor aprova um repertório. */

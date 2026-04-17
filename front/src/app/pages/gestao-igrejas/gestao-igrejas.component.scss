@@ -1,0 +1,614 @@
+.gestao-igrejas-page {
+  width: 100%;
+}
+
+// ─── Page Header ─────────────────────────────────────────────────────────────
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 0 0 4px;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+}
+
+.btn-back-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-white);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  .material-icons-outlined { font-size: 18px; }
+  &:hover { background: var(--bg-surface); }
+}
+
+// ─── Loading & Empty ─────────────────────────────────────────────────────────
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 60px;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.empty-full {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+
+  .empty-icon-wrap {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+
+    .material-icons-outlined { font-size: 34px; color: var(--primary-light); }
+  }
+
+  h3 { font-size: 18px; color: var(--text-primary); margin: 0 0 8px; }
+  p  { font-size: 14px; margin: 0 0 24px; }
+}
+
+// ─── Stats Row ───────────────────────────────────────────────────────────────
+
+.stats-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.summary-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+
+  .material-icons-outlined { font-size: 22px; color: var(--primary); }
+  .stat-value { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+  .stat-label { font-size: 13px; color: var(--text-muted); }
+}
+
+// ─── Igreja Cards Grid ────────────────────────────────────────────────────────
+
+.igrejas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.igreja-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+  }
+
+  &-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px;
+  }
+
+  &-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+  }
+}
+
+.igreja-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .material-icons-outlined { font-size: 22px; color: #fff; }
+}
+
+.igreja-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.igreja-nome {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.igreja-cidade {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+
+  .material-icons-outlined { font-size: 13px; }
+}
+
+.igreja-obs {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.membro-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-muted);
+
+  .material-icons-outlined { font-size: 15px; }
+}
+
+.chevron-icon { font-size: 18px; color: var(--text-muted); }
+
+// ─── Detail Container ─────────────────────────────────────────────────────────
+
+.detalhe-container {
+  background: var(--bg-white);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+// ─── Tabs ────────────────────────────────────────────────────────────────────
+
+.detalhe-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 20px;
+  background: var(--bg-surface);
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 20px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+
+  .material-icons-outlined { font-size: 17px; }
+
+  &.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+
+  &:hover:not(.active) { color: var(--text-primary); }
+}
+
+// ─── Dados Section ────────────────────────────────────────────────────────────
+
+.dados-section { padding: 28px; }
+
+.dados-readonly {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dados-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .dados-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  .dados-value {
+    font-size: 15px;
+    color: var(--text-primary);
+  }
+}
+
+.btn-edit-dados {
+  align-self: flex-start;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .material-icons-outlined { font-size: 17px; }
+}
+
+.dados-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+
+    .required { color: #EF4444; }
+  }
+
+  .form-control {
+    padding: 10px 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--bg-white);
+    transition: border-color 0.15s;
+    outline: none;
+    font-family: inherit;
+
+    &:focus { border-color: var(--primary); }
+
+    &[rows] { resize: vertical; min-height: 80px; }
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+// ─── Membros Section ──────────────────────────────────────────────────────────
+
+.membros-section {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.add-membro-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.add-membro-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px;
+
+  .material-icons-outlined { font-size: 18px; color: var(--primary); }
+}
+
+.add-membro-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .form-control { flex: 1; min-width: 160px; }
+  .select-perfil { flex: 0 0 180px; min-width: 140px; }
+}
+
+.btn-add-membro {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .material-icons-outlined { font-size: 20px; margin: 0; }
+}
+
+.no-users-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+  font-style: italic;
+}
+
+.loading-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 16px 0;
+}
+
+.empty-membros {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-muted);
+
+  .material-icons-outlined { font-size: 36px; display: block; margin-bottom: 8px; }
+  p { margin: 0; font-size: 14px; }
+}
+
+.membros-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.membro-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s;
+
+  &:hover { border-color: var(--primary-light); }
+}
+
+.membro-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.membro-info {
+  flex: 1;
+  min-width: 0;
+
+  .membro-nome {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .membro-funcao {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+.perfil-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &.badge-ministro { background: #F3E8FF; color: #7C3AED; }
+  &.badge-pastor   { background: #FEF3C7; color: #92400E; }
+  &.badge-musico   { background: #D1FAE5; color: #065F46; }
+  &.badge-cantor   { background: #FCE7F3; color: #9D174D; }
+  &.badge-adm      { background: #DBEAFE; color: #1E40AF; }
+}
+
+.btn-remove-membro {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-white);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+
+  .material-icons-outlined { font-size: 17px; }
+
+  &:hover:not(:disabled) {
+    border-color: #EF4444;
+    color: #EF4444;
+    background: #FEF2F2;
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// ─── Shared Buttons ──────────────────────────────────────────────────────────
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  .material-icons-outlined { font-size: 18px; }
+
+  &:hover { opacity: 0.92; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: var(--bg-white);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  .material-icons-outlined { font-size: 18px; }
+
+  &:hover { background: var(--bg-surface); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+// ─── Alerts ──────────────────────────────────────────────────────────────────
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  margin-bottom: 16px;
+
+  .material-icons-outlined { font-size: 20px; flex-shrink: 0; }
+
+  &-success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+  &-error   { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+}
+
+// ─── Spinner ─────────────────────────────────────────────────────────────────
+
+.spinning { animation: spin 1s linear infinite; }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .igrejas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detalhe-tabs {
+    padding: 0 12px;
+  }
+
+  .tab-btn {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  .dados-section {
+    padding: 20px 16px;
+  }
+
+  .membros-section {
+    padding: 16px;
+  }
+
+  .add-membro-row {
+    .select-perfil { flex: 1 1 140px; }
+  }
+
+  .btn-add-membro {
+    width: 100%;
+    height: 40px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+
+    button { width: 100%; justify-content: center; }
+  }
+
+  .summary-stat {
+    flex: 1 1 auto;
+  }
+}

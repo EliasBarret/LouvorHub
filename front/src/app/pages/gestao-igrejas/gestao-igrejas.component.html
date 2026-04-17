@@ -1,0 +1,325 @@
+<div class="gestao-igrejas-page">
+
+  <!-- ─── Page Header ─────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        @if (view === 'lista') { Gestão de Igrejas }
+        @else if (!selectedIgreja && editando) { Nova Igreja }
+        @else { {{ selectedIgreja?.nome }} }
+      </h1>
+      <p class="page-subtitle">
+        @if (view === 'lista') {
+          Cadastre, gerencie membros e visualize os repertórios por igreja.
+        } @else if (!selectedIgreja && editando) {
+          Preencha os dados para cadastrar uma nova igreja na plataforma.
+        } @else if (selectedIgreja?.cidade) {
+          {{ selectedIgreja?.cidade }}
+        } @else {
+          Detalhes da igreja
+        }
+      </p>
+    </div>
+
+    @if (view === 'lista') {
+      <button class="btn-primary" (click)="novaIgreja()">
+        <span class="material-icons-outlined">add</span>
+        Nova Igreja
+      </button>
+    }
+    @if (view === 'detalhe') {
+      <button class="btn-back-header" (click)="voltarLista()">
+        <span class="material-icons-outlined">arrow_back</span>
+        Todas as Igrejas
+      </button>
+    }
+  </div>
+
+  <!-- ─── Loading ─────────────────────────────────────────────────────── -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <span class="material-icons-outlined spinning">autorenew</span>
+      Carregando igrejas…
+    </div>
+  }
+
+  <!-- ─── LISTA VIEW ───────────────────────────────────────────────────── -->
+  @if (!isLoading && view === 'lista') {
+
+    @if (igrejas.length === 0) {
+      <div class="empty-full">
+        <div class="empty-icon-wrap">
+          <span class="material-icons-outlined">church</span>
+        </div>
+        <h3>Nenhuma igreja cadastrada</h3>
+        <p>Crie a primeira igreja para começar a organizar os repertórios e membros.</p>
+        <button class="btn-primary" (click)="novaIgreja()">
+          <span class="material-icons-outlined">add</span>
+          Cadastrar Primeira Igreja
+        </button>
+      </div>
+    }
+
+    @if (igrejas.length > 0) {
+      <div class="stats-row">
+        <div class="summary-stat">
+          <span class="material-icons-outlined">church</span>
+          <span class="stat-value">{{ igrejas.length }}</span>
+          <span class="stat-label">{{ igrejas.length === 1 ? 'Igreja' : 'Igrejas' }}</span>
+        </div>
+      </div>
+
+      <div class="igrejas-grid">
+        @for (igreja of igrejas; track igreja.id) {
+          <div class="igreja-card" (click)="abrirDetalhe(igreja)">
+            <div class="igreja-card-top">
+              <div class="igreja-icon-wrap">
+                <span class="material-icons-outlined">church</span>
+              </div>
+              <div class="igreja-card-info">
+                <h3 class="igreja-nome">{{ igreja.nome }}</h3>
+                @if (igreja.cidade) {
+                  <span class="igreja-cidade">
+                    <span class="material-icons-outlined">location_on</span>
+                    {{ igreja.cidade }}
+                  </span>
+                }
+                @if (igreja.observacoes) {
+                  <span class="igreja-obs">{{ igreja.observacoes }}</span>
+                }
+              </div>
+            </div>
+            <div class="igreja-card-footer">
+              <span class="membro-count">
+                <span class="material-icons-outlined">people</span>
+                {{ getMembrosCount(igreja.id) }} membro{{ getMembrosCount(igreja.id) !== 1 ? 's' : '' }}
+              </span>
+              <span class="material-icons-outlined chevron-icon">chevron_right</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- ─── DETAIL VIEW ──────────────────────────────────────────────────── -->
+  @if (!isLoading && view === 'detalhe') {
+
+    @if (formSucesso) {
+      <div class="alert alert-success">
+        <span class="material-icons-outlined">check_circle</span>
+        {{ formSucesso }}
+      </div>
+    }
+    @if (formErro) {
+      <div class="alert alert-error">
+        <span class="material-icons-outlined">error_outline</span>
+        {{ formErro }}
+      </div>
+    }
+
+    <div class="detalhe-container">
+
+      <!-- Tabs (only when an existing church is selected) -->
+      @if (selectedIgreja) {
+        <div class="detalhe-tabs">
+          <button
+            class="tab-btn"
+            [class.active]="activeTab === 'dados'"
+            (click)="activeTab = 'dados'"
+          >
+            <span class="material-icons-outlined">info</span>
+            Dados
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="activeTab === 'membros'"
+            (click)="activeTab = 'membros'"
+          >
+            <span class="material-icons-outlined">people</span>
+            Membros ({{ membros.length }})
+          </button>
+        </div>
+      }
+
+      <!-- ─── DADOS TAB ─────────────────────────────────────────────── -->
+      @if (!selectedIgreja || activeTab === 'dados') {
+        <div class="dados-section">
+
+          @if (!editando && selectedIgreja) {
+            <!-- Read-only view -->
+            <div class="dados-readonly">
+              <div class="dados-field">
+                <span class="dados-label">Nome</span>
+                <span class="dados-value">{{ selectedIgreja.nome }}</span>
+              </div>
+              @if (selectedIgreja.cidade) {
+                <div class="dados-field">
+                  <span class="dados-label">Cidade</span>
+                  <span class="dados-value">{{ selectedIgreja.cidade }}</span>
+                </div>
+              }
+              @if (selectedIgreja.observacoes) {
+                <div class="dados-field">
+                  <span class="dados-label">Observações</span>
+                  <span class="dados-value">{{ selectedIgreja.observacoes }}</span>
+                </div>
+              }
+              <button class="btn-secondary btn-edit-dados" (click)="iniciarEdicao()">
+                <span class="material-icons-outlined">edit</span>
+                Editar Dados
+              </button>
+            </div>
+          }
+
+          @if (editando) {
+            <!-- Create / Edit form -->
+            <div class="dados-form">
+              <div class="form-group">
+                <label class="form-label">
+                  Nome da Igreja <span class="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="formNome"
+                  placeholder="Ex: Igreja Reviver em Cristo"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cidade</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="formCidade"
+                  placeholder="Ex: Olinda, PE"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Observações</label>
+                <textarea
+                  class="form-control"
+                  [(ngModel)]="formObservacoes"
+                  placeholder="Informações adicionais sobre a igreja…"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="form-actions">
+                <button class="btn-secondary" (click)="cancelarEdicao()" [disabled]="saving">
+                  Cancelar
+                </button>
+                <button class="btn-primary" (click)="salvarIgreja()" [disabled]="saving">
+                  @if (saving) {
+                    <span class="material-icons-outlined spinning">autorenew</span>
+                  } @else {
+                    <span class="material-icons-outlined">save</span>
+                  }
+                  {{ selectedIgreja ? 'Salvar Alterações' : 'Criar Igreja' }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ─── MEMBROS TAB ───────────────────────────────────────────── -->
+      @if (selectedIgreja && activeTab === 'membros') {
+        <div class="membros-section">
+
+          <!-- Add member form -->
+          <div class="add-membro-card">
+            <h4 class="add-membro-title">
+              <span class="material-icons-outlined">person_add</span>
+              Adicionar Membro
+            </h4>
+
+            @if (membroErro) {
+              <div class="alert alert-error" style="margin-bottom:12px">
+                <span class="material-icons-outlined">error_outline</span>
+                {{ membroErro }}
+              </div>
+            }
+
+            <div class="add-membro-row">
+              <select class="form-control" [(ngModel)]="novoMembroUsuarioId">
+                <option [ngValue]="null">Selecione um usuário</option>
+                @for (u of usuariosDisponiveis; track u.id) {
+                  <option [value]="u.id">{{ u.nome }} — {{ u.funcao }}</option>
+                }
+              </select>
+              <select class="form-control select-perfil" [(ngModel)]="novoMembroPerfil">
+                <option value="Ministro">Ministro de Louvor</option>
+                <option value="Pastor">Pastor</option>
+                <option value="Musico">Músico</option>
+                <option value="Cantor">Cantor(a)</option>
+              </select>
+              <button
+                class="btn-primary btn-add-membro"
+                (click)="adicionarMembro()"
+                [disabled]="!novoMembroUsuarioId || addingMembro"
+              >
+                @if (addingMembro) {
+                  <span class="material-icons-outlined spinning">autorenew</span>
+                } @else {
+                  <span class="material-icons-outlined">person_add</span>
+                }
+              </button>
+            </div>
+
+            @if (usuariosDisponiveis.length === 0) {
+              <p class="no-users-hint">Todos os usuários cadastrados já são membros desta igreja.</p>
+            }
+          </div>
+
+          <!-- Members list -->
+          @if (loadingMembros) {
+            <div class="loading-inline">
+              <span class="material-icons-outlined spinning">autorenew</span>
+              Carregando membros…
+            </div>
+          }
+
+          @if (!loadingMembros && membros.length === 0) {
+            <div class="empty-membros">
+              <span class="material-icons-outlined">people_outline</span>
+              <p>Nenhum membro cadastrado nesta igreja ainda.</p>
+            </div>
+          }
+
+          @if (!loadingMembros && membros.length > 0) {
+            <div class="membros-list">
+              @for (m of membros; track m.id) {
+                <div class="membro-row">
+                  <div class="membro-avatar">{{ m.usuario?.iniciais ?? '?' }}</div>
+                  <div class="membro-info">
+                    <span class="membro-nome">{{ m.usuario?.nome ?? 'Usuário #' + m.usuarioId }}</span>
+                    <span class="membro-funcao">{{ m.usuario?.funcao ?? '' }}</span>
+                  </div>
+                  <span class="perfil-badge badge-{{ m.perfil.toLowerCase() }}">
+                    {{ perfilLabel(m.perfil) }}
+                  </span>
+                  <button
+                    class="btn-remove-membro"
+                    (click)="removerMembro(m.id)"
+                    [disabled]="removendoId === m.id"
+                    title="Remover membro"
+                  >
+                    @if (removendoId === m.id) {
+                      <span class="material-icons-outlined spinning">autorenew</span>
+                    } @else {
+                      <span class="material-icons-outlined">person_remove</span>
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  }
+
+</div>

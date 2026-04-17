@@ -26,6 +26,7 @@ export class SidebarComponent implements OnInit {
     { label: 'Início',       icon: 'home',               route: '/inicio' },
     { label: 'Repertórios',  icon: 'queue_music',        route: '/repertorios' },
     { label: 'Aprovações',   icon: 'approval',           route: '/aprovacoes',   perfisPermitidos: ['ADM', 'Pastor'] },
+    { label: 'Igrejas',      icon: 'church',             route: '/igrejas',      perfisPermitidos: ['ADM'] },
     { label: 'Notificações', icon: 'notifications_none', route: '/notificacoes' },
     { label: 'Meu Perfil',   icon: 'person_outline',     route: '/meu-perfil' },
   ];

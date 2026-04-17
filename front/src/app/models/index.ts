@@ -1,8 +1,19 @@
 export type Perfil = 'ADM' | 'Pastor' | 'Ministro' | 'Musico' | 'Cantor';
 
-export interface Filial {
+export interface Igreja {
   id: number;
   nome: string;
+  cidade?: string;
+  observacoes?: string;
+}
+
+export interface MembroIgreja {
+  id: number;
+  usuarioId: number;
+  igrejaId: number;
+  perfil: Perfil;
+  usuario?: Usuario;
+  igreja?: Igreja;
 }
 
 export interface Usuario {
@@ -15,7 +26,6 @@ export interface Usuario {
   ministerio: string;
   avatar: string | null;
   perfil?: Perfil;
-  filialId?: number;
   instrumentos?: string[];
   dataMembro?: string; // formato ISO: YYYY-MM-DD
 }
@@ -110,7 +120,7 @@ export interface Repertorio {
   localCulto?: string;
   aviso?: string;
   status: StatusRepertorio;
-  filialId?: number;
+  igrejaId?: number;
   aprovacao?: AprovacaoRepertorio;
   musicasIds: number[];
   musicas?: Musica[];
@@ -125,6 +135,7 @@ export interface RepertorioForm {
   localCulto?: string;
   aviso?: string;
   status: StatusRepertorio;
+  igrejaId?: number;
   musicasIds: number[];
 }
 

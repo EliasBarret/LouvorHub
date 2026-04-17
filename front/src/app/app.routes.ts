@@ -10,6 +10,7 @@ import { CadastroMusicaComponent } from './pages/cadastro-musica/cadastro-musica
 import { CadastroRepertorioComponent } from './pages/cadastro-repertorio/cadastro-repertorio.component';
 import { StatusConfirmacoesComponent } from './pages/status-confirmacoes/status-confirmacoes.component';
 import { AprovacoesComponent } from './pages/aprovacoes/aprovacoes.component';
+import { GestaoIgrejasComponent } from './pages/gestao-igrejas/gestao-igrejas.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -26,6 +27,7 @@ export const routes: Routes = [
       { path: 'musicas/nova', component: CadastroMusicaComponent },
       { path: 'notificacoes', component: NotificacoesComponent },
       { path: 'aprovacoes', component: AprovacoesComponent },
+      { path: 'igrejas', component: GestaoIgrejasComponent },
       { path: 'meu-perfil', component: MeuPerfilComponent },
     ]
   },

@@ -168,6 +168,7 @@ export class MockApiService {
       dataCulto: form.dataCulto,
       tipoCulto: form.tipoCulto,
       status: form.status,
+      igrejaId: form.igrejaId,
       musicasIds: form.musicasIds,
       criadoEm: new Date().toLocaleDateString('pt-BR'),
     };

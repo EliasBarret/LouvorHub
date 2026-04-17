@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MockApiService } from '../../services/mock-api.service';
+import { IgrejaService } from '../../services/igreja.service';
 import { Repertorio, Tag } from '../../models';
 
 @Component({
@@ -24,6 +25,7 @@ export class RepertoriosComponent implements OnInit {
 
   constructor(
     private api: MockApiService,
+    private igrejaService: IgrejaService,
     private router: Router,
   ) {}
 
@@ -39,13 +41,28 @@ export class RepertoriosComponent implements OnInit {
   private loadData(): void {
     this.participacoesMap = this.api.getParticipacoesPorRepertorio();
 
-    this.api.getTags().subscribe(res => {
-      this.tags = res.data;
-    });
+    this.api.getTags().subscribe(res => { this.tags = res.data; });
 
-    this.api.getRepertorios().subscribe(res => {
-      this.repertorios = res.data.conteudo;
-      this.isLoading = false;
+    this.api.getUsuarioLogado().subscribe(usuRes => {
+      const user = usuRes.data;
+      this.api.getRepertorios().subscribe(repsRes => {
+        const allReps = repsRes.data.conteudo;
+        if (user.perfil === 'ADM') {
+          this.repertorios = allReps;
+          this.isLoading = false;
+        } else if (user.perfil === 'Musico' || user.perfil === 'Cantor') {
+          // Músicos/Cantores vêem apenas repertórios onde foram escalados
+          this.repertorios = allReps.filter(r => this.participacoesMap.has(r.id));
+          this.isLoading = false;
+        } else {
+          // Pastor/Ministro vêem repertórios das suas igrejas
+          this.igrejaService.getIgrejasByUsuarioId(user.id).subscribe(membRes => {
+            const igrejaIds = new Set(membRes.data.map(m => m.igrejaId));
+            this.repertorios = allReps.filter(r => !r.igrejaId || igrejaIds.has(r.igrejaId));
+            this.isLoading = false;
+          });
+        }
+      });
     });
   }
 

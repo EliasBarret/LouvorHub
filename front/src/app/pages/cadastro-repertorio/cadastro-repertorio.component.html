@@ -35,6 +35,31 @@
         Dados do Culto
       </h2>
 
+      <!-- Igreja -->
+      <div class="form-row">
+        <div class="form-group col-2">
+          <label class="form-label" for="igrejaId">
+            Igreja <span class="required">*</span>
+          </label>
+          <select
+            id="igrejaId"
+            class="form-control"
+            [class.error]="f['igrejaId'].invalid && f['igrejaId'].touched"
+            formControlName="igrejaId"
+          >
+            <option [ngValue]="null">Selecione a igreja</option>
+            @for (igreja of minhasIgrejas; track igreja.id) {
+              <option [value]="igreja.id">
+                {{ igreja.nome }}{{ igreja.cidade ? ' — ' + igreja.cidade : '' }}
+              </option>
+            }
+          </select>
+          @if (f['igrejaId'].invalid && f['igrejaId'].touched) {
+            <span class="field-error">Selecione a igreja.</span>
+          }
+        </div>
+      </div>
+
       <div class="form-row">
         <!-- Tipo de culto -->
         <div class="form-group col-2">

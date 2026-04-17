@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { RepertorioService } from '../../services/repertorio.service';
 import { EscalacaoService } from '../../services/escalacao.service';
 import { UsuarioService } from '../../services/usuario.service';
+import { IgrejaService } from '../../services/igreja.service';
 import {
   Repertorio,
   VisaoGeralConfirmacoes,
@@ -45,6 +46,7 @@ export class AprovacoesComponent implements OnInit {
     private repertorioService: RepertorioService,
     private escalacaoService: EscalacaoService,
     private usuarioService: UsuarioService,
+    private igrejaService: IgrejaService,
     private api: MockApiService,
     private router: Router,
   ) {}
@@ -54,14 +56,20 @@ export class AprovacoesComponent implements OnInit {
 
     this.usuarioService.getUsuarioLogado().subscribe(res => {
       this.usuario = res.data;
-      const filialId = res.data.perfil === 'ADM' ? undefined : res.data.filialId;
-      this.carregarPendentes(filialId);
+      if (res.data.perfil === 'ADM') {
+        this.carregarPendentes();
+      } else {
+        this.igrejaService.getIgrejasByUsuarioId(res.data.id).subscribe(membRes => {
+          const igrejaIds = membRes.data.map(m => m.igrejaId);
+          this.carregarPendentes(igrejaIds);
+        });
+      }
     });
   }
 
-  private carregarPendentes(filialId?: number): void {
+  private carregarPendentes(igrejaIds?: number[]): void {
     this.isLoading = true;
-    this.repertorioService.getRepertoriosPendentesAprovacao(filialId).subscribe(res => {
+    this.repertorioService.getRepertoriosPendentesAprovacao(igrejaIds).subscribe(res => {
       this.itens = res.data.map(rep => ({
         repertorio: rep,
         visaoGeral: null,

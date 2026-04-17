@@ -4,7 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MockApiService } from '../../services/mock-api.service';
-import { Musica, Tag } from '../../models';
+import { IgrejaService } from '../../services/igreja.service';
+import { Musica, Tag, Igreja } from '../../models';
 
 @Component({
   selector: 'app-cadastro-repertorio',
@@ -17,6 +18,7 @@ export class CadastroRepertorioComponent implements OnInit {
   tiposCulto: string[] = [];
   todasMusicas: Musica[] = [];
   tags: Tag[] = [];
+  minhasIgrejas: Igreja[] = [];
 
   musicasBuscadas: Musica[] = [];
   musicasSelecionadas: Musica[] = [];
@@ -30,6 +32,7 @@ export class CadastroRepertorioComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private api: MockApiService,
+    private igrejaService: IgrejaService,
     private router: Router
   ) {}
 
@@ -44,6 +47,7 @@ export class CadastroRepertorioComponent implements OnInit {
       dataCulto: ['', Validators.required],
       tipoCulto: ['', Validators.required],
       status: ['rascunho', Validators.required],
+      igrejaId: [null, Validators.required],
     });
   }
 
@@ -60,6 +64,23 @@ export class CadastroRepertorioComponent implements OnInit {
       this.todasMusicas = res.data.conteudo;
       this.musicasBuscadas = [...this.todasMusicas];
       this.isLoadingMusicas = false;
+    });
+
+    // Carrega as igrejas do usuário logado
+    this.api.getUsuarioLogado().subscribe(userRes => {
+      if (userRes.data.perfil === 'ADM') {
+        this.igrejaService.getIgrejas().subscribe(res => {
+          this.minhasIgrejas = res.data;
+          if (res.data.length === 1) this.form.patchValue({ igrejaId: res.data[0].id });
+        });
+      } else {
+        this.igrejaService.getIgrejasByUsuarioId(userRes.data.id).subscribe(membRes => {
+          this.minhasIgrejas = membRes.data
+            .map(m => m.igreja)
+            .filter((ig): ig is Igreja => ig !== undefined);
+          if (this.minhasIgrejas.length === 1) this.form.patchValue({ igrejaId: this.minhasIgrejas[0].id });
+        });
+      }
     });
   }
 
