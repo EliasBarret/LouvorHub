@@ -10,10 +10,53 @@
     "avatar": null
   },
 
+  "usuarios": [
+    {
+      "id": 1,
+      "nome": "Elias Barreto",
+      "primeiroNome": "Elias",
+      "email": "eliaspensador@gmail.com",
+      "iniciais": "E",
+      "funcao": "Violonista",
+      "ministerio": "Ministério de Louvor Palavra Viva",
+      "avatar": null
+    },
+    {
+      "id": 2,
+      "nome": "Ana Souza",
+      "primeiroNome": "Ana",
+      "email": "ana.souza@louvorhub.com",
+      "iniciais": "A",
+      "funcao": "Vocalista",
+      "ministerio": "Ministério de Louvor Palavra Viva",
+      "avatar": null
+    },
+    {
+      "id": 3,
+      "nome": "Carlos Lima",
+      "primeiroNome": "Carlos",
+      "email": "carlos.lima@louvorhub.com",
+      "iniciais": "C",
+      "funcao": "Baterista",
+      "ministerio": "Ministério de Louvor Palavra Viva",
+      "avatar": null
+    },
+    {
+      "id": 4,
+      "nome": "Mariana Oliveira",
+      "primeiroNome": "Mariana",
+      "email": "mariana.oliveira@louvorhub.com",
+      "iniciais": "M",
+      "funcao": "Tecladista",
+      "ministerio": "Ministério de Louvor Palavra Viva",
+      "avatar": null
+    }
+  ],
+
   "stats": {
     "proximosCultos": 2,
-    "musicasEscaladas": 6,
-    "aguardandoConfirmacao": 0
+    "musicasEscaladas": 7,
+    "aguardandoConfirmacao": 7
   },
 
   "escalacoes": [
@@ -23,7 +66,7 @@
       "dia": 23,
       "titulo": "Culto de Quarta — Oração",
       "totalMusicas": 2,
-      "totalParticipacoes": 1,
+      "totalParticipacoes": 2,
       "horario": "19:30",
       "repertorioId": 1
     },
@@ -39,7 +82,143 @@
     }
   ],
 
-  "tags": [
+  "escalacoes_musicos": [
+    {
+      "id": 1,
+      "repertorioId": 2,
+      "usuarioId": 1,
+      "musicasEscaladas": [
+        { "musicaId": 3, "instrumento": "Violão" },
+        { "musicaId": 4, "instrumento": "Violão" },
+        { "musicaId": 5, "instrumento": "Violão" },
+        { "musicaId": 6, "instrumento": "Violão" },
+        { "musicaId": 7, "instrumento": "Violão" }
+      ]
+    },
+    {
+      "id": 2,
+      "repertorioId": 1,
+      "usuarioId": 1,
+      "musicasEscaladas": [
+        { "musicaId": 1, "instrumento": "Violão" },
+        { "musicaId": 2, "instrumento": "Violão" }
+      ]
+    },
+    {
+      "id": 3,
+      "repertorioId": 2,
+      "usuarioId": 2,
+      "musicasEscaladas": [
+        { "musicaId": 3, "instrumento": "Vocais" },
+        { "musicaId": 4, "instrumento": "Vocais" },
+        { "musicaId": 5, "instrumento": "Vocais" },
+        { "musicaId": 6, "instrumento": "Vocais" },
+        { "musicaId": 7, "instrumento": "Vocais" }
+      ]
+    },
+    {
+      "id": 4,
+      "repertorioId": 2,
+      "usuarioId": 3,
+      "musicasEscaladas": [
+        { "musicaId": 3, "instrumento": "Bateria" },
+        { "musicaId": 4, "instrumento": "Bateria" },
+        { "musicaId": 5, "instrumento": "Bateria" },
+        { "musicaId": 6, "instrumento": "Bateria" },
+        { "musicaId": 7, "instrumento": "Bateria" }
+      ]
+    },
+    {
+      "id": 5,
+      "repertorioId": 2,
+      "usuarioId": 4,
+      "musicasEscaladas": [
+        { "musicaId": 3, "instrumento": "Teclado" },
+        { "musicaId": 4, "instrumento": "Teclado" },
+        { "musicaId": 5, "instrumento": "Teclado" },
+        { "musicaId": 6, "instrumento": "Teclado" },
+        { "musicaId": 7, "instrumento": "Teclado" }
+      ]
+    }
+  ],
+
+  "confirmacoes": [
+    { "id": 1,  "escalacaoMusicoId": 1, "musicaId": 3, "status": "pendente" },
+    { "id": 2,  "escalacaoMusicoId": 1, "musicaId": 4, "status": "pendente" },
+    { "id": 3,  "escalacaoMusicoId": 1, "musicaId": 5, "status": "pendente" },
+    { "id": 4,  "escalacaoMusicoId": 1, "musicaId": 6, "status": "pendente" },
+    { "id": 5,  "escalacaoMusicoId": 1, "musicaId": 7, "status": "pendente" },
+    { "id": 6,  "escalacaoMusicoId": 2, "musicaId": 1, "status": "pendente" },
+    { "id": 7,  "escalacaoMusicoId": 2, "musicaId": 2, "status": "pendente" },
+    { "id": 8,  "escalacaoMusicoId": 3, "musicaId": 3, "status": "conhece"  },
+    { "id": 9,  "escalacaoMusicoId": 3, "musicaId": 4, "status": "conhece"  },
+    { "id": 10, "escalacaoMusicoId": 3, "musicaId": 5, "status": "nao_conhece" },
+    { "id": 11, "escalacaoMusicoId": 3, "musicaId": 6, "status": "conhece"  },
+    { "id": 12, "escalacaoMusicoId": 3, "musicaId": 7, "status": "conhece"  },
+    { "id": 13, "escalacaoMusicoId": 4, "musicaId": 3, "status": "conhece"  },
+    { "id": 14, "escalacaoMusicoId": 4, "musicaId": 4, "status": "pendente" },
+    { "id": 15, "escalacaoMusicoId": 4, "musicaId": 5, "status": "pendente" },
+    { "id": 16, "escalacaoMusicoId": 4, "musicaId": 6, "status": "conhece"  },
+    { "id": 17, "escalacaoMusicoId": 4, "musicaId": 7, "status": "nao_conhece" },
+    { "id": 18, "escalacaoMusicoId": 5, "musicaId": 3, "status": "conhece"  },
+    { "id": 19, "escalacaoMusicoId": 5, "musicaId": 4, "status": "conhece"  },
+    { "id": 20, "escalacaoMusicoId": 5, "musicaId": 5, "status": "conhece"  },
+    { "id": 21, "escalacaoMusicoId": 5, "musicaId": 6, "status": "pendente" },
+    { "id": 22, "escalacaoMusicoId": 5, "musicaId": 7, "status": "pendente" }
+  ],
+
+  "notificacoes": [
+    {
+      "id": 1,
+      "usuarioId": 1,
+      "titulo": "Você foi escalado(a) para um culto!",
+      "mensagem": "Você foi escalado(a) para o Culto de Domingo — Manhã em 20/04/2026. Confirme se conhece as músicas.",
+      "tipo": "escalacao",
+      "lida": false,
+      "criadoEm": "14/04/2026",
+      "referenciaId": 2,
+      "referenciaTipo": "repertorio"
+    },
+    {
+      "id": 2,
+      "usuarioId": 1,
+      "titulo": "Aviso: Culto de Domingo — Manhã",
+      "mensagem": "Culto especial com ênfase em adoração profunda. Confirme se conhece as músicas até sábado!",
+      "tipo": "aviso",
+      "lida": false,
+      "criadoEm": "15/04/2026",
+      "referenciaId": 2,
+      "referenciaTipo": "repertorio"
+    },
+    {
+      "id": 3,
+      "usuarioId": 1,
+      "titulo": "Você foi escalado(a) para um culto!",
+      "mensagem": "Você foi escalado(a) para o Culto de Quarta — Oração em 23/04/2026. Confirme se conhece as músicas.",
+      "tipo": "escalacao",
+      "lida": true,
+      "criadoEm": "18/04/2026",
+      "referenciaId": 1,
+      "referenciaTipo": "repertorio"
+    },
+    {
+      "id": 4,
+      "usuarioId": 1,
+      "titulo": "Ana Souza confirmou as músicas",
+      "mensagem": "Ana Souza confirmou 4 de 5 músicas do Culto de Domingo — Manhã. Ela não conhece 'Goodness of God'.",
+      "tipo": "confirmacao",
+      "lida": false,
+      "criadoEm": "16/04/2026",
+      "referenciaId": 2,
+      "referenciaTipo": "repertorio"
+    }
+  ],
+
+  "instrumentos": [
+    "Violão", "Guitarra", "Baixo", "Teclado", "Bateria",
+    "Vocais", "Flauta", "Saxofone", "Trompete", "Violino",
+    "Gaita", "Percussão", "Pandeiro", "Cajon"
+  ],
     { "id": 1, "nome": "Adoração", "cor": "#8B5FC0" },
     { "id": 2, "nome": "Celebração", "cor": "#C9A84C" },
     { "id": 3, "nome": "Lenta", "cor": "#6B7280" },
@@ -272,47 +451,62 @@
     {
       "id": 1,
       "nome": "Culto de Quarta — Oração",
-      "dataCulto": "23/04/2025",
+      "dataCulto": "23/04/2026",
+      "horario": "19:30",
       "tipoCulto": "Culto de Quarta — Oração",
-      "status": "confirmado",
+      "localCulto": "Sede Central",
+      "aviso": "",
+      "status": "publicado",
       "musicasIds": [1, 2],
-      "criadoEm": "18/04/2025"
+      "criadoEm": "18/04/2026"
     },
     {
       "id": 2,
       "nome": "Culto de Domingo — Manhã",
-      "dataCulto": "20/04/2025",
+      "dataCulto": "20/04/2026",
+      "horario": "10:00",
       "tipoCulto": "Culto de Domingo — Manhã",
-      "status": "confirmado",
+      "localCulto": "Olinda",
+      "aviso": "Culto especial com ênfase em adoração profunda. Confirme se conhece as músicas até sábado!",
+      "status": "publicado",
       "musicasIds": [3, 4, 5, 6, 7],
-      "criadoEm": "14/04/2025"
+      "criadoEm": "14/04/2026"
     },
     {
       "id": 3,
       "nome": "Culto de Domingo — Noite",
-      "dataCulto": "20/04/2025",
+      "dataCulto": "27/04/2026",
+      "horario": "19:00",
       "tipoCulto": "Culto de Domingo — Noite",
+      "localCulto": "Sede Central",
+      "aviso": "",
       "status": "pendente",
       "musicasIds": [8, 9, 10, 11],
-      "criadoEm": "14/04/2025"
+      "criadoEm": "14/04/2026"
     },
     {
       "id": 4,
       "nome": "Ensaio Semanal",
-      "dataCulto": "18/04/2025",
+      "dataCulto": "18/04/2026",
+      "horario": "15:00",
       "tipoCulto": "Ensaio Semanal",
+      "localCulto": "Sala de Ensaio",
+      "aviso": "",
       "status": "rascunho",
       "musicasIds": [],
-      "criadoEm": "15/04/2025"
+      "criadoEm": "15/04/2026"
     },
     {
       "id": 5,
       "nome": "Culto de Sexta — Jovens",
-      "dataCulto": "25/04/2025",
+      "dataCulto": "25/04/2026",
+      "horario": "20:00",
       "tipoCulto": "Culto de Sexta — Jovens",
+      "localCulto": "Sede Central",
+      "aviso": "",
       "status": "rascunho",
       "musicasIds": [5, 6, 11, 15],
-      "criadoEm": "17/04/2025"
+      "criadoEm": "17/04/2026"
     }
   ]
 }

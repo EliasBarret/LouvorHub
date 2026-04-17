@@ -16,6 +16,7 @@ export const routes: Routes = [
       { path: 'inicio', component: HomeComponent },
       { path: 'repertorios', component: RepertoriosComponent },
       { path: 'repertorios/novo', component: CadastroRepertorioComponent },
+      { path: 'repertorios/:id', component: RepertoriosComponent },
       { path: 'musicas/nova', component: CadastroMusicaComponent },
       { path: 'notificacoes', component: NotificacoesComponent },
       { path: 'meu-perfil', component: MeuPerfilComponent },

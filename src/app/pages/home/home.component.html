@@ -40,7 +40,7 @@
 
     <div class="escalacoes-list">
       @for (esc of escalacoes; track esc.id) {
-        <div class="escalacao-card">
+        <div class="escalacao-card" [routerLink]="['/repertorios', esc.repertorioId]" style="cursor:pointer">
           <div class="escalacao-date">
             <span class="escalacao-month">{{ esc.mes }}</span>
             <span class="escalacao-day">{{ esc.dia }}</span>
@@ -53,9 +53,9 @@
               · {{ esc.horario }}
             </span>
           </div>
-          <button class="escalacao-arrow">
+          <span class="escalacao-arrow">
             <span class="material-icons-outlined">arrow_forward</span>
-          </button>
+          </span>
         </div>
       }
     </div>

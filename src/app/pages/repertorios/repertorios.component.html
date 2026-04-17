@@ -12,49 +12,19 @@
     } @else {
       <div>
         <h1 class="page-title">Repertórios</h1>
-        <p class="page-subtitle">Gerencie seus repertórios e músicas do ministério.</p>
-      </div>
-      <div class="header-actions">
-        <button class="btn-outline" (click)="goToNovaMusica()">
-          <span class="material-icons-outlined">music_note</span>
-          Nova Música
-        </button>
-        <button class="btn-primary" (click)="goToNovoRepertorio()">
-          <span class="material-icons-outlined">add</span>
-          Novo Repertório
-        </button>
+        <p class="page-subtitle">Todos os cultos organizados por data. Clique para ver detalhes ou confirmar sua participação.</p>
       </div>
     }
   </div>
 
   @if (!selectedRepertorio) {
-    <!-- Tabs -->
-    <div class="tabs">
-      <button
-        class="tab"
-        [class.active]="activeTab === 'repertorios'"
-        (click)="setTab('repertorios')"
-      >
-        <span class="material-icons-outlined tab-icon">folder_open</span>
-        Repertórios
-      </button>
-      <button
-        class="tab"
-        [class.active]="activeTab === 'musicas'"
-        (click)="setTab('musicas')"
-      >
-        <span class="material-icons-outlined tab-icon">music_note</span>
-        Músicas
-      </button>
-    </div>
-
     <!-- Search -->
     <div class="search-bar">
       <span class="material-icons-outlined search-icon">search</span>
       <input
         type="text"
         class="search-input"
-        [placeholder]="activeTab === 'repertorios' ? 'Buscar repertório...' : 'Buscar música ou artista...'"
+        placeholder="Buscar repertório..."
         [(ngModel)]="searchQuery"
       />
       @if (searchQuery) {
@@ -62,6 +32,24 @@
           <span class="material-icons-outlined">close</span>
         </button>
       }
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="activeTab === 'proximos'"
+        (click)="setTab('proximos')"
+      >
+        Próximos ({{ proximosCount }})
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'passados'"
+        (click)="setTab('passados')"
+      >
+        Passados ({{ passadosCount }})
+      </button>
     </div>
 
     <!-- Loading -->
@@ -73,12 +61,14 @@
     }
 
     <!-- Repertórios List -->
-    @if (activeTab === 'repertorios' && !isLoading) {
+    @if (!isLoading) {
       <div class="repertorio-list">
         @for (rep of filteredRepertorios; track rep.id) {
           <div class="repertorio-card" (click)="openRepertorio(rep)">
-            <div class="repertorio-icon">
-              <span class="material-icons-outlined">queue_music</span>
+            <div class="date-block">
+              <span class="date-mes">{{ getDateParts(rep.dataCulto).mes }}</span>
+              <span class="date-dia">{{ getDateParts(rep.dataCulto).dia }}</span>
+              <span class="date-ano">{{ getDateParts(rep.dataCulto).ano }}</span>
             </div>
             <div class="repertorio-info">
               <div class="repertorio-top">
@@ -87,11 +77,17 @@
                   {{ getStatusLabel(rep.status) }}
                 </span>
               </div>
-              <span class="repertorio-meta">{{ rep.dataCulto }} · {{ rep.musicasIds.length }} músicas</span>
+              <div class="repertorio-meta-row">
+                <span class="material-icons-outlined meta-icon">location_on</span>
+                <span class="meta-item">{{ rep.localCulto }}</span>
+                <span class="meta-sep">·</span>
+                <span class="meta-item">{{ rep.musicasIds.length }} músicas</span>
+                <span class="meta-sep">·</span>
+                <span class="meta-item">{{ rep.horario }}</span>
+                <span class="meta-sep">·</span>
+                <span class="meta-item">{{ getParticipacoes(rep.id) }} participação(ões)</span>
+              </div>
             </div>
-            <button class="repertorio-arrow">
-              <span class="material-icons-outlined">chevron_right</span>
-            </button>
           </div>
         }
 
@@ -99,49 +95,6 @@
           <div class="empty-state">
             <span class="material-icons-outlined empty-icon">search_off</span>
             <p class="empty-text">Nenhum repertório encontrado.</p>
-          </div>
-        }
-      </div>
-    }
-
-    <!-- Músicas List -->
-    @if (activeTab === 'musicas' && !isLoading) {
-      <div class="musicas-list">
-        <div class="musicas-table">
-          <div class="table-header">
-            <span class="th-title">Música</span>
-            <span class="th-tom">Tom</span>
-            <span class="th-bpm">BPM</span>
-            <span class="th-tags">Tags</span>
-            <span class="th-used">Último uso</span>
-          </div>
-          @for (musica of filteredMusicas; track musica.id) {
-            <div class="table-row">
-              <div class="td-title">
-                <div class="music-icon">
-                  <span class="material-icons-outlined">music_note</span>
-                </div>
-                <div class="music-info">
-                  <span class="music-name">{{ musica.titulo }}</span>
-                  <span class="music-artist">{{ musica.artista }}</span>
-                </div>
-              </div>
-              <span class="td-tom">{{ musica.tom }}</span>
-              <span class="td-bpm">{{ musica.bpm }}</span>
-              <div class="td-tags">
-                @for (tag of musica.tags; track tag) {
-                  <span class="tag" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">{{ tag }}</span>
-                }
-              </div>
-              <span class="td-used">{{ musica.ultimoUso ?? '—' }}</span>
-            </div>
-          }
-        </div>
-
-        @if (filteredMusicas.length === 0) {
-          <div class="empty-state">
-            <span class="material-icons-outlined empty-icon">search_off</span>
-            <p class="empty-text">Nenhuma música encontrada.</p>
           </div>
         }
       </div>
@@ -156,6 +109,55 @@
           {{ getStatusLabel(selectedRepertorio.status) }}
         </span>
       </div>
+
+      <!-- Minha Escalação: card de confirmação -->
+      @if (detalheEscalacao && detalheEscalacao.musicasComConfirmacao.length > 0) {
+        <div class="escalacao-card">
+          <div class="escalacao-card-header">
+            <span class="material-icons-outlined escalacao-icon">check_circle</span>
+            <div>
+              <h3 class="escalacao-title">
+                Você foi escalado(a) em {{ detalheEscalacao.musicasComConfirmacao.length }} música(s)
+              </h3>
+              <p class="escalacao-subtitle">
+                Confirme se você conhece cada música. Isso ajuda a liderança a se preparar.
+              </p>
+            </div>
+          </div>
+          <div class="escalacao-musicas">
+            @for (mc of detalheEscalacao.musicasComConfirmacao; track mc.musica.id) {
+              <div class="escalacao-musica-item">
+                <div class="escalacao-musica-info">
+                  <span class="escalacao-musica-nome">{{ mc.musica.titulo }}</span>
+                  <span class="escalacao-musica-meta">
+                    {{ mc.instrumento }} · Tom: {{ mc.musica.tom }}
+                  </span>
+                </div>
+                <div class="escalacao-actions">
+                  <button
+                    class="btn-conhece"
+                    [class.active]="mc.confirmacao === 'conhece'"
+                    [disabled]="confirmandoMap.get(mc.musica.id)"
+                    (click)="confirmarMusica(mc.musica.id, 'conhece')"
+                  >
+                    <span class="material-icons-outlined">check_circle</span>
+                    Conheço
+                  </button>
+                  <button
+                    class="btn-nao-conhece"
+                    [class.active]="mc.confirmacao === 'nao_conhece'"
+                    [disabled]="confirmandoMap.get(mc.musica.id)"
+                    (click)="confirmarMusica(mc.musica.id, 'nao_conhece')"
+                  >
+                    <span class="material-icons-outlined">cancel</span>
+                    Não conheço
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <div class="detail-musicas">
         <div class="detail-section-header">
@@ -204,3 +206,4 @@
     </div>
   }
 </div>
+

@@ -202,6 +202,18 @@ export class MockApiService {
     return this.respond(mockData.tiposCulto);
   }
 
+  // ─── Escalações ───────────────────────────────────────────────────────────
+
+  /** Retorna mapa de repertorioId → número de músicos escalados */
+  getParticipacoesPorRepertorio(): Map<number, number> {
+    const escalacoes = mockData.escalacoes_musicos as unknown as Array<{ repertorioId: number }>;
+    const map = new Map<number, number>();
+    for (const e of escalacoes) {
+      map.set(e.repertorioId, (map.get(e.repertorioId) ?? 0) + 1);
+    }
+    return map;
+  }
+
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
   private enrichRepertorio(rep: Repertorio): Repertorio {
