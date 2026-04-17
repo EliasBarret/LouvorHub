@@ -1,3 +1,10 @@
+export type Perfil = 'ADM' | 'Pastor' | 'Ministro' | 'Musico' | 'Cantor';
+
+export interface Filial {
+  id: number;
+  nome: string;
+}
+
 export interface Usuario {
   id: number;
   nome: string;
@@ -7,6 +14,8 @@ export interface Usuario {
   funcao: string;
   ministerio: string;
   avatar: string | null;
+  perfil?: Perfil;
+  filialId?: number;
   instrumentos?: string[];
   dataMembro?: string; // formato ISO: YYYY-MM-DD
 }
@@ -73,6 +82,25 @@ export interface MusicaForm {
   observacoes: string;
 }
 
+export type StatusRepertorio =
+  | 'rascunho'
+  | 'pendente'
+  | 'publicado'
+  | 'confirmado'
+  | 'aguardando_aprovacao'
+  | 'aprovado'
+  | 'reprovado';
+
+export interface AprovacaoRepertorio {
+  id: number;
+  repertorioId: number;
+  pastorId: number;
+  pastor?: Usuario;
+  status: 'aprovado' | 'reprovado';
+  motivo?: string;
+  data: string;
+}
+
 export interface Repertorio {
   id: number;
   nome: string;
@@ -81,7 +109,9 @@ export interface Repertorio {
   tipoCulto: string;
   localCulto?: string;
   aviso?: string;
-  status: 'confirmado' | 'pendente' | 'rascunho' | 'publicado';
+  status: StatusRepertorio;
+  filialId?: number;
+  aprovacao?: AprovacaoRepertorio;
   musicasIds: number[];
   musicas?: Musica[];
   criadoEm: string;
@@ -94,7 +124,7 @@ export interface RepertorioForm {
   tipoCulto: string;
   localCulto?: string;
   aviso?: string;
-  status: 'confirmado' | 'pendente' | 'rascunho' | 'publicado';
+  status: StatusRepertorio;
   musicasIds: number[];
 }
 

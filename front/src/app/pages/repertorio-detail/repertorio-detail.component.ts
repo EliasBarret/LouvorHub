@@ -71,6 +71,11 @@ export class RepertorioDetailComponent implements OnInit {
     this.router.navigate(['/musicas/nova']);
   }
 
+  goToConfirmacoes(): void {
+    if (!this.repertorio) return;
+    this.router.navigate(['/repertorios', this.repertorio.id, 'confirmacoes']);
+  }
+
   getStatusClass(status: string): string {
     return `status-${status}`;
   }
@@ -81,6 +86,9 @@ export class RepertorioDetailComponent implements OnInit {
       pendente: 'Pendente',
       rascunho: 'Rascunho',
       publicado: 'Publicado',
+      aguardando_aprovacao: 'Aguardando Aprovação',
+      aprovado: 'Aprovado',
+      reprovado: 'Reprovado',
     };
     return labels[status] ?? status;
   }

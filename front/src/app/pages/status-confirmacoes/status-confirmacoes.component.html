@@ -1,0 +1,215 @@
+<div class="status-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      <span class="material-icons-outlined">arrow_back</span>
+    </button>
+    <div class="header-info">
+      @if (repertorio) {
+        <h1 class="page-title">Status de Confirmações</h1>
+        <p class="page-subtitle">{{ repertorio.nome }} · {{ repertorio.dataCulto }}</p>
+      } @else {
+        <h1 class="page-title">Carregando…</h1>
+      }
+    </div>
+    @if (repertorio && podeEnviarAprovacao) {
+      <button class="btn-primary btn-enviar" (click)="enviarParaAprovacao()" [disabled]="enviando">
+        @if (enviando) {
+          <span class="material-icons-outlined spinning">autorenew</span>
+        } @else {
+          <span class="material-icons-outlined">send</span>
+        }
+        Enviar para Aprovação
+      </button>
+    }
+  </div>
+
+  <!-- Mensagens de feedback -->
+  @if (mensagemSucesso) {
+    <div class="alert alert-success">
+      <span class="material-icons-outlined">check_circle</span>
+      {{ mensagemSucesso }}
+    </div>
+  }
+  @if (mensagemErro) {
+    <div class="alert alert-error">
+      <span class="material-icons-outlined">error_outline</span>
+      {{ mensagemErro }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <span class="material-icons-outlined spinning">autorenew</span>
+      Carregando confirmações…
+    </div>
+  }
+
+  @if (!isLoading && repertorio) {
+    <!-- Status bar -->
+    <div class="detail-status-bar">
+      <span class="repertorio-status" [class]="getStatusClass(repertorio.status)">
+        {{ getStatusLabel(repertorio.status) }}
+      </span>
+      @if (repertorio.localCulto) {
+        <span class="detail-meta">
+          <span class="material-icons-outlined">location_on</span>
+          {{ repertorio.localCulto }}
+        </span>
+      }
+      @if (repertorio.horario) {
+        <span class="detail-meta">
+          <span class="material-icons-outlined">schedule</span>
+          {{ repertorio.horario }}
+        </span>
+      }
+    </div>
+
+    <!-- Reprovação info -->
+    @if (repertorio.status === 'reprovado' && repertorio.aprovacao?.motivo) {
+      <div class="reprovacao-banner">
+        <span class="material-icons-outlined">cancel</span>
+        <div>
+          <strong>Repertório reprovado.</strong>
+          <p>Motivo: {{ repertorio.aprovacao!.motivo }}</p>
+          <p class="reprovacao-hint">Ajuste o repertório e envie novamente para aprovação.</p>
+        </div>
+      </div>
+    }
+
+    <!-- Summary Cards -->
+    @if (visaoGeral) {
+      <div class="summary-grid">
+        <div class="summary-card summary-musicians">
+          <span class="material-icons-outlined summary-icon">group</span>
+          <div>
+            <span class="summary-value">{{ totalMusicos }}</span>
+            <span class="summary-label">Músicos Escalados</span>
+          </div>
+        </div>
+        <div class="summary-card summary-ok">
+          <span class="material-icons-outlined summary-icon">check_circle</span>
+          <div>
+            <span class="summary-value">{{ totalConhecem }}</span>
+            <span class="summary-label">Músicas sem pendência</span>
+          </div>
+        </div>
+        <div class="summary-card summary-warn">
+          <span class="material-icons-outlined summary-icon">warning</span>
+          <div>
+            <span class="summary-value">{{ totalAtencao }}</span>
+            <span class="summary-label">Músicas com atenção</span>
+          </div>
+        </div>
+        <div class="summary-card summary-pending">
+          <span class="material-icons-outlined summary-icon">hourglass_empty</span>
+          <div>
+            <span class="summary-value">{{ visaoGeral.totalPendentes }}</span>
+            <span class="summary-label">Confirmações pendentes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Por Música -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="material-icons-outlined">library_music</span>
+          Confirmações por Música
+        </h2>
+
+        @if (porMusica.length === 0) {
+          <div class="empty-state">
+            <span class="material-icons-outlined empty-icon">people_outline</span>
+            <p>Nenhum músico foi escalado ainda neste repertório.</p>
+          </div>
+        }
+
+        @for (item of porMusica; track item.musicaId; let i = $index) {
+          <div class="musica-card" [class]="'risco-' + item.risco">
+            <div class="musica-card-header">
+              <div class="musica-order-badge">{{ i + 1 }}</div>
+              <div class="musica-card-info">
+                <span class="musica-card-titulo">{{ item.musicaTitulo }}</span>
+                <span class="musica-card-tom">Tom: {{ item.musicaTom }}</span>
+              </div>
+              <div class="musica-risco-badge" [class]="'risco-badge-' + item.risco">
+                @if (item.risco === 'ok') {
+                  <span class="material-icons-outlined">check_circle</span>
+                  Todos confirmaram
+                } @else if (item.risco === 'atencao') {
+                  <span class="material-icons-outlined">hourglass_empty</span>
+                  Pendências
+                } @else {
+                  <span class="material-icons-outlined">warning</span>
+                  Não conhece
+                }
+              </div>
+            </div>
+
+            <div class="musica-confirmacoes">
+              @for (conf of item.confirmacoes; track conf.usuario.id) {
+                <div class="confirmacao-row" [class]="'conf-' + conf.status">
+                  <div class="conf-avatar">{{ conf.usuario.iniciais }}</div>
+                  <div class="conf-info">
+                    <span class="conf-nome">{{ conf.usuario.primeiroNome }}</span>
+                    <span class="conf-instrumento">{{ conf.instrumento }}</span>
+                  </div>
+                  <div class="conf-status">
+                    @if (conf.status === 'conhece') {
+                      <span class="material-icons-outlined status-icon ok">check_circle</span>
+                      <span class="status-text ok">Conhece</span>
+                    } @else if (conf.status === 'nao_conhece') {
+                      <span class="material-icons-outlined status-icon err">cancel</span>
+                      <span class="status-text err">Não conhece</span>
+                    } @else {
+                      <span class="material-icons-outlined status-icon pend">hourglass_empty</span>
+                      <span class="status-text pend">Pendente</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Por Músico -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="material-icons-outlined">group</span>
+          Resumo por Músico
+        </h2>
+        <div class="musico-grid">
+          @for (pm of visaoGeral.porMusico; track pm.usuario.id) {
+            <div class="musico-card">
+              <div class="musico-card-header">
+                <div class="musico-avatar">{{ pm.usuario.iniciais }}</div>
+                <div>
+                  <span class="musico-nome">{{ pm.usuario.nome }}</span>
+                  <span class="musico-funcao">{{ pm.usuario.funcao }}</span>
+                </div>
+              </div>
+              <div class="musico-musicas">
+                @for (mc of pm.musicasComConfirmacao; track mc.musica.id) {
+                  <div class="musico-musica-row">
+                    <span class="musico-musica-titulo">{{ mc.musica.titulo }}</span>
+                    <span class="conf-dot" [class]="'dot-' + mc.confirmacao">
+                      @if (mc.confirmacao === 'conhece') {
+                        <span class="material-icons-outlined">check_circle</span>
+                      } @else if (mc.confirmacao === 'nao_conhece') {
+                        <span class="material-icons-outlined">cancel</span>
+                      } @else {
+                        <span class="material-icons-outlined">hourglass_empty</span>
+                      }
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

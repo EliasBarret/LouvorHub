@@ -41,6 +41,10 @@
           {{ repertorio.horario }}
         </span>
       }
+      <button class="btn-confirmacoes" (click)="goToConfirmacoes()" title="Ver status de confirmações dos músicos">
+        <span class="material-icons-outlined">fact_check</span>
+        Ver Confirmações
+      </button>
     </div>
 
     @if (repertorio.aviso) {

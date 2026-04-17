@@ -1,58 +1,31 @@
 {
+  "filiais": [
+    { "id": 1, "nome": "REC OLINDA" },
+    { "id": 2, "nome": "REC MACEIO" },
+    { "id": 3, "nome": "REC ARAPIRACA" }
+  ],
+
   "usuario": {
     "id": 1,
     "nome": "Elias Barreto",
     "primeiroNome": "Elias",
     "email": "eliaspensador@gmail.com",
     "iniciais": "E",
-    "funcao": "Músico",
+    "funcao": "Violonista",
     "ministerio": "Ministério de Louvor Palavra Viva",
     "avatar": null,
+    "perfil": "Musico",
+    "filialId": 1,
     "instrumentos": ["Violão", "Guitarra"],
     "dataMembro": "2024-01-15"
   },
 
   "usuarios": [
-    {
-      "id": 1,
-      "nome": "Elias Barreto",
-      "primeiroNome": "Elias",
-      "email": "eliaspensador@gmail.com",
-      "iniciais": "E",
-      "funcao": "Violonista",
-      "ministerio": "Ministério de Louvor Palavra Viva",
-      "avatar": null
-    },
-    {
-      "id": 2,
-      "nome": "Ana Souza",
-      "primeiroNome": "Ana",
-      "email": "ana.souza@louvorhub.com",
-      "iniciais": "A",
-      "funcao": "Vocalista",
-      "ministerio": "Ministério de Louvor Palavra Viva",
-      "avatar": null
-    },
-    {
-      "id": 3,
-      "nome": "Carlos Lima",
-      "primeiroNome": "Carlos",
-      "email": "carlos.lima@louvorhub.com",
-      "iniciais": "C",
-      "funcao": "Baterista",
-      "ministerio": "Ministério de Louvor Palavra Viva",
-      "avatar": null
-    },
-    {
-      "id": 4,
-      "nome": "Mariana Oliveira",
-      "primeiroNome": "Mariana",
-      "email": "mariana.oliveira@louvorhub.com",
-      "iniciais": "M",
-      "funcao": "Tecladista",
-      "ministerio": "Ministério de Louvor Palavra Viva",
-      "avatar": null
-    }
+    { "id": 1, "nome": "Elias Barreto", "primeiroNome": "Elias", "email": "eliaspensador@gmail.com", "iniciais": "E", "funcao": "Violonista", "ministerio": "Ministério de Louvor Palavra Viva", "avatar": null, "perfil": "Ministro", "filialId": 1 },
+    { "id": 2, "nome": "Ana Souza", "primeiroNome": "Ana", "email": "ana.souza@louvorhub.com", "iniciais": "A", "funcao": "Vocalista", "ministerio": "Ministério de Louvor Palavra Viva", "avatar": null, "perfil": "Cantor", "filialId": 1 },
+    { "id": 3, "nome": "Carlos Lima", "primeiroNome": "Carlos", "email": "carlos.lima@louvorhub.com", "iniciais": "C", "funcao": "Baterista", "ministerio": "Ministério de Louvor Palavra Viva", "avatar": null, "perfil": "Musico", "filialId": 1 },
+    { "id": 4, "nome": "Mariana Oliveira", "primeiroNome": "Mariana", "email": "mariana.oliveira@louvorhub.com", "iniciais": "M", "funcao": "Tecladista", "ministerio": "Ministério de Louvor Palavra Viva", "avatar": null, "perfil": "Musico", "filialId": 1 },
+    { "id": 5, "nome": "João Silva", "primeiroNome": "João", "email": "pastor.joao@louvorhub.com", "iniciais": "JS", "funcao": "Pastor", "ministerio": "Ministério de Louvor Palavra Viva", "avatar": null, "perfil": "Pastor", "filialId": 1 }
   ],
 
   "stats": {
@@ -461,6 +434,7 @@
       "localCulto": "Sede Central",
       "aviso": "",
       "status": "publicado",
+      "filialId": 1,
       "musicasIds": [1, 2],
       "criadoEm": "18/04/2026"
     },
@@ -472,7 +446,8 @@
       "tipoCulto": "Culto de Domingo — Manhã",
       "localCulto": "Olinda",
       "aviso": "Culto especial com ênfase em adoração profunda. Confirme se conhece as músicas até sábado!",
-      "status": "publicado",
+      "status": "aguardando_aprovacao",
+      "filialId": 1,
       "musicasIds": [3, 4, 5, 6, 7],
       "criadoEm": "14/04/2026"
     },
@@ -485,6 +460,7 @@
       "localCulto": "Sede Central",
       "aviso": "",
       "status": "pendente",
+      "filialId": 1,
       "musicasIds": [8, 9, 10, 11],
       "criadoEm": "14/04/2026"
     },
@@ -497,6 +473,7 @@
       "localCulto": "Sala de Ensaio",
       "aviso": "",
       "status": "rascunho",
+      "filialId": 1,
       "musicasIds": [],
       "criadoEm": "15/04/2026"
     },
@@ -509,8 +486,11 @@
       "localCulto": "Sede Central",
       "aviso": "",
       "status": "rascunho",
+      "filialId": 1,
       "musicasIds": [5, 6, 11, 15],
       "criadoEm": "17/04/2026"
     }
-  ]
+  ],
+
+  "aprovacoes": []
 }

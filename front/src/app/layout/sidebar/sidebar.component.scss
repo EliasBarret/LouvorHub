@@ -195,6 +195,15 @@
   text-overflow: ellipsis;
 }
 
+.user-role {
+  font-size: 11px;
+  color: var(--primary-light);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .user-actions {
   display: flex;
   align-items: center;

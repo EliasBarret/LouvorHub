@@ -1,0 +1,269 @@
+<div class="aprovacoes-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Aprovações de Repertórios</h1>
+      <p class="page-subtitle">
+        @if (isAdm) {
+          Visão global — todos os repertórios aguardando aprovação.
+        } @else {
+          Repertórios da sua filial aguardando aprovação pastoral.
+        }
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <span class="material-icons-outlined spinning">autorenew</span>
+      Carregando repertórios pendentes…
+    </div>
+  }
+
+  <!-- Feedbacks de ações concluídas -->
+  @for (entry of feedbacks | keyvalue; track entry.key) {
+    <div class="alert" [class]="entry.value.tipo === 'ok' ? 'alert-success' : 'alert-error'">
+      <span class="material-icons-outlined">
+        {{ entry.value.tipo === 'ok' ? 'check_circle' : 'error_outline' }}
+      </span>
+      {{ entry.value.mensagem }}
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && itens.length === 0) {
+    <div class="empty-full">
+      <div class="empty-icon-wrap">
+        <span class="material-icons-outlined">approval</span>
+      </div>
+      <h3>Nenhum repertório aguardando aprovação</h3>
+      <p>Quando o Ministro de Louvor enviar um repertório, ele aparecerá aqui para você aprovar ou reprovar.</p>
+    </div>
+  }
+
+  <!-- Lista de Repertórios Pendentes -->
+  @if (!isLoading && itens.length > 0) {
+    <div class="pendentes-list">
+      @for (item of itens; track item.repertorio.id) {
+        <div class="pendente-card" [class.expanded]="isExpandido(item.repertorio.id)">
+
+          <!-- Card Header -->
+          <div class="pendente-header" (click)="toggleExpandir(item)">
+            <div class="pendente-date-badge">
+              <span class="date-day">{{ item.repertorio.dataCulto.split('/')[0] }}</span>
+              <span class="date-month">
+                @switch (item.repertorio.dataCulto.split('/')[1]) {
+                  @case ('01') { JAN }
+                  @case ('02') { FEV }
+                  @case ('03') { MAR }
+                  @case ('04') { ABR }
+                  @case ('05') { MAI }
+                  @case ('06') { JUN }
+                  @case ('07') { JUL }
+                  @case ('08') { AGO }
+                  @case ('09') { SET }
+                  @case ('10') { OUT }
+                  @case ('11') { NOV }
+                  @case ('12') { DEZ }
+                  @default { {{ item.repertorio.dataCulto.split('/')[1] }} }
+                }
+              </span>
+            </div>
+
+            <div class="pendente-info">
+              <h3 class="pendente-nome">{{ item.repertorio.nome }}</h3>
+              <div class="pendente-meta">
+                @if (item.repertorio.localCulto) {
+                  <span>
+                    <span class="material-icons-outlined">location_on</span>
+                    {{ item.repertorio.localCulto }}
+                  </span>
+                }
+                @if (item.repertorio.horario) {
+                  <span>
+                    <span class="material-icons-outlined">schedule</span>
+                    {{ item.repertorio.horario }}
+                  </span>
+                }
+                <span>
+                  <span class="material-icons-outlined">library_music</span>
+                  {{ item.repertorio.musicasIds.length }} músicas
+                </span>
+              </div>
+            </div>
+
+            <div class="pendente-header-right">
+              <span class="status-badge status-aguardando">
+                <span class="material-icons-outlined">hourglass_empty</span>
+                Aguardando Aprovação
+              </span>
+              <span class="expand-icon material-icons-outlined">
+                {{ isExpandido(item.repertorio.id) ? 'expand_less' : 'expand_more' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Expanded Content -->
+          @if (isExpandido(item.repertorio.id)) {
+            <div class="pendente-body">
+
+              <!-- Loading confirmações -->
+              @if (item.carregando) {
+                <div class="loading-inline">
+                  <span class="material-icons-outlined spinning">autorenew</span>
+                  Carregando confirmações…
+                </div>
+              }
+
+              <!-- Lista de Músicas -->
+              @if (item.repertorio.musicas && item.repertorio.musicas.length > 0) {
+                <div class="musicas-section">
+                  <h4 class="subsection-title">
+                    <span class="material-icons-outlined">queue_music</span>
+                    Músicas do Repertório
+                  </h4>
+                  <div class="musicas-table">
+                    @for (musica of item.repertorio.musicas; track musica.id; let idx = $index) {
+                      <div class="musica-row">
+                        <span class="musica-idx">{{ idx + 1 }}</span>
+                        <div class="musica-main">
+                          <span class="musica-titulo">{{ musica.titulo }}</span>
+                          <span class="musica-artista">{{ musica.artista }}</span>
+                        </div>
+                        <span class="musica-tom">Tom: {{ musica.tom }}</span>
+                        <span class="musica-bpm">{{ musica.bpm }} BPM</span>
+                        <div class="musica-tags">
+                          @for (tag of musica.tags; track tag) {
+                            <span class="tag-chip" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">{{ tag }}</span>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Confirmações -->
+              @if (item.visaoGeral) {
+                <div class="confirmacoes-section">
+                  <h4 class="subsection-title">
+                    <span class="material-icons-outlined">fact_check</span>
+                    Status de Confirmação dos Músicos
+                  </h4>
+
+                  <!-- Stats -->
+                  <div class="conf-stats">
+                    <div class="conf-stat ok">
+                      <span class="material-icons-outlined">check_circle</span>
+                      <span>{{ item.visaoGeral.totalConhecem }} conhecem</span>
+                    </div>
+                    <div class="conf-stat err">
+                      <span class="material-icons-outlined">cancel</span>
+                      <span>{{ item.visaoGeral.totalNaoConhecem }} não conhecem</span>
+                    </div>
+                    <div class="conf-stat pend">
+                      <span class="material-icons-outlined">hourglass_empty</span>
+                      <span>{{ item.visaoGeral.totalPendentes }} pendentes</span>
+                    </div>
+                  </div>
+
+                  <!-- Por músico -->
+                  @for (pm of item.visaoGeral.porMusico; track pm.usuario.id) {
+                    <div class="musico-row">
+                      <div class="musico-avatar">{{ pm.usuario.iniciais }}</div>
+                      <div class="musico-info">
+                        <span class="musico-nome">{{ pm.usuario.nome }}</span>
+                        <span class="musico-funcao">{{ pm.usuario.funcao }}</span>
+                      </div>
+                      <div class="musico-confirmacoes-chips">
+                        @for (mc of pm.musicasComConfirmacao; track mc.musica.id) {
+                          <span class="conf-chip" [class]="'chip-' + mc.confirmacao" [title]="mc.musica.titulo">
+                            @if (mc.confirmacao === 'conhece') {
+                              <span class="material-icons-outlined">check_circle</span>
+                            } @else if (mc.confirmacao === 'nao_conhece') {
+                              <span class="material-icons-outlined">cancel</span>
+                            } @else {
+                              <span class="material-icons-outlined">hourglass_empty</span>
+                            }
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Formulário de Reprovação -->
+              @if (rejeitandoId === item.repertorio.id) {
+                <div class="rejeicao-form">
+                  <div class="rejeicao-form-header">
+                    <span class="material-icons-outlined">report_problem</span>
+                    <h4>Motivo da Reprovação</h4>
+                  </div>
+                  <p class="rejeicao-hint">O Ministro de Louvor receberá este motivo para ajustar o repertório.</p>
+                  <textarea
+                    class="rejeicao-textarea"
+                    [class.error]="motivoErro"
+                    [(ngModel)]="motivoRejeicao"
+                    placeholder="Ex: Alguns músicos não conhecem a música principal. Revisar escala antes de enviar novamente."
+                    rows="3"
+                    (input)="motivoErro = false"
+                  ></textarea>
+                  @if (motivoErro) {
+                    <span class="rejeicao-error">O motivo é obrigatório para reprovar um repertório.</span>
+                  }
+                  <div class="rejeicao-actions">
+                    <button class="btn-confirmar-rejeicao" (click)="confirmarRejeicao(item)" [disabled]="processandoId === item.repertorio.id">
+                      @if (processandoId === item.repertorio.id) {
+                        <span class="material-icons-outlined spinning">autorenew</span>
+                      } @else {
+                        <span class="material-icons-outlined">cancel</span>
+                      }
+                      Confirmar Reprovação
+                    </button>
+                    <button class="btn-cancelar" (click)="fecharRejeicao()">Cancelar</button>
+                  </div>
+                </div>
+              }
+
+              <!-- Ações Pastor -->
+              @if (rejeitandoId !== item.repertorio.id) {
+                <div class="pendente-actions">
+                  <button class="btn-ver" (click)="verRepertorio(item.repertorio.id)">
+                    <span class="material-icons-outlined">open_in_new</span>
+                    Ver Repertório
+                  </button>
+                  <div class="actions-right">
+                    <button
+                      class="btn-reprovar"
+                      (click)="iniciarRejeicao(item.repertorio.id)"
+                      [disabled]="processandoId !== null"
+                    >
+                      <span class="material-icons-outlined">cancel</span>
+                      Reprovar
+                    </button>
+                    <button
+                      class="btn-aprovar"
+                      (click)="aprovar(item)"
+                      [disabled]="processandoId !== null"
+                    >
+                      @if (processandoId === item.repertorio.id) {
+                        <span class="material-icons-outlined spinning">autorenew</span>
+                      } @else {
+                        <span class="material-icons-outlined">check_circle</span>
+                      }
+                      Aprovar
+                    </button>
+                  </div>
+                </div>
+              }
+
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -112,6 +112,9 @@ export class RepertoriosComponent implements OnInit {
       pendente: 'Pendente',
       rascunho: 'Rascunho',
       publicado: 'Publicado',
+      aguardando_aprovacao: 'Aguardando Aprovação',
+      aprovado: 'Aprovado',
+      reprovado: 'Reprovado',
     };
     return labels[status] ?? status;
   }

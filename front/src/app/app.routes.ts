@@ -8,6 +8,8 @@ import { NotificacoesComponent } from './pages/notificacoes/notificacoes.compone
 import { MeuPerfilComponent } from './pages/meu-perfil/meu-perfil.component';
 import { CadastroMusicaComponent } from './pages/cadastro-musica/cadastro-musica.component';
 import { CadastroRepertorioComponent } from './pages/cadastro-repertorio/cadastro-repertorio.component';
+import { StatusConfirmacoesComponent } from './pages/status-confirmacoes/status-confirmacoes.component';
+import { AprovacoesComponent } from './pages/aprovacoes/aprovacoes.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -20,8 +22,10 @@ export const routes: Routes = [
       { path: 'repertorios', component: RepertoriosComponent },
       { path: 'repertorios/novo', component: CadastroRepertorioComponent },
       { path: 'repertorios/:id', component: RepertorioDetailComponent },
+      { path: 'repertorios/:id/confirmacoes', component: StatusConfirmacoesComponent },
       { path: 'musicas/nova', component: CadastroMusicaComponent },
       { path: 'notificacoes', component: NotificacoesComponent },
+      { path: 'aprovacoes', component: AprovacoesComponent },
       { path: 'meu-perfil', component: MeuPerfilComponent },
     ]
   },

@@ -7,6 +7,7 @@ import {
   Musica,
   Repertorio,
   RepertorioForm,
+  AprovacaoRepertorio,
   ApiResponse,
   PageResponse,
 } from '../models';
@@ -31,7 +32,9 @@ export class RepertorioService {
 
   private repertorios: Repertorio[] = mockData.repertorios as unknown as Repertorio[];
   private musicas: Musica[] = mockData.musicas as Musica[];
+  private aprovacoes: AprovacaoRepertorio[] = [];
   private nextId = this.repertorios.length + 1;
+  private nextAprovacaoId = 1;
 
   // ─── Utilitário ──────────────────────────────────────────────────────────
 
@@ -148,5 +151,63 @@ export class RepertorioService {
 
   getRepertoriosSnapshot(): Repertorio[] {
     return [...this.repertorios];
+  }
+
+  // ─── Fluxo de Aprovação ───────────────────────────────────────────────────
+
+  /** Ministro envia o repertório para aprovação pastoral. */
+  enviarParaAprovacao(id: number): Observable<ApiResponse<Repertorio>> {
+    const index = this.repertorios.findIndex(r => r.id === id);
+    if (index === -1) return this.notFound('Repertório não encontrado.');
+    const updated: Repertorio = { ...this.repertorios[index], status: 'aguardando_aprovacao' };
+    this.repertorios = [...this.repertorios.slice(0, index), updated, ...this.repertorios.slice(index + 1)];
+    return this.respond(this.enrichRepertorio(updated), 'Repertório enviado para aprovação do pastor.');
+  }
+
+  /**
+   * Retorna os repertórios aguardando aprovação.
+   * Se filialId for fornecido, filtra pela filial do pastor.
+   */
+  getRepertoriosPendentesAprovacao(filialId?: number): Observable<ApiResponse<Repertorio[]>> {
+    const pendentes = this.repertorios
+      .filter(r => r.status === 'aguardando_aprovacao')
+      .filter(r => !filialId || r.filialId === filialId)
+      .map(r => this.enrichRepertorio(r));
+    return this.respond(pendentes);
+  }
+
+  /** Pastor aprova um repertório. */
+  aprovarRepertorio(repertorioId: number, pastorId: number): Observable<ApiResponse<Repertorio>> {
+    const index = this.repertorios.findIndex(r => r.id === repertorioId);
+    if (index === -1) return this.notFound('Repertório não encontrado.');
+    const aprovacao: AprovacaoRepertorio = {
+      id: this.nextAprovacaoId++,
+      repertorioId,
+      pastorId,
+      status: 'aprovado',
+      data: new Date().toLocaleDateString('pt-BR'),
+    };
+    this.aprovacoes = [...this.aprovacoes, aprovacao];
+    const updated: Repertorio = { ...this.repertorios[index], status: 'aprovado', aprovacao };
+    this.repertorios = [...this.repertorios.slice(0, index), updated, ...this.repertorios.slice(index + 1)];
+    return this.respond(this.enrichRepertorio(updated), 'Repertório aprovado com sucesso.');
+  }
+
+  /** Pastor reprova um repertório com motivo obrigatório. */
+  reprovarRepertorio(repertorioId: number, pastorId: number, motivo: string): Observable<ApiResponse<Repertorio>> {
+    const index = this.repertorios.findIndex(r => r.id === repertorioId);
+    if (index === -1) return this.notFound('Repertório não encontrado.');
+    const aprovacao: AprovacaoRepertorio = {
+      id: this.nextAprovacaoId++,
+      repertorioId,
+      pastorId,
+      status: 'reprovado',
+      motivo,
+      data: new Date().toLocaleDateString('pt-BR'),
+    };
+    this.aprovacoes = [...this.aprovacoes, aprovacao];
+    const updated: Repertorio = { ...this.repertorios[index], status: 'reprovado', aprovacao };
+    this.repertorios = [...this.repertorios.slice(0, index), updated, ...this.repertorios.slice(index + 1)];
+    return this.respond(this.enrichRepertorio(updated), 'Repertório reprovado.');
   }
 }
