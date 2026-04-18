@@ -137,10 +137,7 @@ export class StatusConfirmacoesComponent implements OnInit {
         this.repertorio.status !== 'aprovado'
       );
     }
-    return (
-      this.repertorio.status === 'publicado' ||
-      this.repertorio.status === 'reprovado'
-    );
+    return this.repertorio.status === 'reprovado';
   }
 
   get totalMusicos(): number {
@@ -183,10 +180,6 @@ export class StatusConfirmacoesComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
-      rascunho: 'Rascunho',
-      pendente: 'Pendente',
-      publicado: 'Publicado',
-      confirmado: 'Confirmado',
       aguardando_aprovacao: 'Aguardando Aprovação',
       aprovado: 'Aprovado',
       reprovado: 'Reprovado',

@@ -441,7 +441,7 @@
       "tipoCulto": "Culto de Quarta — Oração",
       "localCulto": "Sede Central",
       "aviso": "",
-      "status": "publicado",
+      "status": "aguardando_aprovacao",
       "igrejaId": 1,
       "musicasIds": [1, 2],
       "criadoEm": "18/04/2026"
@@ -467,7 +467,7 @@
       "tipoCulto": "Culto de Domingo — Noite",
       "localCulto": "Sede Central",
       "aviso": "",
-      "status": "pendente",
+      "status": "aguardando_aprovacao",
       "igrejaId": 1,
       "musicasIds": [8, 9, 10, 11],
       "criadoEm": "14/04/2026"
@@ -480,7 +480,7 @@
       "tipoCulto": "Ensaio Semanal",
       "localCulto": "Sala de Ensaio",
       "aviso": "",
-      "status": "rascunho",
+      "status": "aguardando_aprovacao",
       "igrejaId": 1,
       "musicasIds": [],
       "criadoEm": "15/04/2026"
@@ -493,7 +493,7 @@
       "tipoCulto": "Culto de Sexta — Jovens",
       "localCulto": "Sede Central",
       "aviso": "",
-      "status": "rascunho",
+      "status": "aguardando_aprovacao",
       "igrejaId": 1,
       "musicasIds": [5, 6, 11, 15],
       "criadoEm": "17/04/2026"

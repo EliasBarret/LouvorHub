@@ -162,10 +162,6 @@ export class AprovacoesComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
-      rascunho: 'Rascunho',
-      pendente: 'Pendente',
-      publicado: 'Publicado',
-      confirmado: 'Confirmado',
       aguardando_aprovacao: 'Aguardando Aprovação',
       aprovado: 'Aprovado',
       reprovado: 'Reprovado',

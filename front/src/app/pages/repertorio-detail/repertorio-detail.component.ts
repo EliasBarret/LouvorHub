@@ -82,10 +82,6 @@ export class RepertorioDetailComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
-      confirmado: 'Confirmado',
-      pendente: 'Pendente',
-      rascunho: 'Rascunho',
-      publicado: 'Publicado',
       aguardando_aprovacao: 'Aguardando Aprovação',
       aprovado: 'Aprovado',
       reprovado: 'Reprovado',

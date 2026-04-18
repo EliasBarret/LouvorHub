@@ -119,18 +119,6 @@
   padding: 3px 10px;
   border-radius: 20px;
 
-  &.status-publicado {
-    background: rgba(5, 150, 105, 0.12);
-    color: #059669;
-    border: 1px solid rgba(5, 150, 105, 0.3);
-  }
-
-  &.status-confirmado {
-    background: rgba(5, 150, 105, 0.12);
-    color: #059669;
-    border: 1px solid rgba(5, 150, 105, 0.3);
-  }
-
   &.status-aguardando_aprovacao {
     background: rgba(201, 168, 76, 0.15);
     color: #92700a;
@@ -149,17 +137,6 @@
     border: 1px solid rgba(220, 38, 38, 0.3);
   }
 
-  &.status-pendente {
-    background: rgba(201, 168, 76, 0.15);
-    color: #92700a;
-    border: 1px solid rgba(201, 168, 76, 0.4);
-  }
-
-  &.status-rascunho {
-    background: var(--border-light);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-  }
 }
 
 // ─── Reprovação Banner ─────────────────────────────────────────────────────

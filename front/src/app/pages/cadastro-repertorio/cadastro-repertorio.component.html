@@ -121,32 +121,7 @@
           }
         </div>
 
-        <!-- Status -->
-        <div class="form-group col-2">
-          <label class="form-label" for="status">Status</label>
-          <div class="status-group">
-            @for (opt of [
-              { value: 'rascunho',   label: 'Rascunho',   icon: 'edit_note' },
-              { value: 'pendente',   label: 'Pendente',   icon: 'schedule' },
-              { value: 'confirmado', label: 'Confirmado', icon: 'check_circle' }
-            ]; track opt.value) {
-              <label
-                class="status-option"
-                [class.active]="f['status'].value === opt.value"
-                [class]="'status-option status-' + opt.value + (f['status'].value === opt.value ? ' active' : '')"
-              >
-                <input
-                  type="radio"
-                  formControlName="status"
-                  [value]="opt.value"
-                  hidden
-                />
-                <span class="material-icons-outlined status-icon">{{ opt.icon }}</span>
-                {{ opt.label }}
-              </label>
-            }
-          </div>
-        </div>
+
       </div>
     </div>
 

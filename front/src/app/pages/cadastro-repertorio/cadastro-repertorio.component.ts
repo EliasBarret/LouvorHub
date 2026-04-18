@@ -46,7 +46,6 @@ export class CadastroRepertorioComponent implements OnInit {
       nome: ['', [Validators.required, Validators.minLength(3)]],
       dataCulto: ['', Validators.required],
       tipoCulto: ['', Validators.required],
-      status: ['rascunho', Validators.required],
       igrejaId: [null, Validators.required],
     });
   }
@@ -147,6 +146,7 @@ export class CadastroRepertorioComponent implements OnInit {
     const payload = {
       ...this.form.value,
       dataCulto: dataCultoFormatada,
+      status: 'aguardando_aprovacao' as const,
       musicasIds: this.musicasSelecionadas.map(m => m.id),
     };
 

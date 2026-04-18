@@ -93,10 +93,6 @@ export interface MusicaForm {
 }
 
 export type StatusRepertorio =
-  | 'rascunho'
-  | 'pendente'
-  | 'publicado'
-  | 'confirmado'
   | 'aguardando_aprovacao'
   | 'aprovado'
   | 'reprovado';

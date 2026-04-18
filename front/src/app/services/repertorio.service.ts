@@ -96,7 +96,7 @@ export class RepertorioService {
       tipoCulto: form.tipoCulto,
       localCulto: form.localCulto,
       aviso: form.aviso,
-      status: form.status,
+      status: 'aguardando_aprovacao',
       musicasIds: form.musicasIds,
       criadoEm: new Date().toLocaleDateString('pt-BR'),
     };
@@ -131,7 +131,7 @@ export class RepertorioService {
   publicarRepertorio(id: number): Observable<ApiResponse<Repertorio>> {
     const index = this.repertorios.findIndex(r => r.id === id);
     if (index === -1) return this.notFound('Repertório não encontrado.');
-    const updated: Repertorio = { ...this.repertorios[index], status: 'publicado' };
+    const updated: Repertorio = { ...this.repertorios[index], status: 'aguardando_aprovacao' };
     this.repertorios = [
       ...this.repertorios.slice(0, index),
       updated,

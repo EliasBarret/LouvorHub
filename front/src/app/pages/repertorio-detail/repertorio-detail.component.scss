@@ -88,30 +88,6 @@
   padding: 3px 10px;
   border-radius: 20px;
 
-  &.status-confirmado {
-    background: rgba(5, 150, 105, 0.12);
-    color: #059669;
-    border: 1px solid rgba(5, 150, 105, 0.3);
-  }
-
-  &.status-publicado {
-    background: rgba(5, 150, 105, 0.12);
-    color: #059669;
-    border: 1px solid rgba(5, 150, 105, 0.3);
-  }
-
-  &.status-pendente {
-    background: rgba(217, 119, 6, 0.12);
-    color: #D97706;
-    border: 1px solid rgba(217, 119, 6, 0.3);
-  }
-
-  &.status-rascunho {
-    background: var(--border-light);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-  }
-
   &.status-aguardando_aprovacao {
     background: rgba(201, 168, 76, 0.15);
     color: #92700a;

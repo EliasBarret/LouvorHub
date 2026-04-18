@@ -208,9 +208,7 @@ select.form-control {
     color: var(--primary);
   }
 
-  &.status-rascunho.active  { border-color: var(--text-muted);  background: var(--border-light);  color: var(--text-secondary); }
-  &.status-pendente.active  { border-color: #D97706; background: rgba(217,119,6,0.12); color: #D97706; }
-  &.status-confirmado.active { border-color: #059669; background: rgba(5,150,105,0.12); color: #059669; }
+
 }
 
 // ─── Busca de Músicas ─────────────────────────────────────────────────────────
