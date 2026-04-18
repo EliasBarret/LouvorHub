@@ -1,98 +1,269 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# LouvorHub — API Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend completo em **NestJS** para o sistema de gestão de louvor **LouvorHub**, conectado ao Supabase (PostgreSQL) via **Prisma ORM**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 Tecnologias
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **NestJS 11** — Framework Node.js modular
+- **Prisma 7** — ORM com migrations
+- **PostgreSQL** (Supabase) — Banco de dados
+- **JWT + Passport** — Autenticação e autorização
+- **Swagger** — Documentação automática da API
+- **class-validator** — Validação de DTOs
 
-## Project setup
+---
+
+## ⚙️ Configuração
+
+### 1. Instalar dependências
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+### 2. Configurar variáveis de ambiente
+
+Copie o arquivo `.env.example` para `.env` e preencha as variáveis:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+```env
+DATABASE_URL="postgresql://postgres:SUA_SENHA@db.vxccbvnlotbgiawgesdb.supabase.co:5432/postgres?schema=public&sslmode=require"
+JWT_SECRET="troque_por_um_segredo_forte"
+JWT_EXPIRES_IN="7d"
+PORT=3000
+CORS_ORIGINS="http://localhost:4200"
+```
+
+### 3. Gerar o Prisma Client
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npx prisma generate
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 4. Rodar as migrations (cria todas as tabelas no Supabase)
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npx prisma migrate deploy
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+> Para desenvolvimento (com reset):
+> ```bash
+> npx prisma migrate dev --name init
+> ```
 
-## Resources
+### 5. Iniciar o servidor
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+# Desenvolvimento (watch mode)
+npm run start:dev
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Produção
+npm run build && npm run start:prod
+```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 📚 Documentação Swagger
 
-## Stay in touch
+Após iniciar o servidor, acesse:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```
+http://localhost:3000/api/docs
+```
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 📡 Endpoints Principais
+
+### Auth
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/api/auth/register` | Cadastrar novo usuário |
+| POST | `/api/auth/login` | Login e obter JWT |
+
+### Usuários
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/usuarios/me` | Dados do usuário logado |
+| PUT | `/api/usuarios/me` | Atualizar perfil |
+| GET | `/api/usuarios` | Listar membros |
+| GET | `/api/usuarios/:id` | Buscar por ID |
+
+### Igrejas
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/igrejas` | Listar igrejas |
+| POST | `/api/igrejas` | Criar igreja |
+| PUT | `/api/igrejas/:id` | Atualizar igreja |
+| DELETE | `/api/igrejas/:id` | Remover igreja |
+| GET | `/api/igrejas/:id/membros` | Membros da igreja |
+| POST | `/api/igrejas/:id/membros` | Adicionar membro |
+| DELETE | `/api/igrejas/membros/:membroId` | Remover membro |
+
+### Músicas
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/musicas` | Listar músicas |
+| GET | `/api/musicas/:id` | Buscar por ID |
+| POST | `/api/musicas` | Criar música |
+| PUT | `/api/musicas/:id` | Atualizar música |
+| DELETE | `/api/musicas/:id` | Remover música |
+| GET | `/api/musicas/tags` | Listar tags |
+| GET | `/api/musicas/tons` | Listar tons |
+| GET | `/api/musicas/instrumentos` | Listar instrumentos |
+
+### Repertórios
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/repertorios` | Listar repertórios |
+| GET | `/api/repertorios/:id` | Buscar por ID |
+| POST | `/api/repertorios` | Criar repertório |
+| PUT | `/api/repertorios/:id` | Atualizar repertório |
+| DELETE | `/api/repertorios/:id` | Remover repertório |
+| PATCH | `/api/repertorios/:id/publicar` | Enviar para aprovação |
+| PATCH | `/api/repertorios/:id/aprovar` | Aprovar (pastor) |
+| PATCH | `/api/repertorios/:id/reprovar` | Reprovar (pastor) |
+| GET | `/api/repertorios/pendentes` | Pendentes de aprovação |
+| GET | `/api/repertorios/tipos-culto` | Tipos de culto |
+
+### Escalações
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/escalacoes/minhas` | Minhas escalações |
+| GET | `/api/escalacoes/detalhe/:repertorioId` | Detalhe da escalação |
+| POST | `/api/escalacoes` | Escalar músico |
+| DELETE | `/api/escalacoes/:id` | Remover músico |
+
+### Confirmações
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/api/confirmacoes` | Confirmar/negar música |
+| GET | `/api/confirmacoes/repertorio/:id` | Status de confirmações |
+
+### Notificações
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/notificacoes` | Listar notificações |
+| PATCH | `/api/notificacoes/:id/lida` | Marcar como lida |
+| PATCH | `/api/notificacoes/marcar-todas-lidas` | Marcar todas lidas |
+| GET | `/api/notificacoes/nao-lidas/count` | Contagem não lidas |
+
+### Dashboard
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/dashboard/stats` | Cards de estatísticas |
+| GET | `/api/dashboard/escalacoes` | Próximas escalações |
+
+---
+
+## 🔐 Autenticação
+
+Todas as rotas (exceto `/api/auth/login` e `/api/auth/register`) exigem o header:
+
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+---
+
+## 📋 Exemplos de Requisições
+
+### Cadastro de usuário
+```json
+POST /api/auth/register
+{
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "senha": "senha123",
+  "funcao": "Violonista",
+  "ministerio": "Ministério de Louvor"
+}
+```
+
+### Login
+```json
+POST /api/auth/login
+{
+  "email": "joao@email.com",
+  "senha": "senha123"
+}
+```
+
+### Criar música
+```json
+POST /api/musicas
+Authorization: Bearer <token>
+{
+  "titulo": "Deus de Promessas",
+  "artista": "Toque no Altar",
+  "tom": "G",
+  "bpm": 72,
+  "tagIds": [1, 3],
+  "linkYoutube": "https://youtu.be/exemplo",
+  "observacoes": "Capo 2 no violão"
+}
+```
+
+### Criar repertório
+```json
+POST /api/repertorios
+Authorization: Bearer <token>
+{
+  "nome": "Culto de Domingo — Manhã",
+  "dataCulto": "2026-04-20",
+  "horario": "10:00",
+  "tipoCulto": "Culto de Domingo — Manhã",
+  "igrejaId": 1,
+  "musicasIds": [1, 2, 3, 4, 5]
+}
+```
+
+### Escalar músico
+```json
+POST /api/escalacoes
+Authorization: Bearer <token>
+{
+  "repertorioId": 1,
+  "usuarioId": 2,
+  "musicasEscaladas": [
+    { "musicaId": 1, "instrumento": "Violão" },
+    { "musicaId": 2, "instrumento": "Violão" }
+  ]
+}
+```
+
+### Confirmar música
+```json
+POST /api/confirmacoes
+Authorization: Bearer <token>
+{
+  "escalacaoMusicoId": 1,
+  "musicaId": 1,
+  "status": "conhece"
+}
+```
+
+---
+
+## 🗄️ Estrutura do Banco de Dados
+
+```
+usuarios          — Usuários do sistema
+igrejas           — Igrejas cadastradas
+membros_igrejas   — Relação usuário ↔ igreja com perfil
+musicas           — Catálogo de músicas
+tags              — Tags de categorização
+musicas_tags      — Relação musica ↔ tag
+repertorios       — Repertórios de culto
+repertorios_musicas — Relação repertório ↔ música
+aprovacoes_repertorios — Histórico de aprovações
+escalacoes_musicos — Músicos escalados por repertório
+musicas_escaladas — Músicas por escalação (com instrumento)
+confirmacoes_musicas — Confirmações de conhecimento
+notificacoes      — Notificações dos usuários
+```

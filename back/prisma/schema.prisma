@@ -1,0 +1,243 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Usuarios ────────────────────────────────────────────────────────────────
+
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  email        String   @unique
+  senhaHash    String   @map("senha_hash")
+  funcao       String   @default("")
+  ministerio   String   @default("")
+  avatar       String?
+  instrumentos String[] @default([])
+  dataMembro   DateTime? @map("data_membro")
+  criadoEm    DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  membros          MembroIgreja[]
+  musicasCriadas   Musica[]
+  repertoriosCriados Repertorio[]
+  aprovacoes       AprovacaoRepertorio[]
+  escalacoes       EscalacaoMusico[]
+  notificacoes     Notificacao[]
+
+  @@map("usuarios")
+}
+
+// ─── Igrejas ─────────────────────────────────────────────────────────────────
+
+model Igreja {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  cidade       String?
+  observacoes  String?
+  criadoEm    DateTime @default(now()) @map("criado_em")
+
+  membros     MembroIgreja[]
+  repertorios Repertorio[]
+
+  @@map("igrejas")
+}
+
+model MembroIgreja {
+  id        Int     @id @default(autoincrement())
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId Int     @map("usuario_id")
+  igreja    Igreja  @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  igrejaId  Int     @map("igreja_id")
+  perfil    PerfilMembro
+
+  @@unique([usuarioId, igrejaId])
+  @@map("membros_igrejas")
+}
+
+enum PerfilMembro {
+  ADM
+  Pastor
+  Ministro
+  Musico
+  Cantor
+}
+
+// ─── Tags ─────────────────────────────────────────────────────────────────────
+
+model Tag {
+  id     Int    @id @default(autoincrement())
+  nome   String @unique
+  cor    String @default("#6B7280")
+
+  musicas MusicaTag[]
+
+  @@map("tags")
+}
+
+// ─── Musicas ─────────────────────────────────────────────────────────────────
+
+model Musica {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  artista     String   @default("")
+  tom         String   @default("")
+  bpm         Int      @default(0)
+  linkYoutube String   @default("") @map("link_youtube")
+  linkSpotify String   @default("") @map("link_spotify")
+  observacoes String   @default("")
+  ultimoUso   DateTime? @map("ultimo_uso")
+  criadoEm   DateTime @default(now()) @map("criado_em")
+  criadoPor  Usuario  @relation(fields: [criadoPorId], references: [id])
+  criadoPorId Int     @map("criado_por_id")
+
+  tags        MusicaTag[]
+  repertorios RepertorioMusica[]
+  musicasEscaladas MusicaEscalada[]
+  confirmacoes ConfirmacaoMusica[]
+
+  @@map("musicas")
+}
+
+model MusicaTag {
+  musica   Musica @relation(fields: [musicaId], references: [id], onDelete: Cascade)
+  musicaId Int    @map("musica_id")
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId    Int    @map("tag_id")
+
+  @@id([musicaId, tagId])
+  @@map("musicas_tags")
+}
+
+// ─── Repertorios ─────────────────────────────────────────────────────────────
+
+enum StatusRepertorio {
+  aguardando_aprovacao
+  aprovado
+  reprovado
+}
+
+model Repertorio {
+  id          Int              @id @default(autoincrement())
+  nome        String
+  dataCulto   DateTime         @map("data_culto")
+  horario     String?
+  tipoCulto   String           @map("tipo_culto")
+  localCulto  String?          @map("local_culto")
+  aviso       String?
+  status      StatusRepertorio @default(aguardando_aprovacao)
+  criadoEm   DateTime         @default(now()) @map("criado_em")
+
+  criador     Usuario @relation(fields: [criadorId], references: [id])
+  criadorId   Int     @map("criador_id")
+
+  igreja      Igreja? @relation(fields: [igrejaId], references: [id])
+  igrejaId    Int?    @map("igreja_id")
+
+  musicas     RepertorioMusica[]
+  aprovacao   AprovacaoRepertorio?
+  escalacoes  EscalacaoMusico[]
+
+  @@map("repertorios")
+}
+
+model RepertorioMusica {
+  repertorio   Repertorio @relation(fields: [repertorioId], references: [id], onDelete: Cascade)
+  repertorioId Int        @map("repertorio_id")
+  musica       Musica     @relation(fields: [musicaId], references: [id], onDelete: Cascade)
+  musicaId     Int        @map("musica_id")
+  ordem        Int        @default(0)
+
+  @@id([repertorioId, musicaId])
+  @@map("repertorios_musicas")
+}
+
+model AprovacaoRepertorio {
+  id           Int      @id @default(autoincrement())
+  repertorio   Repertorio @relation(fields: [repertorioId], references: [id], onDelete: Cascade)
+  repertorioId Int      @unique @map("repertorio_id")
+  pastor       Usuario  @relation(fields: [pastorId], references: [id])
+  pastorId     Int      @map("pastor_id")
+  status       String   // 'aprovado' | 'reprovado'
+  motivo       String?
+  data         DateTime @default(now())
+
+  @@map("aprovacoes_repertorios")
+}
+
+// ─── Escalações ──────────────────────────────────────────────────────────────
+
+model EscalacaoMusico {
+  id           Int        @id @default(autoincrement())
+  repertorio   Repertorio @relation(fields: [repertorioId], references: [id], onDelete: Cascade)
+  repertorioId Int        @map("repertorio_id")
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId    Int        @map("usuario_id")
+
+  musicasEscaladas MusicaEscalada[]
+
+  @@unique([repertorioId, usuarioId])
+  @@map("escalacoes_musicos")
+}
+
+model MusicaEscalada {
+  id             Int             @id @default(autoincrement())
+  escalacao      EscalacaoMusico @relation(fields: [escalacaoId], references: [id], onDelete: Cascade)
+  escalacaoId    Int             @map("escalacao_id")
+  musica         Musica          @relation(fields: [musicaId], references: [id], onDelete: Cascade)
+  musicaId       Int             @map("musica_id")
+  instrumento    String
+
+  confirmacao    ConfirmacaoMusica?
+
+  @@unique([escalacaoId, musicaId])
+  @@map("musicas_escaladas")
+}
+
+enum StatusConfirmacao {
+  conhece
+  nao_conhece
+  pendente
+}
+
+model ConfirmacaoMusica {
+  id               Int               @id @default(autoincrement())
+  musicaEscalada   MusicaEscalada    @relation(fields: [musicaEscaladaId], references: [id], onDelete: Cascade)
+  musicaEscaladaId Int               @unique @map("musica_escalada_id")
+  musica           Musica            @relation(fields: [musicaId], references: [id])
+  musicaId         Int               @map("musica_id")
+  status           StatusConfirmacao @default(pendente)
+  atualizadoEm    DateTime          @updatedAt @map("atualizado_em")
+
+  @@map("confirmacoes_musicas")
+}
+
+// ─── Notificações ─────────────────────────────────────────────────────────────
+
+enum TipoNotificacao {
+  escalacao
+  confirmacao
+  aviso
+  sistema
+}
+
+model Notificacao {
+  id             Int             @id @default(autoincrement())
+  usuario        Usuario         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId      Int             @map("usuario_id")
+  titulo         String
+  mensagem       String
+  tipo           TipoNotificacao
+  lida           Boolean         @default(false)
+  criadoEm      DateTime        @default(now()) @map("criado_em")
+  referenciaId   Int?            @map("referencia_id")
+  referenciaTipo String?         @map("referencia_tipo")
+
+  @@map("notificacoes")
+}
