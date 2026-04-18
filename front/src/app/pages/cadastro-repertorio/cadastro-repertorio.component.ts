@@ -74,9 +74,7 @@ export class CadastroRepertorioComponent implements OnInit {
         });
       } else {
         this.igrejaService.getIgrejasByUsuarioId(userRes.data.id).subscribe(membRes => {
-          this.minhasIgrejas = membRes.data
-            .map(m => m.igreja)
-            .filter((ig): ig is Igreja => ig !== undefined);
+          this.minhasIgrejas = membRes.data;
           if (this.minhasIgrejas.length === 1) this.form.patchValue({ igrejaId: this.minhasIgrejas[0].id });
         });
       }
@@ -139,13 +137,8 @@ export class CadastroRepertorioComponent implements OnInit {
     this.isSubmitting = true;
     this.submitError = '';
 
-    const rawDate: string = this.form.value.dataCulto;
-    const [year, month, day] = rawDate.split('-');
-    const dataCultoFormatada = `${day}/${month}/${year}`;
-
     const payload = {
       ...this.form.value,
-      dataCulto: dataCultoFormatada,
       status: 'aguardando_aprovacao' as const,
       musicasIds: this.musicasSelecionadas.map(m => m.id),
     };

@@ -60,7 +60,7 @@ export class GestaoIgrejasComponent implements OnInit {
       this.isLoading = false;
     });
 
-    this.usuarioService.getMembros().subscribe(res => {
+    this.usuarioService.getUsuarios().subscribe(res => {
       this.todosUsuarios = res.data.conteudo;
     });
   }

@@ -57,7 +57,7 @@ export class RepertoriosComponent implements OnInit {
         } else {
           // Pastor/Ministro vêem repertórios das suas igrejas
           this.igrejaService.getIgrejasByUsuarioId(user.id).subscribe(membRes => {
-            const igrejaIds = new Set(membRes.data.map(m => m.igrejaId));
+            const igrejaIds = new Set(membRes.data.map(m => m.id));
             this.repertorios = allReps.filter(r => !r.igrejaId || igrejaIds.has(r.igrejaId));
             this.isLoading = false;
           });

@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
-
-import mockData from '../data/mock-data.json';
+import { Observable } from 'rxjs';
 import {
   Usuario,
   Escalacao,
@@ -16,219 +13,100 @@ import {
   PageResponse,
   PerfilEditavel,
 } from '../models';
+import { MusicaService } from './musica.service';
+import { RepertorioService } from './repertorio.service';
+import { UsuarioService } from './usuario.service';
+import { DashboardService } from './dashboard.service';
 
-/**
- * MockApiService — simula as chamadas HTTP ao back-end Spring Boot.
- * Todos os dados vêm do arquivo mock-data.json.
- * Cada método retorna Observable<T> com delay de 300ms,
- * reproduzindo o comportamento real de uma API REST.
- */
 @Injectable({ providedIn: 'root' })
 export class MockApiService {
+  constructor(
+    private musicaService: MusicaService,
+    private repertorioService: RepertorioService,
+    private usuarioService: UsuarioService,
+    private dashboardService: DashboardService,
+  ) {}
 
-  private readonly DELAY_MS = 300;
+  // ─── Usuário ──────────────────────────────────────────────────────────────
 
-  // ─── Estado em memória (simula o banco de dados) ───────────────────────────
-  private musicas: Musica[] = mockData.musicas as Musica[];
-  private repertorios: Repertorio[] = mockData.repertorios as unknown as Repertorio[];
-  private usuario: Usuario = { ...mockData.usuario as unknown as Usuario };
-  private nextMusicaId = this.musicas.length + 1;
-  private nextRepertorioId = this.repertorios.length + 1;
-
-  // ─── Utilitário interno ────────────────────────────────────────────────────
-  private respond<T>(data: T): Observable<ApiResponse<T>> {
-    const response: ApiResponse<T> = {
-      data,
-      sucesso: true,
-      mensagem: 'OK',
-      timestamp: new Date().toISOString(),
-    };
-    return of(response).pipe(delay(this.DELAY_MS));
-  }
-
-  // ─── Usuário ───────────────────────────────────────────────────────────────
-
-  /** GET /api/usuarios/me */
   getUsuarioLogado(): Observable<ApiResponse<Usuario>> {
-    return this.respond({ ...this.usuario });
+    return this.usuarioService.getUsuarioLogado();
   }
 
-  /** PATCH /api/usuarios/me/perfil */
   updatePerfilEditavel(form: PerfilEditavel): Observable<ApiResponse<Usuario>> {
-    this.usuario = { ...this.usuario, ...form };
-    return this.respond({ ...this.usuario });
+    return this.usuarioService.updatePerfilEditavel(0, form as any);
   }
 
   // ─── Dashboard ────────────────────────────────────────────────────────────
 
-  /** GET /api/dashboard/stats */
   getStats(): Observable<ApiResponse<Stat[]>> {
-    const stats: Stat[] = [
-      { icon: 'calendar_today', label: 'PRÓXIMOS CULTOS',        value: mockData.stats.proximosCultos,          color: '#8B5FC0' },
-      { icon: 'music_note',    label: 'MÚSICAS ESCALADAS',       value: mockData.stats.musicasEscaladas,        color: '#8B5FC0' },
-      { icon: 'schedule',      label: 'AGUARDANDO CONFIRMAÇÃO',  value: mockData.stats.aguardandoConfirmacao,   color: '#C9A84C' },
-    ];
-    return this.respond(stats);
+    return this.dashboardService.getStats();
   }
 
-  /** GET /api/dashboard/escalacoes */
   getEscalacoes(): Observable<ApiResponse<Escalacao[]>> {
-    return this.respond(mockData.escalacoes as Escalacao[]);
+    return this.dashboardService.getEscalacoes();
   }
 
   // ─── Músicas ──────────────────────────────────────────────────────────────
 
-  /** GET /api/musicas */
   getMusicas(): Observable<ApiResponse<PageResponse<Musica>>> {
-    const page: PageResponse<Musica> = {
-      conteudo: [...this.musicas],
-      total: this.musicas.length,
-      pagina: 0,
-      tamanhoPagina: 50,
-    };
-    return this.respond(page);
+    return this.musicaService.getMusicas();
   }
 
-  /** GET /api/musicas/:id */
   getMusicaById(id: number): Observable<ApiResponse<Musica>> {
-    const musica = this.musicas.find(m => m.id === id);
-    if (!musica) {
-      return of({ data: null as unknown as Musica, sucesso: false, mensagem: 'Música não encontrada', timestamp: new Date().toISOString() })
-        .pipe(delay(this.DELAY_MS));
-    }
-    return this.respond(musica);
+    return this.musicaService.getMusicaById(id);
   }
 
-  /** POST /api/musicas */
   createMusica(form: MusicaForm): Observable<ApiResponse<Musica>> {
-    const novaMusica: Musica = {
-      id: this.nextMusicaId++,
-      titulo: form.titulo,
-      artista: form.artista,
-      tom: form.tom,
-      bpm: form.bpm ?? 0,
-      tags: form.tags,
-      linkYoutube: form.linkYoutube,
-      linkSpotify: form.linkSpotify,
-      observacoes: form.observacoes,
-      ultimoUso: null,
-      criadoEm: new Date().toLocaleDateString('pt-BR'),
-    };
-    this.musicas = [...this.musicas, novaMusica];
-    return this.respond(novaMusica);
+    return this.musicaService.createMusica(form);
   }
 
-  /** PUT /api/musicas/:id */
   updateMusica(id: number, form: MusicaForm): Observable<ApiResponse<Musica>> {
-    const index = this.musicas.findIndex(m => m.id === id);
-    if (index === -1) {
-      return of({ data: null as unknown as Musica, sucesso: false, mensagem: 'Música não encontrada', timestamp: new Date().toISOString() })
-        .pipe(delay(this.DELAY_MS));
-    }
-    const updated: Musica = { ...this.musicas[index], ...form, bpm: form.bpm ?? 0 };
-    this.musicas = [...this.musicas.slice(0, index), updated, ...this.musicas.slice(index + 1)];
-    return this.respond(updated);
+    return this.musicaService.updateMusica(id, form);
   }
 
-  /** DELETE /api/musicas/:id */
   deleteMusica(id: number): Observable<ApiResponse<void>> {
-    this.musicas = this.musicas.filter(m => m.id !== id);
-    return this.respond(undefined as unknown as void);
+    return this.musicaService.deleteMusica(id);
   }
 
   // ─── Repertórios ──────────────────────────────────────────────────────────
 
-  /** GET /api/repertorios */
   getRepertorios(): Observable<ApiResponse<PageResponse<Repertorio>>> {
-    const comMusicas = this.repertorios.map(r => this.enrichRepertorio(r));
-    const page: PageResponse<Repertorio> = {
-      conteudo: comMusicas,
-      total: comMusicas.length,
-      pagina: 0,
-      tamanhoPagina: 50,
-    };
-    return this.respond(page);
+    return this.repertorioService.getRepertorios();
   }
 
-  /** GET /api/repertorios/:id */
   getRepertorioById(id: number): Observable<ApiResponse<Repertorio>> {
-    const rep = this.repertorios.find(r => r.id === id);
-    if (!rep) {
-      return of({ data: null as unknown as Repertorio, sucesso: false, mensagem: 'Repertório não encontrado', timestamp: new Date().toISOString() })
-        .pipe(delay(this.DELAY_MS));
-    }
-    return this.respond(this.enrichRepertorio(rep));
+    return this.repertorioService.getRepertorioById(id);
   }
 
-  /** POST /api/repertorios */
   createRepertorio(form: RepertorioForm): Observable<ApiResponse<Repertorio>> {
-    const novoRepertorio: Repertorio = {
-      id: this.nextRepertorioId++,
-      nome: form.nome,
-      dataCulto: form.dataCulto,
-      tipoCulto: form.tipoCulto,
-      status: 'aguardando_aprovacao',
-      igrejaId: form.igrejaId,
-      musicasIds: form.musicasIds,
-      criadoEm: new Date().toLocaleDateString('pt-BR'),
-    };
-    this.repertorios = [...this.repertorios, novoRepertorio];
-    return this.respond(this.enrichRepertorio(novoRepertorio));
+    return this.repertorioService.createRepertorio(form);
   }
 
-  /** PUT /api/repertorios/:id */
   updateRepertorio(id: number, form: RepertorioForm): Observable<ApiResponse<Repertorio>> {
-    const index = this.repertorios.findIndex(r => r.id === id);
-    if (index === -1) {
-      return of({ data: null as unknown as Repertorio, sucesso: false, mensagem: 'Repertório não encontrado', timestamp: new Date().toISOString() })
-        .pipe(delay(this.DELAY_MS));
-    }
-    const updated: Repertorio = { ...this.repertorios[index], ...form };
-    this.repertorios = [...this.repertorios.slice(0, index), updated, ...this.repertorios.slice(index + 1)];
-    return this.respond(this.enrichRepertorio(updated));
+    return this.repertorioService.updateRepertorio(id, form);
   }
 
-  /** DELETE /api/repertorios/:id */
   deleteRepertorio(id: number): Observable<ApiResponse<void>> {
-    this.repertorios = this.repertorios.filter(r => r.id !== id);
-    return this.respond(undefined as unknown as void);
+    return this.repertorioService.deleteRepertorio(id);
   }
 
   // ─── Metadados ────────────────────────────────────────────────────────────
 
-  /** GET /api/tags */
   getTags(): Observable<ApiResponse<Tag[]>> {
-    return this.respond(mockData.tags as Tag[]);
+    return this.musicaService.getTags();
   }
 
-  /** GET /api/tons */
   getTons(): Observable<ApiResponse<string[]>> {
-    return this.respond(mockData.tons);
+    return this.musicaService.getTons();
   }
 
-  /** GET /api/tipos-culto */
   getTiposCulto(): Observable<ApiResponse<string[]>> {
-    return this.respond(mockData.tiposCulto);
+    return this.repertorioService.getTiposCulto();
   }
 
-  // ─── Escalações ───────────────────────────────────────────────────────────
-
-  /** Retorna mapa de repertorioId → número de músicos escalados */
+  /** @deprecated Use EscalacaoService.getMinhasEscalacoes() instead */
   getParticipacoesPorRepertorio(): Map<number, number> {
-    const escalacoes = mockData.escalacoes_musicos as unknown as Array<{ repertorioId: number }>;
-    const map = new Map<number, number>();
-    for (const e of escalacoes) {
-      map.set(e.repertorioId, (map.get(e.repertorioId) ?? 0) + 1);
-    }
-    return map;
-  }
-
-  // ─── Helpers ──────────────────────────────────────────────────────────────
-
-  private enrichRepertorio(rep: Repertorio): Repertorio {
-    return {
-      ...rep,
-      musicas: rep.musicasIds.map(id => this.musicas.find(m => m.id === id)).filter((m): m is Musica => !!m),
-    };
+    return new Map();
   }
 }

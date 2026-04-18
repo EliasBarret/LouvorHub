@@ -60,7 +60,7 @@ export class AprovacoesComponent implements OnInit {
         this.carregarPendentes();
       } else {
         this.igrejaService.getIgrejasByUsuarioId(res.data.id).subscribe(membRes => {
-          const igrejaIds = membRes.data.map(m => m.igrejaId);
+          const igrejaIds = membRes.data.map(m => m.id);
           this.carregarPendentes(igrejaIds);
         });
       }

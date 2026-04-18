@@ -1,5 +1,25 @@
 export type Perfil = 'ADM' | 'Pastor' | 'Ministro' | 'Musico' | 'Cantor';
 
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+export interface LoginForm {
+  email: string;
+  senha: string;
+}
+
+export interface RegisterForm {
+  nome: string;
+  email: string;
+  senha: string;
+  funcao?: string;
+  ministerio?: string;
+}
+
+export interface AuthData {
+  token: string;
+  usuario: Usuario;
+}
+
 export interface Igreja {
   id: number;
   nome: string;
@@ -41,6 +61,16 @@ export interface PerfilForm {
 export interface PerfilEditavel {
   instrumentos: string[];
   dataMembro: string;
+}
+
+export interface UpdatePerfilForm {
+  nome?: string;
+  email?: string;
+  funcao?: string;
+  ministerio?: string;
+  avatar?: string | null;
+  instrumentos?: string[];
+  dataMembro?: string;
 }
 
 export interface Stat {
