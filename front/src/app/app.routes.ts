@@ -11,12 +11,14 @@ import { CadastroRepertorioComponent } from './pages/cadastro-repertorio/cadastr
 import { StatusConfirmacoesComponent } from './pages/status-confirmacoes/status-confirmacoes.component';
 import { AprovacoesComponent } from './pages/aprovacoes/aprovacoes.component';
 import { GestaoIgrejasComponent } from './pages/gestao-igrejas/gestao-igrejas.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio', component: HomeComponent },
@@ -33,3 +35,4 @@ export const routes: Routes = [
   },
   { path: '**', redirectTo: 'login' }
 ];
+
