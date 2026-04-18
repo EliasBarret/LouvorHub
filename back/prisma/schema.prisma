@@ -19,6 +19,7 @@ model Usuario {
   funcao       String   @default("")
   ministerio   String   @default("")
   avatar       String?
+  perfil       PerfilMembro @default(Musico)
   instrumentos String[] @default([])
   dataMembro   DateTime? @map("data_membro")
   criadoEm    DateTime @default(now()) @map("criado_em")

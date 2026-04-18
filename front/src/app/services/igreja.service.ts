@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Igreja, MembroIgreja, ApiResponse } from '../models';
 
@@ -43,6 +44,8 @@ export class IgrejaService {
   }
 
   getIgrejasByUsuarioId(usuarioId: number): Observable<ApiResponse<Igreja[]>> {
-    return this.http.get<ApiResponse<Igreja[]>>(`${this.api}/usuario/${usuarioId}`);
+    return this.http
+      .get<ApiResponse<any[]>>(`${this.api}/usuario/${usuarioId}`)
+      .pipe(map(res => ({ ...res, data: res.data.map((m: any) => m.igreja ?? m) })));
   }
 }
