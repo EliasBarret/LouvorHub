@@ -11,6 +11,7 @@ import { CadastroRepertorioComponent } from './pages/cadastro-repertorio/cadastr
 import { StatusConfirmacoesComponent } from './pages/status-confirmacoes/status-confirmacoes.component';
 import { AprovacoesComponent } from './pages/aprovacoes/aprovacoes.component';
 import { GestaoIgrejasComponent } from './pages/gestao-igrejas/gestao-igrejas.component';
+import { GestaoCultosComponent } from './pages/gestao-cultos/gestao-cultos.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -31,6 +32,7 @@ export const routes: Routes = [
       { path: 'notificacoes', component: NotificacoesComponent },
       { path: 'aprovacoes', component: AprovacoesComponent },
       { path: 'igrejas', component: GestaoIgrejasComponent },
+      { path: 'cultos', component: GestaoCultosComponent },
       { path: 'meu-perfil', component: MeuPerfilComponent },
     ]
   },

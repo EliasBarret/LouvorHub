@@ -54,6 +54,11 @@ export class CreateRepertorioDto {
   @IsString()
   horario?: string;
 
+  @ApiPropertyOptional({ example: '12:00', description: 'Horário de término do culto (HH:MM)' })
+  @IsOptional()
+  @IsString()
+  horarioFim?: string;
+
   @ApiProperty({ example: 'Culto de Domingo — Manhã' })
   @IsString()
   tipoCulto: string;

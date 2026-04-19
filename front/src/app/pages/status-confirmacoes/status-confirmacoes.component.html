@@ -111,6 +111,43 @@
         </div>
       </div>
 
+      <!-- Por Músico -->
+      <div class="section">
+        <h2 class="section-title">
+          <span class="material-icons-outlined">group</span>
+          Resumo por Músico
+        </h2>
+        <div class="musico-grid">
+          @for (pm of visaoGeral.porMusico; track pm.usuario.id) {
+            <div class="musico-card">
+              <div class="musico-card-header">
+                <div class="musico-avatar">{{ pm.usuario.iniciais }}</div>
+                <div>
+                  <span class="musico-nome">{{ pm.usuario.nome }}</span>
+                  <span class="musico-funcao">{{ pm.usuario.funcao }}</span>
+                </div>
+              </div>
+              <div class="musico-musicas">
+                @for (mc of pm.musicasComConfirmacao; track mc.musica.id) {
+                  <div class="musico-musica-row">
+                    <span class="musico-musica-titulo">{{ mc.musica.titulo }}</span>
+                    <span class="conf-dot" [class]="'dot-' + mc.confirmacao">
+                      @if (mc.confirmacao === 'conhece') {
+                        <span class="material-icons-outlined">check_circle</span>
+                      } @else if (mc.confirmacao === 'nao_conhece') {
+                        <span class="material-icons-outlined">cancel</span>
+                      } @else {
+                        <span class="material-icons-outlined">hourglass_empty</span>
+                      }
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
       <!-- Por Música -->
       <div class="section">
         <h2 class="section-title">
@@ -172,43 +209,6 @@
             </div>
           </div>
         }
-      </div>
-
-      <!-- Por Músico -->
-      <div class="section">
-        <h2 class="section-title">
-          <span class="material-icons-outlined">group</span>
-          Resumo por Músico
-        </h2>
-        <div class="musico-grid">
-          @for (pm of visaoGeral.porMusico; track pm.usuario.id) {
-            <div class="musico-card">
-              <div class="musico-card-header">
-                <div class="musico-avatar">{{ pm.usuario.iniciais }}</div>
-                <div>
-                  <span class="musico-nome">{{ pm.usuario.nome }}</span>
-                  <span class="musico-funcao">{{ pm.usuario.funcao }}</span>
-                </div>
-              </div>
-              <div class="musico-musicas">
-                @for (mc of pm.musicasComConfirmacao; track mc.musica.id) {
-                  <div class="musico-musica-row">
-                    <span class="musico-musica-titulo">{{ mc.musica.titulo }}</span>
-                    <span class="conf-dot" [class]="'dot-' + mc.confirmacao">
-                      @if (mc.confirmacao === 'conhece') {
-                        <span class="material-icons-outlined">check_circle</span>
-                      } @else if (mc.confirmacao === 'nao_conhece') {
-                        <span class="material-icons-outlined">cancel</span>
-                      } @else {
-                        <span class="material-icons-outlined">hourglass_empty</span>
-                      }
-                    </span>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-        </div>
       </div>
     }
   }

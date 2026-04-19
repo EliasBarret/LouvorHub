@@ -12,6 +12,7 @@ import {
   ApiResponse,
   PageResponse,
   PerfilEditavel,
+  TipoCulto,
 } from '../models';
 import { MusicaService } from './musica.service';
 import { RepertorioService } from './repertorio.service';
@@ -101,7 +102,7 @@ export class MockApiService {
     return this.musicaService.getTons();
   }
 
-  getTiposCulto(): Observable<ApiResponse<string[]>> {
+  getTiposCulto(): Observable<ApiResponse<TipoCulto[]>> {
     return this.repertorioService.getTiposCulto();
   }
 

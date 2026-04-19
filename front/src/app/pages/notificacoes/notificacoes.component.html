@@ -2,33 +2,58 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">Notificações</h1>
-      <p class="page-subtitle">Você tem {{ unreadCount }} notificações não lidas.</p>
+      <p class="page-subtitle">
+        @if (carregando()) {
+          Carregando...
+        } @else {
+          Você tem {{ unreadCount() }} notificação(ões) não lida(s).
+        }
+      </p>
     </div>
-    @if (unreadCount > 0) {
-      <button class="btn-outline" (click)="markAllAsRead()">
+    @if (unreadCount() > 0) {
+      <button class="btn-outline" (click)="marcarTodasLidas()">
         <span class="material-icons-outlined">done_all</span>
         Marcar todas como lidas
       </button>
     }
   </div>
 
-  <div class="notificacoes-list">
-    @for (notif of notificacoes; track notif.id) {
-      <div class="notif-card" [class.unread]="!notif.read" (click)="markAsRead(notif)">
-        <div class="notif-icon" [class]="'notif-icon-' + notif.type">
-          <span class="material-icons-outlined">{{ getIcon(notif.type) }}</span>
-        </div>
-        <div class="notif-content">
-          <div class="notif-top">
-            <span class="notif-title">{{ notif.title }}</span>
-            <span class="notif-time">{{ notif.time }}</span>
+  @if (erro()) {
+    <div class="erro-msg">{{ erro() }}</div>
+  }
+
+  @if (carregando()) {
+    <div class="carregando">Carregando notificações...</div>
+  } @else if (notificacoes().length === 0) {
+    <div class="empty-state">
+      <span class="material-icons-outlined">notifications_none</span>
+      <p>Nenhuma notificação por enquanto.</p>
+    </div>
+  } @else {
+    <div class="notificacoes-list">
+      @for (notif of notificacoes(); track notif.id) {
+        <div
+          class="notif-card"
+          [class]="'notif-card notif-color-' + getIconColor(notif.tipo)"
+          [class.unread]="!notif.lida"
+          [class.clickable]="!!getLink(notif)"
+          (click)="clicar(notif)"
+        >
+          <div class="notif-icon notif-icon-{{ getIconColor(notif.tipo) }}">
+            <span class="material-icons-outlined">{{ getIcon(notif.tipo) }}</span>
           </div>
-          <p class="notif-message">{{ notif.message }}</p>
+          <div class="notif-content">
+            <div class="notif-top">
+              <span class="notif-title">{{ notif.titulo }}</span>
+              <span class="notif-time">{{ notif.criadoEm | date : 'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <p class="notif-message">{{ notif.mensagem }}</p>
+          </div>
+          @if (!notif.lida) {
+            <div class="unread-dot"></div>
+          }
         </div>
-        @if (!notif.read) {
-          <div class="unread-dot"></div>
-        }
-      </div>
-    }
-  </div>
+      }
+    </div>
+  }
 </div>

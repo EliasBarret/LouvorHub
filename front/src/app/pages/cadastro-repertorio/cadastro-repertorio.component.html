@@ -100,8 +100,8 @@
             (change)="onTipoCultoChange(f['tipoCulto'].value)"
           >
             <option value="">Selecione o tipo</option>
-            @for (tipo of tiposCulto; track tipo) {
-              <option [value]="tipo">{{ tipo }}</option>
+            @for (tipo of tiposCulto; track tipo.id) {
+              <option [value]="tipo.nome">{{ tipo.nome }} — {{ tipo.horario }}</option>
             }
           </select>
           @if (f['tipoCulto'].invalid && f['tipoCulto'].touched) {
@@ -147,8 +147,32 @@
           }
         </div>
 
-
       </div>
+
+      <!-- Horários (auto-preenchidos pelo tipo de culto) -->
+      <div class="form-row">
+        <div class="form-group col-2">
+          <label class="form-label" for="horario">Horário de Início</label>
+          <input
+            id="horario"
+            type="time"
+            class="form-control"
+            formControlName="horario"
+          />
+          <span class="field-hint">Preenchido automaticamente pelo tipo de culto.</span>
+        </div>
+        <div class="form-group col-2">
+          <label class="form-label" for="horarioFim">Horário de Término</label>
+          <input
+            id="horarioFim"
+            type="time"
+            class="form-control"
+            formControlName="horarioFim"
+          />
+          <span class="field-hint">Usado para lembretes e controle de duração.</span>
+        </div>
+      </div>
+
     </div>
 
     <!-- Músicas do Repertório -->

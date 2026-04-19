@@ -5,7 +5,7 @@
 // Page Header
 .page-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
   gap: 16px;
@@ -137,8 +137,8 @@
   }
 
   &.active {
-    background: var(--text-primary);
-    border-color: var(--text-primary);
+    background: var(--primary);
+    border-color: var(--primary);
     color: #fff;
     font-weight: 600;
   }
@@ -436,7 +436,6 @@
   font-weight: 500;
   color: var(--text-secondary);
   background: var(--bg-white);
-  margin-top: 12px;
   transition: all 0.2s;
 
   &:hover {

@@ -1,83 +1,152 @@
-import { Component } from '@angular/core';
-
-interface Notificacao {
-  id: number;
-  type: 'escalacao' | 'musica' | 'aviso' | 'confirmacao';
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-}
+import { Component, OnInit, signal, computed } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { NotificacaoService } from '../../services/notificacao.service';
+import { Notificacao, TipoNotificacao } from '../../models';
 
 @Component({
   selector: 'app-notificacoes',
-  imports: [],
+  imports: [CommonModule, DatePipe, RouterModule],
   templateUrl: './notificacoes.component.html',
-  styleUrl: './notificacoes.component.scss'
+  styleUrl: './notificacoes.component.scss',
 })
-export class NotificacoesComponent {
-  notificacoes: Notificacao[] = [
-    {
-      id: 1,
-      type: 'escalacao',
-      title: 'Nova escalação',
-      message: 'Você foi escalado para o Culto de Quarta — Oração em 23/04.',
-      time: 'Há 2 horas',
-      read: false,
-    },
-    {
-      id: 2,
-      type: 'musica',
-      title: 'Repertório atualizado',
-      message: 'O repertório do Culto de Domingo — Manhã foi atualizado com novas músicas.',
-      time: 'Há 5 horas',
-      read: false,
-    },
-    {
-      id: 3,
-      type: 'confirmacao',
-      title: 'Confirmação pendente',
-      message: 'Confirme sua participação no Culto de Domingo — Noite.',
-      time: 'Ontem',
-      read: false,
-    },
-    {
-      id: 4,
-      type: 'aviso',
-      title: 'Ensaio remarcado',
-      message: 'O ensaio de sexta foi remarcado para sábado às 16:00.',
-      time: '2 dias atrás',
-      read: true,
-    },
-    {
-      id: 5,
-      type: 'musica',
-      title: 'Nova música adicionada',
-      message: 'A música "Oceanos" foi adicionada ao repertório geral.',
-      time: '3 dias atrás',
-      read: true,
-    },
+export class NotificacoesComponent implements OnInit {
+  notificacoes = signal<Notificacao[]>([]);
+  carregando = signal(true);
+  erro = signal<string | null>(null);
+
+  unreadCount = computed(() => this.notificacoes().filter((n) => !n.lida).length);
+
+  constructor(
+    private notificacaoService: NotificacaoService,
+    private router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.carregar();
+  }
+
+  carregar(): void {
+    this.carregando.set(true);
+    this.notificacaoService.getNotificacoes(0, 50).subscribe({
+      next: (res) => {
+        const lista = res.data?.conteudo ?? [];
+        this.notificacoes.set(lista);
+        this.carregando.set(false);
+        // Sincroniza o contador do topbar com a realidade da lista
+        const naoLidas = lista.filter((n) => !n.lida).length;
+        this.notificacaoService.atualizarContadorLocal(naoLidas);
+      },
+      error: () => {
+        this.erro.set('Não foi possível carregar as notificações.');
+        this.carregando.set(false);
+      },
+    });
+  }
+
+  /** Tipos de notificação cujo referenciaId aponta para um repertório. */
+  private readonly TIPOS_REPERTORIO: TipoNotificacao[] = [
+    'escalacao',
+    'lembrete_culto',
+    'lembrete_culto_hora',
+    'repertorio_alterado',
+    'repertorio_aprovado',
+    'repertorio_reprovado',
+    'repertorio_pendente_aprovacao',
+    'confirmacao_pendente',
+    'musico_confirmou',
   ];
 
-  get unreadCount(): number {
-    return this.notificacoes.filter(n => !n.read).length;
+  getLink(notif: Notificacao): string | null {
+    if (!notif.referenciaId) return null;
+
+    // Músico confirmando se conhece as músicas → detalhe do repertório
+    if (notif.tipo === 'confirmacao_pendente') {
+      return `/repertorios/${notif.referenciaId}`;
+    }
+
+    // Ministro/pastor vendo quem confirmou → tela de status de confirmações
+    if (notif.tipo === 'musico_confirmou') {
+      return `/repertorios/${notif.referenciaId}/confirmacoes`;
+    }
+
+    // Demais notificações de repertório → detalhe do repertório
+    if (this.TIPOS_REPERTORIO.includes(notif.tipo)) {
+      return `/repertorios/${notif.referenciaId}`;
+    }
+
+    return null;
   }
 
-  getIcon(type: string): string {
-    const icons: Record<string, string> = {
+  clicar(notif: Notificacao): void {
+    const link = this.getLink(notif);
+    const marcar$ = notif.lida
+      ? null
+      : this.notificacaoService.marcarComoLida(notif.id);
+
+    if (marcar$) {
+      marcar$.subscribe({
+        next: () => {
+          this.notificacoes.update((lista) =>
+            lista.map((n) => (n.id === notif.id ? { ...n, lida: true } : n)),
+          );
+          if (link) this.router.navigateByUrl(link);
+        },
+      });
+    } else if (link) {
+      this.router.navigateByUrl(link);
+    }
+  }
+
+  marcarLida(notif: Notificacao): void {
+    if (notif.lida) return;
+    this.notificacaoService.marcarComoLida(notif.id).subscribe({
+      next: () => {
+        this.notificacoes.update((lista) =>
+          lista.map((n) => (n.id === notif.id ? { ...n, lida: true } : n)),
+        );
+      },
+    });
+  }
+
+  marcarTodasLidas(): void {
+    this.notificacaoService.marcarTodasComoLidas().subscribe({
+      next: () => {
+        this.notificacoes.update((lista) => lista.map((n) => ({ ...n, lida: true })));
+      },
+    });
+  }
+
+  getIcon(tipo: TipoNotificacao): string {
+    const icons: Record<TipoNotificacao, string> = {
       escalacao: 'event',
-      musica: 'music_note',
-      aviso: 'campaign',
       confirmacao: 'check_circle',
+      confirmacao_pendente: 'pending_actions',
+      musico_confirmou: 'how_to_reg',
+      aviso: 'campaign',
+      sistema: 'info',
+      lembrete_culto: 'event_available',
+      lembrete_culto_hora: 'alarm',
+      repertorio_alterado: 'edit_note',
+      repertorio_aprovado: 'verified',
+      repertorio_reprovado: 'cancel',
+      repertorio_pendente_aprovacao: 'rate_review',
     };
-    return icons[type] || 'notifications';
+    return icons[tipo] ?? 'notifications';
   }
 
-  markAsRead(notif: Notificacao): void {
-    notif.read = true;
-  }
-
-  markAllAsRead(): void {
-    this.notificacoes.forEach(n => n.read = true);
+  getIconColor(tipo: TipoNotificacao): string {
+    const colors: Partial<Record<TipoNotificacao, string>> = {
+      escalacao: 'primary',
+      repertorio_aprovado: 'success',
+      repertorio_reprovado: 'danger',
+      repertorio_pendente_aprovacao: 'warning',
+      lembrete_culto: 'warning',
+      lembrete_culto_hora: 'danger',
+      confirmacao_pendente: 'warning',
+      musico_confirmou: 'info',
+      repertorio_alterado: 'info',
+    };
+    return colors[tipo] ?? 'default';
   }
 }

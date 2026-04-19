@@ -4,26 +4,17 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificacoesService } from '../notificacoes/notificacoes.service';
 import { CreateRepertorioDto, UpdateRepertorioDto, MusicaRepertorioDto } from './dto/create-repertorio.dto';
 import { ReprovacaoDto } from './dto/aprovacao.dto';
 import { StatusRepertorio } from '@prisma/client';
 
-const TIPOS_CULTO = [
-  'Aniversário da Igreja',
-  'Batismo',
-  'Conferência',
-  'Congresso Jovem',
-  'Culto de Avivamento',
-  'Culto de Celebração',
-  'Culto para Família',
-  'EBD',
-  'Natal',
-  'Páscoa',
-];
-
 @Injectable()
 export class RepertoriosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificacoes: NotificacoesService,
+  ) {}
 
   private include = {
     musicas: { include: { musica: { include: { tags: { include: { tag: true } } } } }, orderBy: { ordem: 'asc' as const } },
@@ -72,6 +63,7 @@ export class RepertoriosService {
         nome: dto.nome,
         dataCulto: new Date(dto.dataCulto),
         horario: dto.horario,
+        horarioFim: dto.horarioFim,
         tipoCulto: dto.tipoCulto,
         localCulto: dto.localCulto,
         aviso: dto.aviso,
@@ -86,11 +78,32 @@ export class RepertoriosService {
     });
 
     await this.criarEscalacoes(rep.id, dto.musicas);
-    return this.getById(rep.id);
+
+    // Notificar músicos escalados
+    const escaladosIds = await this.notificacoes.getEscaladosPorRepertorio(rep.id);
+    const repertorioCompleto = await this.getById(rep.id);
+    const dataCulto = new Date(dto.dataCulto);
+    await Promise.all(
+      escaladosIds.map((uid) =>
+        this.notificacoes.notificarEscalacao(uid, rep.id, dto.nome, dataCulto),
+      ),
+    );
+
+    // Notificar pastores/ADMs
+    if (dto.igrejaId) {
+      const pastoresIds = await this.notificacoes.getPastoresAdmsPorIgreja(dto.igrejaId);
+      await this.notificacoes.notificarRepertorioPendenteAprovacao(pastoresIds, rep.id, dto.nome);
+    }
+
+    return repertorioCompleto;
   }
 
   async update(id: number, dto: UpdateRepertorioDto) {
     await this.getById(id);
+
+    // Capturar escalados antes de deletar, para notificá-los sobre a alteração
+    const escaladosAntes = await this.notificacoes.getEscaladosPorRepertorio(id);
+
     // Ao editar, volta para aguardando_aprovacao e limpa aprovação anterior
     await this.prisma.aprovacaoRepertorio.deleteMany({ where: { repertorioId: id } });
     // Remove escalações existentes (MusicaEscalada é em cascade)
@@ -102,6 +115,7 @@ export class RepertoriosService {
         nome: dto.nome,
         dataCulto: new Date(dto.dataCulto),
         horario: dto.horario,
+        horarioFim: dto.horarioFim,
         tipoCulto: dto.tipoCulto,
         localCulto: dto.localCulto,
         aviso: dto.aviso,
@@ -111,11 +125,32 @@ export class RepertoriosService {
           create: dto.musicas.map((m, ordem) => ({ musicaId: m.musicaId, ordem })),
         },
       },
-      select: { id: true },
+      select: { id: true, igrejaId: true },
     });
 
     await this.criarEscalacoes(rep.id, dto.musicas);
-    return this.getById(rep.id);
+
+    // Notificar usuários que estavam escalados antes sobre a alteração
+    if (escaladosAntes.length > 0) {
+      await this.notificacoes.notificarAlteracaoRepertorio(escaladosAntes, id, dto.nome);
+    }
+
+    // Notificar novos escalados
+    const novosEscalados = await this.notificacoes.getEscaladosPorRepertorio(id);
+    const dataCulto = new Date(dto.dataCulto);
+    await Promise.all(
+      novosEscalados.map((uid) =>
+        this.notificacoes.notificarEscalacao(uid, id, dto.nome, dataCulto),
+      ),
+    );
+
+    // Notificar pastores/ADMs que há nova versão aguardando aprovação
+    if (rep.igrejaId) {
+      const pastoresIds = await this.notificacoes.getPastoresAdmsPorIgreja(rep.igrejaId);
+      await this.notificacoes.notificarRepertorioPendenteAprovacao(pastoresIds, id, dto.nome);
+    }
+
+    return this.getById(id);
   }
 
   async remove(id: number) {
@@ -146,11 +181,18 @@ export class RepertoriosService {
         data: { status: StatusRepertorio.aprovado },
       }),
     ]);
+
+    // Notificar criador e todos os escalados
+    const notificarIds = new Set<number>([rep.criadorId]);
+    const escalados = await this.notificacoes.getEscaladosPorRepertorio(id);
+    escalados.forEach((uid) => notificarIds.add(uid));
+    await this.notificacoes.notificarRepertorioAprovado([...notificarIds], id, rep.nome);
+
     return this.getById(id);
   }
 
   async reprovar(id: number, pastorId: number, dto: ReprovacaoDto) {
-    await this.getById(id);
+    const rep = await this.getById(id);
     await this.prisma.$transaction([
       this.prisma.aprovacaoRepertorio.upsert({
         where: { repertorioId: id },
@@ -162,11 +204,20 @@ export class RepertoriosService {
         data: { status: StatusRepertorio.reprovado },
       }),
     ]);
+
+    // Notificar criador e todos os escalados
+    const notificarIds = new Set<number>([rep.criadorId]);
+    const escalados = await this.notificacoes.getEscaladosPorRepertorio(id);
+    escalados.forEach((uid) => notificarIds.add(uid));
+    await this.notificacoes.notificarRepertorioReprovado([...notificarIds], id, rep.nome, dto.motivo);
+
     return this.getById(id);
   }
 
   getTiposCulto() {
-    return TIPOS_CULTO;
+    return this.prisma.tipoCulto.findMany({
+      orderBy: [{ horario: 'asc' }, { nome: 'asc' }],
+    });
   }
 
   private async criarEscalacoes(repertorioId: number, musicas: MusicaRepertorioDto[]) {

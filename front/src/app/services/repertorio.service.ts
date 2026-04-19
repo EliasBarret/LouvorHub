@@ -10,6 +10,7 @@ import {
   AprovacaoRepertorio,
   ApiResponse,
   PageResponse,
+  TipoCulto,
 } from '../models';
 
 function isoToBr(iso: string | null | undefined): string {
@@ -96,8 +97,8 @@ export class RepertorioService {
       .pipe(map(res => ({ ...res, data: formatRepertorio(res.data) })));
   }
 
-  getTiposCulto(): Observable<ApiResponse<string[]>> {
-    return this.http.get<ApiResponse<string[]>>(`${this.api}/tipos-culto`);
+  getTiposCulto(): Observable<ApiResponse<TipoCulto[]>> {
+    return this.http.get<ApiResponse<TipoCulto[]>>(`${environment.apiUrl}/tipos-culto`);
   }
 
   getRepertoriosSnapshot(): Repertorio[] { return []; }

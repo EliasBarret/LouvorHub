@@ -1,0 +1,180 @@
+<div class="gestao-cultos-page">
+
+  <!-- ─── Page Header ─────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Tipos de Culto</h1>
+      <p class="page-subtitle">Cadastre os tipos de culto com seu horário fixo. A data é definida em cada repertório.</p>
+    </div>
+    @if (!showForm) {
+      <button class="btn-primary" (click)="abrirNovo()">
+        <span class="material-icons-outlined">add</span>
+        Novo Tipo de Culto
+      </button>
+    }
+  </div>
+
+  <!-- ─── Sucesso global ───────────────────────────────────────────────── -->
+  @if (formSucesso && !showForm) {
+    <div class="alert alert-success">
+      <span class="material-icons-outlined">check_circle</span>
+      {{ formSucesso }}
+    </div>
+  }
+
+  <!-- ─── Formulário ──────────────────────────────────────────────────── -->
+  @if (showForm) {
+    <div class="form-card">
+      <h2 class="section-title">
+        <span class="material-icons-outlined section-icon">church</span>
+        {{ editingId ? 'Editar Tipo de Culto' : 'Novo Tipo de Culto' }}
+      </h2>
+
+      @if (formErro) {
+        <div class="alert alert-error">
+          <span class="material-icons-outlined">error_outline</span>
+          {{ formErro }}
+        </div>
+      }
+
+      <!-- Nome -->
+      <div class="form-row">
+        <div class="form-group col-full">
+          <label class="form-label" for="nome">
+            Nome <span class="required">*</span>
+          </label>
+          <input
+            id="nome"
+            type="text"
+            class="form-control"
+            [(ngModel)]="formNome"
+            placeholder="Ex: Culto de Domingo — Manhã"
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <!-- Horários -->
+      <div class="form-row">
+        <div class="form-group col-2">
+          <label class="form-label" for="horario">
+            Horário de Início <span class="required">*</span>
+          </label>
+          <input
+            id="horario"
+            type="time"
+            class="form-control"
+            [(ngModel)]="formHorario"
+          />
+          <span class="field-hint">Preenchido automaticamente ao criar repertórios.</span>
+        </div>
+
+        <div class="form-group col-2">
+          <label class="form-label" for="horarioFim">Horário de Término</label>
+          <input
+            id="horarioFim"
+            type="time"
+            class="form-control"
+            [(ngModel)]="formHorarioFim"
+          />
+          <span class="field-hint">Usado para lembretes e controle de duração.</span>
+        </div>
+      </div>
+
+      <!-- Igreja -->
+      <div class="form-row">
+        <div class="form-group col-2">
+          <label class="form-label" for="igrejaId">Igreja (opcional)</label>
+          <select id="igrejaId" class="form-control" [(ngModel)]="formIgrejaId">
+            <option [ngValue]="null">Todas as igrejas</option>
+            @for (igreja of igrejas; track igreja.id) {
+              <option [value]="igreja.id">{{ igreja.nome }}{{ igreja.cidade ? ' — ' + igreja.cidade : '' }}</option>
+            }
+          </select>
+          <span class="field-hint">Deixe em branco para disponibilizar em todas as igrejas.</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="cancelarForm()" [disabled]="saving">
+          Cancelar
+        </button>
+        <button type="button" class="btn-primary" (click)="salvar()" [disabled]="saving">
+          @if (saving) {
+            <span class="material-icons-outlined spinning">autorenew</span>
+            Salvando…
+          } @else {
+            <span class="material-icons-outlined">save</span>
+            {{ editingId ? 'Salvar Alterações' : 'Criar Tipo de Culto' }}
+          }
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ─── Loading ─────────────────────────────────────────────────────── -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <span class="material-icons-outlined spinning">autorenew</span>
+      Carregando…
+    </div>
+  }
+
+  <!-- ─── Lista vazia ──────────────────────────────────────────────────── -->
+  @if (!isLoading && tiposCulto.length === 0 && !showForm) {
+    <div class="empty-full">
+      <div class="empty-icon-wrap">
+        <span class="material-icons-outlined">church</span>
+      </div>
+      <h3>Nenhum tipo de culto cadastrado</h3>
+      <p>Crie os tipos de culto para facilitar o preenchimento dos repertórios.</p>
+      <button class="btn-primary" (click)="abrirNovo()">
+        <span class="material-icons-outlined">add</span>
+        Criar Primeiro Tipo
+      </button>
+    </div>
+  }
+
+  <!-- ─── Lista de tipos ───────────────────────────────────────────────── -->
+  @if (!isLoading && tiposCulto.length > 0) {
+    <div class="cultos-list">
+      @for (tipo of tiposCulto; track tipo.id) {
+        <div class="culto-card">
+          <div class="culto-icon-wrap">
+            <span class="material-icons-outlined">schedule</span>
+          </div>
+          <div class="culto-info">
+            <span class="culto-nome">{{ tipo.nome }}</span>
+            <span class="culto-meta">
+              <span class="material-icons-outlined meta-icon">access_time</span>
+              {{ tipo.horario }}{{ tipo.horarioFim ? ' — ' + tipo.horarioFim : '' }}
+              @if (tipo.igrejaId) {
+                <span class="sep">·</span>
+                <span class="material-icons-outlined meta-icon">church</span>
+                {{ getNomeIgreja(tipo.igrejaId) }}
+              }
+            </span>
+          </div>
+          <div class="culto-actions">
+            <button class="action-btn edit" (click)="abrirEdicao(tipo)" title="Editar">
+              <span class="material-icons-outlined">edit</span>
+            </button>
+            <button
+              class="action-btn delete"
+              (click)="remover(tipo)"
+              [disabled]="removendoId === tipo.id"
+              title="Remover"
+            >
+              @if (removendoId === tipo.id) {
+                <span class="material-icons-outlined spinning">autorenew</span>
+              } @else {
+                <span class="material-icons-outlined">delete_outline</span>
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

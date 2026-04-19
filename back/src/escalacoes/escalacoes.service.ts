@@ -4,13 +4,17 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificacoesService } from '../notificacoes/notificacoes.service';
 import { CreateEscalacaoDto } from './dto/create-escalacao.dto';
 import { ConfirmacaoDto } from './dto/confirmacao.dto';
 import { StatusConfirmacao } from '@prisma/client';
 
 @Injectable()
 export class EscalacoesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificacoes: NotificacoesService,
+  ) {}
 
   async getMinhasEscalacoes(userId: number) {
     const escalacoes = await this.prisma.escalacaoMusico.findMany({
@@ -115,8 +119,18 @@ export class EscalacoesService {
       },
       include: {
         musicasEscaladas: { include: { confirmacao: true } },
+        repertorio: true,
       },
     });
+
+    // Notificar músico escalado
+    await this.notificacoes.notificarEscalacao(
+      dto.usuarioId,
+      dto.repertorioId,
+      escalacao.repertorio.nome,
+      escalacao.repertorio.dataCulto,
+    );
+
     return escalacao;
   }
 
@@ -140,11 +154,56 @@ export class EscalacoesService {
     if (!musicaEscalada) throw new NotFoundException('Música escalada não encontrada.');
 
     const status = dto.status as unknown as StatusConfirmacao;
-    return this.prisma.confirmacaoMusica.upsert({
+    const result = await this.prisma.confirmacaoMusica.upsert({
       where: { musicaEscaladaId: musicaEscalada.id },
       create: { musicaEscaladaId: musicaEscalada.id, musicaId: dto.musicaId, status },
       update: { status },
+      include: {
+        musica: true,
+        musicaEscalada: {
+          include: {
+            escalacao: {
+              include: {
+                repertorio: true,
+                usuario: { select: { id: true, nome: true } },
+              },
+            },
+          },
+        },
+      },
     });
+
+    // Notificar o criador do repertório (ministro) sobre a confirmação
+    const escalacao = result.musicaEscalada.escalacao;
+    const repertorio = escalacao.repertorio;
+    const criadorId = repertorio.criadorId;
+
+    // Destinatários: criador (ministro) + todos os pastores/ADMs da igreja
+    const destinatarios = new Set<number>();
+    if (criadorId !== escalacao.usuarioId) {
+      destinatarios.add(criadorId);
+    }
+    if (repertorio.igrejaId) {
+      const pastoresAdms = await this.notificacoes.getPastoresAdmsPorIgreja(repertorio.igrejaId);
+      pastoresAdms
+        .filter((uid) => uid !== escalacao.usuarioId)
+        .forEach((uid) => destinatarios.add(uid));
+    }
+
+    await Promise.all(
+      [...destinatarios].map((uid) =>
+        this.notificacoes.notificarMusicoConfirmou(
+          uid,
+          escalacao.usuario.nome,
+          result.musica.titulo,
+          status,
+          repertorio.id,
+          repertorio.nome,
+        ),
+      ),
+    );
+
+    return result;
   }
 
   async getConfirmacoesRepertorio(repertorioId: number) {

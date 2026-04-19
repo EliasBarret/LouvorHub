@@ -10,11 +10,11 @@
         {{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}
       </span>
     </button>
-    <button class="notification-btn">
+    <a class="notification-btn" routerLink="/notificacoes" title="Notificações">
       <span class="material-icons-outlined">notifications_none</span>
-      @if (notificationCount > 0) {
-        <span class="notification-badge">{{ notificationCount }}</span>
+      @if (notificationCount() > 0) {
+        <span class="notification-badge">{{ notificationCount() > 99 ? '99+' : notificationCount() }}</span>
       }
-    </button>
+    </a>
   </div>
 </header>

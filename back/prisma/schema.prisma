@@ -44,10 +44,25 @@ model Igreja {
   observacoes  String?
   criadoEm    DateTime @default(now()) @map("criado_em")
 
-  membros     MembroIgreja[]
-  repertorios Repertorio[]
+  membros      MembroIgreja[]
+  repertorios  Repertorio[]
+  tiposCulto   TipoCulto[]
 
   @@map("igrejas")
+}
+
+// ─── Tipos de Culto ──────────────────────────────────────────────────────────
+
+model TipoCulto {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  horario     String
+  horarioFim  String?  @map("horario_fim")
+  igrejaId    Int?     @map("igreja_id")
+  igreja      Igreja?  @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
+  criadoEm   DateTime @default(now()) @map("criado_em")
+
+  @@map("tipos_culto")
 }
 
 model MembroIgreja {
@@ -129,6 +144,7 @@ model Repertorio {
   nome        String
   dataCulto   DateTime         @map("data_culto")
   horario     String?
+  horarioFim  String?          @map("horario_fim")
   tipoCulto   String           @map("tipo_culto")
   localCulto  String?          @map("local_culto")
   aviso       String?
@@ -226,6 +242,14 @@ enum TipoNotificacao {
   confirmacao
   aviso
   sistema
+  lembrete_culto
+  lembrete_culto_hora
+  repertorio_alterado
+  repertorio_aprovado
+  repertorio_reprovado
+  repertorio_pendente_aprovacao
+  confirmacao_pendente
+  musico_confirmou
 }
 
 model Notificacao {

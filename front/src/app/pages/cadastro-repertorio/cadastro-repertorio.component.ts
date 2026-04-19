@@ -5,7 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MockApiService } from '../../services/mock-api.service';
 import { IgrejaService } from '../../services/igreja.service';
-import { Musica, Tag, Igreja, MembroIgreja, Repertorio } from '../../models';
+import { TiposCultoService } from '../../services/tipos-culto.service';
+import { Musica, Tag, Igreja, MembroIgreja, Repertorio, TipoCulto } from '../../models';
 
 interface MusicoForm {
   membro: MembroIgreja;
@@ -31,7 +32,7 @@ interface MusicaAssignment {
 })
 export class CadastroRepertorioComponent implements OnInit {
   form!: FormGroup;
-  tiposCulto: string[] = [];
+  tiposCulto: TipoCulto[] = [];
   todasMusicas: Musica[] = [];
   tags: Tag[] = [];
   minhasIgrejas: Igreja[] = [];
@@ -60,6 +61,7 @@ export class CadastroRepertorioComponent implements OnInit {
     private fb: FormBuilder,
     private api: MockApiService,
     private igrejaService: IgrejaService,
+    private tiposCultoService: TiposCultoService,
     private router: Router,
     private route: ActivatedRoute,
   ) {}
@@ -91,6 +93,7 @@ export class CadastroRepertorioComponent implements OnInit {
       tipoCulto: rep.tipoCulto,
       igrejaId: rep.igrejaId ?? null,
       horario: rep.horario ?? '',
+      horarioFim: rep.horarioFim ?? '',
       localCulto: rep.localCulto ?? '',
       aviso: rep.aviso ?? '',
     });
@@ -162,6 +165,8 @@ export class CadastroRepertorioComponent implements OnInit {
       dataCulto: ['', Validators.required],
       tipoCulto: ['', Validators.required],
       igrejaId: [null, Validators.required],
+      horario: [''],
+      horarioFim: [''],
     });
 
     this.form.get('igrejaId')?.valueChanges.subscribe(igrejaId => {
@@ -170,7 +175,7 @@ export class CadastroRepertorioComponent implements OnInit {
   }
 
   private loadMetadata(): void {
-    this.api.getTiposCulto().subscribe(res => {
+    this.tiposCultoService.getAll().subscribe(res => {
       this.tiposCulto = res.data;
     });
 
@@ -219,10 +224,17 @@ export class CadastroRepertorioComponent implements OnInit {
     return this.form.controls;
   }
 
-  onTipoCultoChange(tipo: string): void {
+  onTipoCultoChange(tipoNome: string): void {
     const nomeAtual = this.form.get('nome')?.value;
     if (!nomeAtual) {
-      this.form.patchValue({ nome: tipo });
+      this.form.patchValue({ nome: tipoNome });
+    }
+    const tipo = this.tiposCulto.find(t => t.nome === tipoNome);
+    if (tipo) {
+      this.form.patchValue({
+        horario: tipo.horario,
+        horarioFim: tipo.horarioFim ?? '',
+      });
     }
   }
 

@@ -27,6 +27,16 @@ export interface Igreja {
   observacoes?: string;
 }
 
+export interface TipoCulto {
+  id: number;
+  nome: string;
+  horario: string;
+  horarioFim?: string;
+  igrejaId?: number;
+  igreja?: { id: number; nome: string };
+  criadoEm?: string;
+}
+
 export interface MembroIgreja {
   id: number;
   usuarioId: number;
@@ -142,6 +152,7 @@ export interface Repertorio {
   nome: string;
   dataCulto: string;
   horario?: string;
+  horarioFim?: string;
   tipoCulto: string;
   localCulto?: string;
   aviso?: string;
@@ -157,6 +168,7 @@ export interface RepertorioForm {
   nome: string;
   dataCulto: string;
   horario?: string;
+  horarioFim?: string;
   tipoCulto: string;
   localCulto?: string;
   aviso?: string;
@@ -281,7 +293,19 @@ export interface VisaoGeralConfirmacoes {
 
 // ─── Notificações ─────────────────────────────────────────────────────────────
 
-export type TipoNotificacao = 'escalacao' | 'confirmacao' | 'aviso' | 'sistema';
+export type TipoNotificacao =
+  | 'escalacao'
+  | 'confirmacao'
+  | 'aviso'
+  | 'sistema'
+  | 'lembrete_culto'
+  | 'lembrete_culto_hora'
+  | 'repertorio_alterado'
+  | 'repertorio_aprovado'
+  | 'repertorio_reprovado'
+  | 'repertorio_pendente_aprovacao'
+  | 'confirmacao_pendente'
+  | 'musico_confirmou';
 
 export interface Notificacao {
   id: number;
