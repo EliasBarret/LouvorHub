@@ -10,18 +10,19 @@ export class DashboardService {
   ) {}
 
   async getStats(userId: number) {
-    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const [proximosCultos, musicasEscaladas, aguardandoConfirmacao] = await Promise.all([
       this.prisma.escalacaoMusico.count({
         where: {
           usuarioId: userId,
-          repertorio: { dataCulto: { gte: now } },
+          repertorio: { dataCulto: { gte: today } },
         },
       }),
       this.prisma.musicaEscalada.count({
-        where: { escalacao: { usuarioId: userId, repertorio: { dataCulto: { gte: now } } } },
+        where: { escalacao: { usuarioId: userId, repertorio: { dataCulto: { gte: today } } } },
       }),
-      this.escalacoesService.getPendentesCount(userId),
+      this.escalacoesService.getPendentesCount(userId, today),
     ]);
 
     return [

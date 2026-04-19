@@ -190,11 +190,12 @@ export class EscalacoesService {
     };
   }
 
-  async getPendentesCount(userId: number): Promise<number> {
+  async getPendentesCount(userId: number, fromDate?: Date): Promise<number> {
+    const date = fromDate ?? (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })();
     const result = await this.prisma.confirmacaoMusica.count({
       where: {
         status: StatusConfirmacao.pendente,
-        musicaEscalada: { escalacao: { usuarioId: userId } },
+        musicaEscalada: { escalacao: { usuarioId: userId, repertorio: { dataCulto: { gte: date } } } },
       },
     });
     return result;
