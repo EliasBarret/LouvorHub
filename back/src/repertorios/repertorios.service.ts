@@ -4,7 +4,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateRepertorioDto, UpdateRepertorioDto } from './dto/create-repertorio.dto';
+import { CreateRepertorioDto, UpdateRepertorioDto, MusicaRepertorioDto } from './dto/create-repertorio.dto';
 import { ReprovacaoDto } from './dto/aprovacao.dto';
 import { StatusRepertorio } from '@prisma/client';
 
@@ -30,6 +30,12 @@ export class RepertoriosService {
     aprovacao: { include: { pastor: { select: { id: true, nome: true, email: true } } } },
     criador: { select: { id: true, nome: true, email: true } },
     igreja: true,
+    escalacoes: {
+      include: {
+        usuario: { select: { id: true, nome: true, email: true, perfil: true, instrumentos: true } },
+        musicasEscaladas: true,
+      },
+    },
   };
 
   async getAll(page = 0, size = 50, igrejaIds?: number[]) {
@@ -73,16 +79,20 @@ export class RepertoriosService {
         criadorId: userId,
         igrejaId: dto.igrejaId,
         musicas: {
-          create: dto.musicasIds.map((musicaId, ordem) => ({ musicaId, ordem })),
+          create: dto.musicas.map((m, ordem) => ({ musicaId: m.musicaId, ordem })),
         },
       },
-      include: this.include,
+      select: { id: true },
     });
-    return this.format(rep);
+
+    await this.criarEscalacoes(rep.id, dto.musicas);
+    return this.getById(rep.id);
   }
 
   async update(id: number, dto: UpdateRepertorioDto) {
     await this.getById(id);
+    // Remove escalações existentes (MusicaEscalada é em cascade)
+    await this.prisma.escalacaoMusico.deleteMany({ where: { repertorioId: id } });
     await this.prisma.repertorioMusica.deleteMany({ where: { repertorioId: id } });
     const rep = await this.prisma.repertorio.update({
       where: { id },
@@ -95,12 +105,14 @@ export class RepertoriosService {
         aviso: dto.aviso,
         igrejaId: dto.igrejaId,
         musicas: {
-          create: dto.musicasIds.map((musicaId, ordem) => ({ musicaId, ordem })),
+          create: dto.musicas.map((m, ordem) => ({ musicaId: m.musicaId, ordem })),
         },
       },
-      include: this.include,
+      select: { id: true },
     });
-    return this.format(rep);
+
+    await this.criarEscalacoes(rep.id, dto.musicas);
+    return this.getById(rep.id);
   }
 
   async remove(id: number) {
@@ -154,14 +166,55 @@ export class RepertoriosService {
     return TIPOS_CULTO;
   }
 
+  private async criarEscalacoes(repertorioId: number, musicas: MusicaRepertorioDto[]) {
+    for (const musicaDto of musicas) {
+      for (const cantorId of musicaDto.cantores ?? []) {
+        await this.upsertMusicaEscalada(repertorioId, cantorId, musicaDto.musicaId, 'Cantor');
+      }
+      for (const musico of musicaDto.musicos ?? []) {
+        await this.upsertMusicaEscalada(repertorioId, musico.usuarioId, musicaDto.musicaId, musico.instrumento);
+      }
+    }
+  }
+
+  private async upsertMusicaEscalada(repertorioId: number, usuarioId: number, musicaId: number, instrumento: string) {
+    const escalacao = await this.prisma.escalacaoMusico.upsert({
+      where: { repertorioId_usuarioId: { repertorioId, usuarioId } },
+      create: { repertorioId, usuarioId },
+      update: {},
+    });
+    await this.prisma.musicaEscalada.upsert({
+      where: { escalacaoId_musicaId: { escalacaoId: escalacao.id, musicaId } },
+      create: { escalacaoId: escalacao.id, musicaId, instrumento },
+      update: { instrumento },
+    });
+  }
+
   private format(rep: any) {
     return {
       ...rep,
       musicasIds: rep.musicas?.map((rm: any) => rm.musicaId) ?? [],
-      musicas: rep.musicas?.map((rm: any) => ({
-        ...rm.musica,
-        tags: rm.musica?.tags?.map((mt: any) => mt.tag?.nome) ?? [],
-      })) ?? [],
+      musicas: rep.musicas?.map((rm: any) => {
+        const musicaId = rm.musicaId;
+        const cantores: any[] = [];
+        const musicos: any[] = [];
+        for (const escalacao of rep.escalacoes ?? []) {
+          const me = escalacao.musicasEscaladas?.find((m: any) => m.musicaId === musicaId);
+          if (me) {
+            if (me.instrumento === 'Cantor') {
+              cantores.push(escalacao.usuario);
+            } else {
+              musicos.push({ ...escalacao.usuario, instrumento: me.instrumento });
+            }
+          }
+        }
+        return {
+          ...rm.musica,
+          tags: rm.musica?.tags?.map((mt: any) => mt.tag?.nome) ?? [],
+          cantores,
+          musicos,
+        };
+      }) ?? [],
     };
   }
 }

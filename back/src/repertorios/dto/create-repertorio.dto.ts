@@ -6,8 +6,39 @@ import {
   IsArray,
   IsInt,
   IsEnum,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { StatusRepertorio } from '@prisma/client';
+
+export class MusicoEscaladoDto {
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  usuarioId: number;
+
+  @ApiProperty({ example: 'Guitarra' })
+  @IsString()
+  instrumento: string;
+}
+
+export class MusicaRepertorioDto {
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  musicaId: number;
+
+  @ApiPropertyOptional({ type: [Number], description: 'IDs dos cantores escalados para esta música' })
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  cantores?: number[];
+
+  @ApiPropertyOptional({ type: [MusicoEscaladoDto], description: 'Músicos escalados para esta música com seus instrumentos' })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MusicoEscaladoDto)
+  musicos?: MusicoEscaladoDto[];
+}
 
 export class CreateRepertorioDto {
   @ApiProperty({ example: 'Culto de Domingo — Manhã' })
@@ -47,10 +78,11 @@ export class CreateRepertorioDto {
   @IsInt()
   igrejaId?: number;
 
-  @ApiProperty({ type: [Number] })
+  @ApiProperty({ type: [MusicaRepertorioDto], description: 'Músicas do repertório com cantores e músicos escalados' })
   @IsArray()
-  @IsInt({ each: true })
-  musicasIds: number[];
+  @ValidateNested({ each: true })
+  @Type(() => MusicaRepertorioDto)
+  musicas: MusicaRepertorioDto[];
 }
 
 export class UpdateRepertorioDto extends CreateRepertorioDto {}

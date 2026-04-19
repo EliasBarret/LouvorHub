@@ -208,6 +208,15 @@
                 }
               </div>
               <div class="selected-actions">
+                <button type="button" class="escalacao-toggle-btn"
+                  [class.active]="getAssignment(musica.id).showAssignment"
+                  (click)="toggleAssignment(musica.id)"
+                  title="Escalar cantores e músicos">
+                  <span class="material-icons-outlined">people</span>
+                  @if (getTotalEscalados(musica.id) > 0) {
+                    <span class="escalacao-count">{{ getTotalEscalados(musica.id) }}</span>
+                  }
+                </button>
                 <button type="button" class="order-btn" [disabled]="i === 0" (click)="moverMusica(i, 'up')">
                   <span class="material-icons-outlined">keyboard_arrow_up</span>
                 </button>
@@ -219,6 +228,143 @@
                 </button>
               </div>
             </div>
+
+            <!-- Painel de Escalação -->
+            @if (getAssignment(musica.id).showAssignment) {
+              <div class="escalacao-panel">
+
+                <!-- Cantores -->
+                <div class="escalacao-section">
+                  <h4 class="escalacao-section-title">
+                    <span class="material-icons-outlined">mic</span>
+                    Cantores
+                  </h4>
+
+                  <!-- Cantores escalados -->
+                  @if (getAssignment(musica.id).cantores.length > 0) {
+                    <div class="escalados-chips">
+                      @for (cantor of getAssignment(musica.id).cantores; track cantor.usuarioId) {
+                        <div class="escalado-chip">
+                          <span class="chip-avatar">{{ getNomeUsuario(cantor)[0] }}</span>
+                          <span class="chip-nome">{{ getNomeUsuario(cantor) }}</span>
+                          <button type="button" class="chip-remove" (click)="removerCantor(musica.id, cantor.usuarioId)">
+                            <span class="material-icons-outlined">close</span>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- Busca cantores -->
+                  <div class="escalacao-search-wrapper">
+                    <span class="material-icons-outlined escalacao-search-icon">search</span>
+                    <input
+                      type="text"
+                      class="escalacao-search"
+                      placeholder="Buscar cantor por nome…"
+                      [value]="getAssignment(musica.id).searchCantor"
+                      (input)="onSearchCantorInput(musica.id, $any($event.target).value)"
+                      autocomplete="off"
+                    />
+                  </div>
+                  @if (getAssignment(musica.id).searchCantor.length > 0) {
+                    <div class="escalacao-results">
+                      @if (getAssignment(musica.id).membrosBuscadosCantores.length === 0) {
+                        <div class="escalacao-empty">Nenhum membro encontrado.</div>
+                      } @else {
+                        @for (membro of getAssignment(musica.id).membrosBuscadosCantores.slice(0, 5); track membro.id) {
+                          <div class="escalacao-result-item" (click)="adicionarCantor(musica.id, membro)">
+                            <span class="result-avatar">{{ getNomeUsuario(membro)[0] }}</span>
+                            <span class="result-nome">{{ getNomeUsuario(membro) }}</span>
+                            <span class="result-perfil">{{ membro.perfil }}</span>
+                          </div>
+                        }
+                      }
+                    </div>
+                  }
+                </div>
+
+                <!-- Músicos -->
+                <div class="escalacao-section">
+                  <h4 class="escalacao-section-title">
+                    <span class="material-icons-outlined">piano</span>
+                    Músicos
+                  </h4>
+
+                  <!-- Músicos escalados -->
+                  @if (getAssignment(musica.id).musicos.length > 0) {
+                    <div class="escalados-chips">
+                      @for (mf of getAssignment(musica.id).musicos; track mf.membro.usuarioId) {
+                        <div class="escalado-chip escalado-chip--musico">
+                          <span class="chip-avatar">{{ getNomeUsuario(mf.membro)[0] }}</span>
+                          <div class="chip-info">
+                            <span class="chip-nome">{{ getNomeUsuario(mf.membro) }}</span>
+                            @if (getInstrumentos(mf.membro).length > 1) {
+                              <select
+                                class="chip-instrumento-select"
+                                [(ngModel)]="mf.instrumento"
+                                [ngModelOptions]="{ standalone: true }"
+                              >
+                                @for (inst of getInstrumentos(mf.membro); track inst) {
+                                  <option [value]="inst">{{ inst }}</option>
+                                }
+                              </select>
+                            } @else if (getInstrumentos(mf.membro).length === 1) {
+                              <span class="chip-instrumento-badge">{{ mf.instrumento }}</span>
+                            } @else {
+                              <input
+                                type="text"
+                                class="chip-instrumento-input"
+                                placeholder="Instrumento"
+                                [(ngModel)]="mf.instrumento"
+                                [ngModelOptions]="{ standalone: true }"
+                              />
+                            }
+                          </div>
+                          <button type="button" class="chip-remove" (click)="removerMusico(musica.id, mf.membro.usuarioId)">
+                            <span class="material-icons-outlined">close</span>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- Busca músicos -->
+                  <div class="escalacao-search-wrapper">
+                    <span class="material-icons-outlined escalacao-search-icon">search</span>
+                    <input
+                      type="text"
+                      class="escalacao-search"
+                      placeholder="Buscar músico por nome…"
+                      [value]="getAssignment(musica.id).searchMusico"
+                      (input)="onSearchMusicoInput(musica.id, $any($event.target).value)"
+                      autocomplete="off"
+                    />
+                  </div>
+                  @if (getAssignment(musica.id).searchMusico.length > 0) {
+                    <div class="escalacao-results">
+                      @if (getAssignment(musica.id).membrosBuscadosMusicos.length === 0) {
+                        <div class="escalacao-empty">Nenhum membro encontrado.</div>
+                      } @else {
+                        @for (membro of getAssignment(musica.id).membrosBuscadosMusicos.slice(0, 5); track membro.id) {
+                          <div class="escalacao-result-item" (click)="adicionarMusico(musica.id, membro)">
+                            <span class="result-avatar">{{ getNomeUsuario(membro)[0] }}</span>
+                            <div class="result-info">
+                              <span class="result-nome">{{ getNomeUsuario(membro) }}</span>
+                              @if (membro.usuario?.instrumentos?.length) {
+                                <span class="result-instrumentos">{{ membro.usuario?.instrumentos?.join(', ') }}</span>
+                              }
+                            </div>
+                            <span class="result-perfil">{{ membro.perfil }}</span>
+                          </div>
+                        }
+                      }
+                    </div>
+                  }
+                </div>
+
+              </div>
+            }
           }
         </div>
       } @else {

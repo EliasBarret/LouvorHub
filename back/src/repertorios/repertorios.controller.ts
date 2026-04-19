@@ -11,6 +11,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RepertoriosService } from './repertorios.service';
@@ -54,6 +55,10 @@ export class RepertoriosController {
   @Post()
   @ApiOperation({ summary: 'Criar novo repertório' })
   create(@Body() dto: CreateRepertorioDto, @CurrentUser() user: any) {
+    const perfisPermitidos = ['ADM', 'Pastor', 'Ministro'];
+    if (!perfisPermitidos.includes(user.perfil)) {
+      throw new ForbiddenException('Apenas Administrador, Pastor ou Ministro podem criar repertórios.');
+    }
     return this.repertoriosService.create(dto, user.id);
   }
 

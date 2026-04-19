@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MockApiService } from '../../services/mock-api.service';
 import { IgrejaService } from '../../services/igreja.service';
-import { Repertorio, Tag } from '../../models';
+import { Repertorio, Tag, Usuario } from '../../models';
 
 @Component({
   selector: 'app-repertorios',
@@ -20,6 +20,13 @@ export class RepertoriosComponent implements OnInit {
 
   repertorios: Repertorio[] = [];
   isLoading = true;
+  usuario: Usuario | null = null;
+
+  get podeCrearRepertorio(): boolean {
+    return this.usuario?.perfil === 'ADM' ||
+           this.usuario?.perfil === 'Pastor' ||
+           this.usuario?.perfil === 'Ministro';
+  }
 
   private readonly MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
 
@@ -45,6 +52,7 @@ export class RepertoriosComponent implements OnInit {
 
     this.api.getUsuarioLogado().subscribe(usuRes => {
       const user = usuRes.data;
+      this.usuario = user;
       this.api.getRepertorios().subscribe(repsRes => {
         const allReps = repsRes.data.conteudo;
         if (user.perfil === 'ADM') {

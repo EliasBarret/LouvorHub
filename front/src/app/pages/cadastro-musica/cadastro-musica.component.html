@@ -122,13 +122,13 @@
             <button
               type="button"
               class="tag-btn"
-              [class.selected]="isTagSelected(tag.nome)"
+              [class.selected]="isTagSelected(tag.id)"
               [style.--tag-cor]="tag.cor"
-              (click)="toggleTag(tag.nome)"
+              (click)="toggleTag(tag.id)"
             >
               <span class="tag-dot"></span>
               {{ tag.nome }}
-              @if (isTagSelected(tag.nome)) {
+              @if (isTagSelected(tag.id)) {
                 <span class="material-icons-outlined tag-check">check</span>
               }
             </button>

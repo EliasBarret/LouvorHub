@@ -149,7 +149,7 @@ export interface Repertorio {
   igrejaId?: number;
   aprovacao?: AprovacaoRepertorio;
   musicasIds: number[];
-  musicas?: Musica[];
+  musicas?: MusicaRepertorio[];
   criadoEm: string;
 }
 
@@ -162,7 +162,7 @@ export interface RepertorioForm {
   aviso?: string;
   status: StatusRepertorio;
   igrejaId?: number;
-  musicasIds: number[];
+  musicas: MusicaRepertorioItem[];
 }
 
 export interface ApiResponse<T> {
@@ -182,6 +182,33 @@ export interface PageResponse<T> {
 // ─── Escalação e Confirmações ─────────────────────────────────────────────────
 
 export type StatusConfirmacao = 'conhece' | 'nao_conhece' | 'pendente';
+
+/** Um músico/cantor escalado para uma música específica de um repertório. */
+export interface CantorescaladoItem {
+  id: number;
+  nome: string;
+  email: string;
+  perfil?: Perfil;
+  instrumentos?: string[];
+}
+
+/** Um músico escalado com instrumento específico. */
+export interface MusicoEscaladoItem extends CantorescaladoItem {
+  instrumento: string;
+}
+
+/** Uma música dentro de um repertório, com cantores e músicos escalados. */
+export interface MusicaRepertorio extends Musica {
+  cantores: CantorescaladoItem[];
+  musicos: MusicoEscaladoItem[];
+}
+
+/** Item de música para envio no formulário de criação/edição de repertório. */
+export interface MusicaRepertorioItem {
+  musicaId: number;
+  cantores?: number[];
+  musicos?: { usuarioId: number; instrumento: string }[];
+}
 
 /** Um item de música dentro de uma escalação de músico, com instrumento. */
 export interface MusicaEscaladaItem {

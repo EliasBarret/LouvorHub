@@ -48,6 +48,8 @@ export class IgrejasService {
             funcao: true,
             ministerio: true,
             avatar: true,
+            perfil: true,
+            instrumentos: true,
           },
         },
         igreja: true,

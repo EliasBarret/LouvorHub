@@ -10,10 +10,12 @@
         <span class="material-icons-outlined">add</span>
         Nova Música
       </button>
-      <button class="btn-primary" (click)="goToNovoRepertorio()">
-        <span class="material-icons-outlined">add</span>
-        Novo Repertório
-      </button>
+      @if (podeCrearRepertorio) {
+        <button class="btn-primary" (click)="goToNovoRepertorio()">
+          <span class="material-icons-outlined">add</span>
+          Novo Repertório
+        </button>
+      }
     </div>
   </div>
 

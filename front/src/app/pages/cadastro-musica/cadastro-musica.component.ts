@@ -51,18 +51,18 @@ export class CadastroMusicaComponent implements OnInit {
     });
   }
 
-  selectedTags = new Set<string>();
+  selectedTags = new Set<number>();
 
-  toggleTag(tagNome: string): void {
-    if (this.selectedTags.has(tagNome)) {
-      this.selectedTags.delete(tagNome);
+  toggleTag(tagId: number): void {
+    if (this.selectedTags.has(tagId)) {
+      this.selectedTags.delete(tagId);
     } else {
-      this.selectedTags.add(tagNome);
+      this.selectedTags.add(tagId);
     }
   }
 
-  isTagSelected(tagNome: string): boolean {
-    return this.selectedTags.has(tagNome);
+  isTagSelected(tagId: number): boolean {
+    return this.selectedTags.has(tagId);
   }
 
   get f() {
@@ -80,7 +80,7 @@ export class CadastroMusicaComponent implements OnInit {
 
     const payload = {
       ...this.form.value,
-      tags: Array.from(this.selectedTags),
+      tagIds: Array.from(this.selectedTags),
     };
 
     this.api.createMusica(payload).subscribe({
