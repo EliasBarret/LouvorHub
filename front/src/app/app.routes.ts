@@ -24,6 +24,7 @@ export const routes: Routes = [
       { path: 'inicio', component: HomeComponent },
       { path: 'repertorios', component: RepertoriosComponent },
       { path: 'repertorios/novo', component: CadastroRepertorioComponent },
+      { path: 'repertorios/:id/editar', component: CadastroRepertorioComponent },
       { path: 'repertorios/:id', component: RepertorioDetailComponent },
       { path: 'repertorios/:id/confirmacoes', component: StatusConfirmacoesComponent },
       { path: 'musicas/nova', component: CadastroMusicaComponent },

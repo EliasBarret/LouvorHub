@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MockApiService } from '../../services/mock-api.service';
 import { EscalacaoService } from '../../services/escalacao.service';
-import { DetalheEscalacao, Repertorio, Tag } from '../../models';
+import { DetalheEscalacao, Repertorio, Tag, Usuario } from '../../models';
 
 @Component({
   selector: 'app-repertorio-detail',
@@ -16,6 +16,7 @@ export class RepertorioDetailComponent implements OnInit {
   detalheEscalacao: DetalheEscalacao | null = null;
   confirmandoMap = new Map<number, boolean>();
   tags: Tag[] = [];
+  usuarioLogado: Usuario | null = null;
   isLoading = true;
 
   constructor(
@@ -27,6 +28,10 @@ export class RepertorioDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
+
+    this.api.getUsuarioLogado().subscribe(res => {
+      this.usuarioLogado = res.data;
+    });
 
     this.api.getTags().subscribe(res => {
       this.tags = res.data;
@@ -69,6 +74,16 @@ export class RepertorioDetailComponent implements OnInit {
 
   goToNovaMusica(): void {
     this.router.navigate(['/musicas/nova']);
+  }
+
+  goToEditar(): void {
+    if (!this.repertorio) return;
+    this.router.navigate(['/repertorios', this.repertorio.id, 'editar']);
+  }
+
+  podeEditar(): boolean {
+    const perfil = this.usuarioLogado?.perfil;
+    return perfil === 'ADM' || perfil === 'Pastor' || perfil === 'Ministro';
   }
 
   goToConfirmacoes(): void {

@@ -63,6 +63,19 @@
     border: 1px solid var(--alert-error-border);
   }
 
+  &.alert-warning {
+    background: #fff8e1;
+    color: #b45309;
+    border: 1px solid #fbbf24;
+    align-items: flex-start;
+  }
+
+  &.alert-info {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #93c5fd;
+  }
+
   .material-icons-outlined {
     font-size: 20px;
   }

@@ -45,6 +45,12 @@
         <span class="material-icons-outlined">fact_check</span>
         Ver Confirmações
       </button>
+      @if (podeEditar()) {
+        <button class="btn-editar" (click)="goToEditar()" title="Editar repertório">
+          <span class="material-icons-outlined">edit</span>
+          Editar
+        </button>
+      }
     </div>
 
     @if (repertorio.aviso) {

@@ -5,16 +5,42 @@
       <span class="material-icons-outlined">arrow_back</span>
     </button>
     <div>
-      <h1 class="page-title">Novo Repertório</h1>
-      <p class="page-subtitle">Monte o repertório do culto e escale as músicas.</p>
+      @if (modoEdicao) {
+        <h1 class="page-title">Editar Repertório</h1>
+        <p class="page-subtitle">Altere o repertório. Ao salvar, ele voltará para aprovação.</p>
+      } @else {
+        <h1 class="page-title">Novo Repertório</h1>
+        <p class="page-subtitle">Monte o repertório do culto e escale as músicas.</p>
+      }
     </div>
   </div>
+
+  <!-- Motivo de Reprovação (modo edição) -->
+  @if (modoEdicao && repertorioOriginal?.aprovacao?.status === 'reprovado') {
+    <div class="alert alert-warning">
+      <span class="material-icons-outlined">warning_amber</span>
+      <div>
+        <strong>Repertório reprovado</strong>
+        @if (repertorioOriginal?.aprovacao?.motivo) {
+          <p style="margin: 4px 0 0">Motivo: {{ repertorioOriginal?.aprovacao?.motivo }}</p>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Aviso de reset de status (modo edição) -->
+  @if (modoEdicao) {
+    <div class="alert alert-info">
+      <span class="material-icons-outlined">info</span>
+      Ao salvar as alterações, o status voltará para <strong>Aguardando Aprovação</strong> e o pastor precisará aprovar novamente.
+    </div>
+  }
 
   <!-- Success Banner -->
   @if (submitSuccess) {
     <div class="alert alert-success">
       <span class="material-icons-outlined">check_circle</span>
-      Repertório criado com sucesso! Redirecionando…
+      @if (modoEdicao) { Repertório atualizado! Redirecionando… } @else { Repertório criado com sucesso! Redirecionando… }
     </div>
   }
 
@@ -383,6 +409,9 @@
         @if (isSubmitting) {
           <span class="material-icons-outlined spinning">autorenew</span>
           Salvando…
+        } @else if (modoEdicao) {
+          <span class="material-icons-outlined">save</span>
+          Salvar Alterações
         } @else {
           <span class="material-icons-outlined">save</span>
           Criar Repertório

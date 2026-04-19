@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^powershell -Command \"Get-Content 'c:/project_personal/LouvorHub/front/src/app/pages/cadastro-repertorio/cadastro-repertorio\\.component\\.ts' \\| Select-Object -First 423 \\| Set-Content 'c:/project_personal/LouvorHub/front/src/app/pages/cadastro-repertorio/cadastro-repertorio\\.component\\.ts'\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

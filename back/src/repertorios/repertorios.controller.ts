@@ -63,8 +63,16 @@ export class RepertoriosController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Atualizar repertório' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRepertorioDto) {
+  @ApiOperation({ summary: 'Atualizar repertório (ADM, Pastor ou Ministro)' })
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateRepertorioDto,
+    @CurrentUser() user: any,
+  ) {
+    const perfisPermitidos = ['ADM', 'Pastor', 'Ministro'];
+    if (!perfisPermitidos.includes(user.perfil)) {
+      throw new ForbiddenException('Apenas Administrador, Pastor ou Ministro podem editar repertórios.');
+    }
     return this.repertoriosService.update(id, dto);
   }
 

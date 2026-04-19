@@ -91,6 +91,8 @@ export class RepertoriosService {
 
   async update(id: number, dto: UpdateRepertorioDto) {
     await this.getById(id);
+    // Ao editar, volta para aguardando_aprovacao e limpa aprovação anterior
+    await this.prisma.aprovacaoRepertorio.deleteMany({ where: { repertorioId: id } });
     // Remove escalações existentes (MusicaEscalada é em cascade)
     await this.prisma.escalacaoMusico.deleteMany({ where: { repertorioId: id } });
     await this.prisma.repertorioMusica.deleteMany({ where: { repertorioId: id } });
@@ -104,6 +106,7 @@ export class RepertoriosService {
         localCulto: dto.localCulto,
         aviso: dto.aviso,
         igrejaId: dto.igrejaId,
+        status: StatusRepertorio.aguardando_aprovacao,
         musicas: {
           create: dto.musicas.map((m, ordem) => ({ musicaId: m.musicaId, ordem })),
         },
