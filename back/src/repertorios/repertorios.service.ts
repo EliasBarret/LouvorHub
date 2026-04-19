@@ -9,16 +9,16 @@ import { ReprovacaoDto } from './dto/aprovacao.dto';
 import { StatusRepertorio } from '@prisma/client';
 
 const TIPOS_CULTO = [
-  'Culto de Domingo — Manhã',
-  'Culto de Domingo — Tarde',
-  'Culto de Domingo — Noite',
-  'Culto de Quarta — Oração',
-  'Culto de Sexta — Jovens',
-  'Culto de Sábado — Família',
-  'Ensaio Semanal',
-  'Evento Especial',
-  'Conferência',
+  'Aniversário da Igreja',
   'Batismo',
+  'Conferência',
+  'Congresso Jovem',
+  'Culto de Avivamento',
+  'Culto de Celebração',
+  'Culto para Família',
+  'EBD',
+  'Natal',
+  'Páscoa',
 ];
 
 @Injectable()
