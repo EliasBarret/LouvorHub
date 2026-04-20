@@ -69,13 +69,13 @@
   <!-- User section -->
   <div class="sidebar-bottom">
     @if (usuario) {
-      <div class="user-info">
+      <a class="user-info" routerLink="/meu-perfil" (click)="closed.emit()" title="Meu Perfil">
         <div class="user-avatar">{{ usuario.iniciais }}</div>
         <div class="user-details">
           <span class="user-name">{{ usuario.nome }}</span>
           <span class="user-role">{{ perfilLabel }}</span>
         </div>
-      </div>
+      </a>
     }
     <div class="user-actions">
       <button class="action-btn" title="Sair" (click)="logout()">

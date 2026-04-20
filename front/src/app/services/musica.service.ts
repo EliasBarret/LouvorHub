@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Musica, MusicaForm, Tag, ApiResponse, PageResponse } from '../models';
+import { Musica, MusicaForm, MusicaHistoricoItem, Tag, ApiResponse, PageResponse } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class MusicaService {
@@ -44,6 +44,10 @@ export class MusicaService {
 
   deleteMusica(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.api}/${id}`);
+  }
+
+  getMusicaHistorico(id: number): Observable<ApiResponse<MusicaHistoricoItem[]>> {
+    return this.http.get<ApiResponse<MusicaHistoricoItem[]>>(`${this.api}/${id}/historico`);
   }
 
   // ─── Metadados ───────────────────────────────────────────────────────────

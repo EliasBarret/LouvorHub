@@ -176,6 +176,11 @@
   border-radius: var(--radius-md);
   padding: 20px 24px;
   margin-bottom: 24px;
+  transition: padding 0.2s ease;
+
+  &.recolhido {
+    padding-bottom: 20px;
+  }
 }
 
 .escalacao-card-header {
@@ -183,6 +188,18 @@
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 16px;
+
+  .escalacao-card.recolhido & {
+    margin-bottom: 0;
+  }
+}
+
+.escalacao-toggle-icon {
+  font-size: 20px !important;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  align-self: center;
+  transition: transform 0.2s ease;
 }
 
 .escalacao-icon {
@@ -437,6 +454,31 @@
   text-overflow: ellipsis;
 }
 
+.music-musicians {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.musician-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--border-light);
+  border-radius: 4px;
+  padding: 1px 6px;
+  line-height: 1.6;
+
+  .chip-role {
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+  }
+}
+
 .music-meta {
   display: flex;
   gap: 12px;
@@ -466,6 +508,20 @@
   border-radius: 20px;
 }
 
+.music-desktop-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.music-mobile-actions {
+  display: none;
+  position: relative;
+  flex-shrink: 0;
+}
+
 .music-yt-btn {
   color: var(--text-muted);
   display: flex;
@@ -483,7 +539,6 @@
 
 .music-actions-btn {
   color: var(--text-muted);
-  margin-left: auto;
 
   &:hover {
     color: var(--text-primary);
@@ -491,6 +546,64 @@
 
   .material-icons-outlined {
     font-size: 20px;
+  }
+}
+
+.music-menu-btn {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background 0.15s, color 0.15s;
+
+  .material-icons-outlined {
+    font-size: 20px;
+  }
+
+  &:hover {
+    background: var(--border-light);
+    color: var(--text-primary);
+  }
+}
+
+.music-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 100;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  min-width: 170px;
+  overflow: hidden;
+}
+
+.music-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  text-decoration: none;
+  transition: background 0.15s;
+  cursor: pointer;
+
+  .material-icons-outlined {
+    font-size: 17px;
+    color: var(--text-muted);
+  }
+
+  &:hover {
+    background: var(--bg-main);
   }
 }
 
@@ -543,6 +656,43 @@
     padding: 12px 16px;
   }
 
+  .music-order {
+    display: none;
+  }
+
+  .music-icon {
+    display: none;
+  }
+
+  .music-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word;
+  }
+
+  .music-desktop-actions {
+    display: none;
+  }
+
+  .music-mobile-actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .meta-tom-original {
+    display: none;
+  }
+
+  .escalacao-card.recolhido .escalacao-icon {
+    display: none;
+  }
+
+  .escalacao-card.recolhido .escalacao-title {
+    font-size: 14px;
+  }
+
   .escalacao-actions {
     flex-direction: column;
     align-items: stretch;
@@ -570,5 +720,60 @@
     flex-wrap: wrap;
     gap: 8px;
   }
+
+  .btn-confirmacoes,
+  .btn-editar {
+    .btn-label {
+      display: none;
+    }
+  }
 }
 
+
+// ─── Blocos de músicas ────────────────────────────────────────────────────────
+
+.detail-bloco {
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: visible;
+}
+
+.detail-bloco-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.bloco-icon {
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.detail-bloco-nome {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detail-bloco-descricao {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-left: 4px;
+
+  &::before {
+    content: '— ';
+  }
+}
+
+.meta-tom-original {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}

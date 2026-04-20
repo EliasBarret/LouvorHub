@@ -1,11 +1,10 @@
 import {
   Injectable,
   NotFoundException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificacoesService } from '../notificacoes/notificacoes.service';
-import { CreateRepertorioDto, UpdateRepertorioDto, MusicaRepertorioDto } from './dto/create-repertorio.dto';
+import { CreateRepertorioDto, UpdateRepertorioDto, MusicaRepertorioDto, BlocoRepertorioDto } from './dto/create-repertorio.dto';
 import { ReprovacaoDto } from './dto/aprovacao.dto';
 import { StatusRepertorio } from '@prisma/client';
 
@@ -17,6 +16,15 @@ export class RepertoriosService {
   ) {}
 
   private include = {
+    blocos: {
+      orderBy: { ordem: 'asc' as const },
+      include: {
+        musicas: {
+          orderBy: { ordem: 'asc' as const },
+          include: { musica: { include: { tags: { include: { tag: true } } } } },
+        },
+      },
+    },
     musicas: { include: { musica: { include: { tags: { include: { tag: true } } } } }, orderBy: { ordem: 'asc' as const } },
     aprovacao: { include: { pastor: { select: { id: true, nome: true, email: true } } } },
     criador: { select: { id: true, nome: true, email: true } },
@@ -58,6 +66,8 @@ export class RepertoriosService {
   }
 
   async create(dto: CreateRepertorioDto, userId: number) {
+    const todasMusicas = this.resolverMusicas(dto);
+
     const rep = await this.prisma.repertorio.create({
       data: {
         nome: dto.nome,
@@ -70,16 +80,14 @@ export class RepertoriosService {
         status: dto.status ?? StatusRepertorio.aguardando_aprovacao,
         criadorId: userId,
         igrejaId: dto.igrejaId,
-        musicas: {
-          create: dto.musicas.map((m, ordem) => ({ musicaId: m.musicaId, ordem })),
-        },
       },
       select: { id: true },
     });
 
-    await this.criarEscalacoes(rep.id, dto.musicas);
+    await this.salvarBlocosEMusicas(rep.id, dto);
 
-    // Notificar músicos escalados
+    await this.criarEscalacoes(rep.id, todasMusicas);
+
     const escaladosIds = await this.notificacoes.getEscaladosPorRepertorio(rep.id);
     const repertorioCompleto = await this.getById(rep.id);
     const dataCulto = new Date(dto.dataCulto);
@@ -89,7 +97,6 @@ export class RepertoriosService {
       ),
     );
 
-    // Notificar pastores/ADMs
     if (dto.igrejaId) {
       const pastoresIds = await this.notificacoes.getPastoresAdmsPorIgreja(dto.igrejaId);
       await this.notificacoes.notificarRepertorioPendenteAprovacao(pastoresIds, rep.id, dto.nome);
@@ -101,14 +108,13 @@ export class RepertoriosService {
   async update(id: number, dto: UpdateRepertorioDto) {
     await this.getById(id);
 
-    // Capturar escalados antes de deletar, para notificá-los sobre a alteração
     const escaladosAntes = await this.notificacoes.getEscaladosPorRepertorio(id);
 
-    // Ao editar, volta para aguardando_aprovacao e limpa aprovação anterior
     await this.prisma.aprovacaoRepertorio.deleteMany({ where: { repertorioId: id } });
-    // Remove escalações existentes (MusicaEscalada é em cascade)
     await this.prisma.escalacaoMusico.deleteMany({ where: { repertorioId: id } });
     await this.prisma.repertorioMusica.deleteMany({ where: { repertorioId: id } });
+    await this.prisma.blocoRepertorio.deleteMany({ where: { repertorioId: id } });
+
     const rep = await this.prisma.repertorio.update({
       where: { id },
       data: {
@@ -121,21 +127,19 @@ export class RepertoriosService {
         aviso: dto.aviso,
         igrejaId: dto.igrejaId,
         status: StatusRepertorio.aguardando_aprovacao,
-        musicas: {
-          create: dto.musicas.map((m, ordem) => ({ musicaId: m.musicaId, ordem })),
-        },
       },
       select: { id: true, igrejaId: true },
     });
 
-    await this.criarEscalacoes(rep.id, dto.musicas);
+    await this.salvarBlocosEMusicas(rep.id, dto);
 
-    // Notificar usuários que estavam escalados antes sobre a alteração
+    const todasMusicas = this.resolverMusicas(dto);
+    await this.criarEscalacoes(rep.id, todasMusicas);
+
     if (escaladosAntes.length > 0) {
       await this.notificacoes.notificarAlteracaoRepertorio(escaladosAntes, id, dto.nome);
     }
 
-    // Notificar novos escalados
     const novosEscalados = await this.notificacoes.getEscaladosPorRepertorio(id);
     const dataCulto = new Date(dto.dataCulto);
     await Promise.all(
@@ -144,7 +148,6 @@ export class RepertoriosService {
       ),
     );
 
-    // Notificar pastores/ADMs que há nova versão aguardando aprovação
     if (rep.igrejaId) {
       const pastoresIds = await this.notificacoes.getPastoresAdmsPorIgreja(rep.igrejaId);
       await this.notificacoes.notificarRepertorioPendenteAprovacao(pastoresIds, id, dto.nome);
@@ -182,7 +185,6 @@ export class RepertoriosService {
       }),
     ]);
 
-    // Notificar criador e todos os escalados
     const notificarIds = new Set<number>([rep.criadorId]);
     const escalados = await this.notificacoes.getEscaladosPorRepertorio(id);
     escalados.forEach((uid) => notificarIds.add(uid));
@@ -205,7 +207,6 @@ export class RepertoriosService {
       }),
     ]);
 
-    // Notificar criador e todos os escalados
     const notificarIds = new Set<number>([rep.criadorId]);
     const escalados = await this.notificacoes.getEscaladosPorRepertorio(id);
     escalados.forEach((uid) => notificarIds.add(uid));
@@ -218,6 +219,52 @@ export class RepertoriosService {
     return this.prisma.tipoCulto.findMany({
       orderBy: [{ horario: 'asc' }, { nome: 'asc' }],
     });
+  }
+
+  /** Retorna lista plana de todas as músicas (de blocos ou da lista legada). */
+  private resolverMusicas(dto: CreateRepertorioDto): MusicaRepertorioDto[] {
+    if (dto.blocos?.length) {
+      return dto.blocos.flatMap((b) => b.musicas);
+    }
+    return dto.musicas ?? [];
+  }
+
+  /** Persiste blocos (se presentes) e músicas (com ou sem bloco) no banco. */
+  private async salvarBlocosEMusicas(repertorioId: number, dto: CreateRepertorioDto) {
+    if (dto.blocos?.length) {
+      for (let blocoIdx = 0; blocoIdx < dto.blocos.length; blocoIdx++) {
+        const blocoDto: BlocoRepertorioDto = dto.blocos[blocoIdx];
+        const bloco = await this.prisma.blocoRepertorio.create({
+          data: {
+            repertorioId,
+            nome: blocoDto.nome,
+            descricao: blocoDto.descricao,
+            ordem: blocoIdx,
+          },
+          select: { id: true },
+        });
+        for (let musicaIdx = 0; musicaIdx < blocoDto.musicas.length; musicaIdx++) {
+          const m = blocoDto.musicas[musicaIdx];
+          await this.prisma.repertorioMusica.create({
+            data: {
+              repertorioId,
+              musicaId: m.musicaId,
+              blocoId: bloco.id,
+              ordem: musicaIdx,
+              tomOverride: m.tomOverride,
+            },
+          });
+        }
+      }
+    } else if (dto.musicas?.length) {
+      // Legado: lista plana sem blocos
+      for (let i = 0; i < dto.musicas.length; i++) {
+        const m = dto.musicas[i];
+        await this.prisma.repertorioMusica.create({
+          data: { repertorioId, musicaId: m.musicaId, ordem: i, tomOverride: m.tomOverride },
+        });
+      }
+    }
   }
 
   private async criarEscalacoes(repertorioId: number, musicas: MusicaRepertorioDto[]) {
@@ -250,30 +297,50 @@ export class RepertoriosService {
   }
 
   private format(rep: any) {
-    return {
-      ...rep,
-      musicasIds: rep.musicas?.map((rm: any) => rm.musicaId) ?? [],
-      musicas: rep.musicas?.map((rm: any) => {
-        const musicaId = rm.musicaId;
-        const cantores: any[] = [];
-        const musicos: any[] = [];
-        for (const escalacao of rep.escalacoes ?? []) {
-          const me = escalacao.musicasEscaladas?.find((m: any) => m.musicaId === musicaId);
-          if (me) {
-            if (me.instrumento === 'Cantor') {
-              cantores.push(escalacao.usuario);
-            } else {
-              musicos.push({ ...escalacao.usuario, instrumento: me.instrumento });
-            }
+    const escalacoes = rep.escalacoes ?? [];
+
+    const formatMusica = (rm: any) => {
+      const musicaId = rm.musicaId;
+      const cantores: any[] = [];
+      const musicos: any[] = [];
+      for (const escalacao of escalacoes) {
+        const me = escalacao.musicasEscaladas?.find((m: any) => m.musicaId === musicaId);
+        if (me) {
+          if (me.instrumento === 'Cantor') {
+            cantores.push(escalacao.usuario);
+          } else {
+            musicos.push({ ...escalacao.usuario, instrumento: me.instrumento });
           }
         }
-        return {
-          ...rm.musica,
-          tags: rm.musica?.tags?.map((mt: any) => mt.tag?.nome) ?? [],
-          cantores,
-          musicos,
-        };
-      }) ?? [],
+      }
+      return {
+        ...rm.musica,
+        tags: rm.musica?.tags?.map((mt: any) => mt.tag?.nome) ?? [],
+        tomOverride: rm.tomOverride ?? null,
+        cantores,
+        musicos,
+      };
+    };
+
+    // Blocos estruturados
+    const blocos = (rep.blocos ?? []).map((bloco: any) => ({
+      id: bloco.id,
+      nome: bloco.nome,
+      descricao: bloco.descricao ?? null,
+      ordem: bloco.ordem,
+      musicas: (bloco.musicas ?? []).map(formatMusica),
+    }));
+
+    // Lista plana (para músicas sem bloco ou compatibilidade legada)
+    const musicasSemBloco = (rep.musicas ?? []).filter((rm: any) => !rm.blocoId);
+
+    return {
+      ...rep,
+      blocos,
+      musicasIds: rep.musicas?.map((rm: any) => rm.musicaId) ?? [],
+      musicas: rep.musicas?.map(formatMusica) ?? [],
+      musicasSemBloco: musicasSemBloco.map(formatMusica),
     };
   }
 }
+

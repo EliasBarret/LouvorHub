@@ -50,25 +50,82 @@
           <div class="letra-group">
             <div class="letra-header">{{ grupo.letra }}</div>
             @for (musica of grupo.musicas; track musica.id) {
-              <button class="musica-row" (click)="editarMusica(musica.id)">
-                <div class="musica-info">
-                  <span class="musica-titulo">{{ musica.titulo }}</span>
-                  <span class="musica-artista">{{ musica.artista }}</span>
-                </div>
-                <div class="musica-meta">
-                  @if (musica.tomFeminino) {
-                    <span class="meta-chip">{{ musica.tomFeminino }}</span>
-                  }
-                  @if (musica.bpm) {
-                    <span class="meta-chip">{{ musica.bpm }} BPM</span>
-                  }
-                </div>
-                <span class="material-icons-outlined edit-icon">chevron_right</span>
-              </button>
+              <div class="musica-row">
+                <button class="musica-body" (click)="editarMusica(musica.id)">
+                  <div class="musica-info">
+                    <span class="musica-titulo">{{ musica.titulo }}</span>
+                    <span class="musica-artista">{{ musica.artista }}</span>
+                  </div>
+                  <div class="musica-meta">
+                    @if (musica.tomFeminino) {
+                      <span class="meta-chip">{{ musica.tomFeminino }}</span>
+                    }
+                    @if (musica.bpm) {
+                      <span class="meta-chip">{{ musica.bpm }} BPM</span>
+                    }
+                  </div>
+                  <span class="material-icons-outlined edit-icon">chevron_right</span>
+                </button>
+                <button
+                  class="historico-btn"
+                  title="Ver histórico de uso"
+                  (click)="abrirHistorico($event, musica)"
+                >
+                  <span class="material-icons-outlined">history</span>
+                </button>
+              </div>
             }
           </div>
         }
       </div>
     }
+  }
+
+  <!-- Painel de Histórico -->
+  @if (historicoMusica) {
+    <div class="historico-overlay" (click)="fecharHistorico()"></div>
+    <div class="historico-panel">
+      <div class="historico-panel-header">
+        <div>
+          <h2 class="historico-panel-title">Histórico de Uso</h2>
+          <p class="historico-panel-subtitle">{{ historicoMusica.titulo }}</p>
+        </div>
+        <button class="historico-close-btn" (click)="fecharHistorico()">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+
+      @if (historicoLoading) {
+        <div class="historico-loading">
+          <span class="material-icons-outlined spinning">autorenew</span>
+          Carregando…
+        </div>
+      } @else if (historico.length === 0) {
+        <div class="historico-empty">
+          <span class="material-icons-outlined">event_busy</span>
+          <p>Esta música ainda não foi usada em nenhum repertório.</p>
+        </div>
+      } @else {
+        <p class="historico-hint">Últimos {{ historico.length }} uso(s) em repertórios:</p>
+        <ul class="historico-list">
+          @for (item of historico; track item.repertorioId) {
+            <li class="historico-item">
+              <div class="historico-item-icon">
+                <span class="material-icons-outlined">event</span>
+              </div>
+              <div class="historico-item-info">
+                <span class="historico-item-nome">{{ item.nome }}</span>
+                <span class="historico-item-meta">
+                  {{ item.dataCulto | date:'dd/MM/yyyy' }}
+                  @if (item.tipoCulto) {
+                    &bull; {{ item.tipoCulto }}
+                  }
+                </span>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
   }
 </div>

@@ -173,10 +173,24 @@ model Repertorio {
   igrejaId    Int?    @map("igreja_id")
 
   musicas     RepertorioMusica[]
+  blocos      BlocoRepertorio[]
   aprovacao   AprovacaoRepertorio?
   escalacoes  EscalacaoMusico[]
 
   @@map("repertorios")
+}
+
+model BlocoRepertorio {
+  id           Int        @id @default(autoincrement())
+  repertorio   Repertorio @relation(fields: [repertorioId], references: [id], onDelete: Cascade)
+  repertorioId Int        @map("repertorio_id")
+  nome         String     // ex: "Abertura", "Adorações", "Ofertório", "Solo", "Apelo"
+  descricao    String?    // ex: "Larissa", "Quarteto" — usado para solos/grupos
+  ordem        Int        @default(0)
+
+  musicas      RepertorioMusica[]
+
+  @@map("blocos_repertorio")
 }
 
 model RepertorioMusica {
@@ -184,7 +198,10 @@ model RepertorioMusica {
   repertorioId Int        @map("repertorio_id")
   musica       Musica     @relation(fields: [musicaId], references: [id], onDelete: Cascade)
   musicaId     Int        @map("musica_id")
+  bloco        BlocoRepertorio? @relation(fields: [blocoId], references: [id], onDelete: SetNull)
+  blocoId      Int?       @map("bloco_id")
   ordem        Int        @default(0)
+  tomOverride  String?    @map("tom_override") // tom específico para este culto
 
   @@id([repertorioId, musicaId])
   @@map("repertorios_musicas")

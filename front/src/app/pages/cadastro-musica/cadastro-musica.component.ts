@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MockApiService } from '../../services/mock-api.service';
-import { TipoMusica } from '../../models';
+import { TipoMusica, MusicaHistoricoItem } from '../../models';
 
 @Component({
   selector: 'app-cadastro-musica',
@@ -21,6 +21,8 @@ export class CadastroMusicaComponent implements OnInit {
 
   modoEdicao = false;
   musicaId: number | null = null;
+  historico: MusicaHistoricoItem[] = [];
+  historicoLoading = false;
 
   readonly tiposMusica: { valor: TipoMusica; label: string }[] = [
     { valor: 'Adoracao',              label: 'Adoração' },
@@ -47,6 +49,7 @@ export class CadastroMusicaComponent implements OnInit {
       this.modoEdicao = true;
       this.musicaId = Number(id);
       this.carregarMusica(this.musicaId);
+      this.carregarHistorico(this.musicaId);
     }
   }
 
@@ -91,6 +94,17 @@ export class CadastroMusicaComponent implements OnInit {
         this.submitError = 'Erro ao carregar os dados da música.';
         this.isLoading = false;
       },
+    });
+  }
+
+  private carregarHistorico(id: number): void {
+    this.historicoLoading = true;
+    this.api.getMusicaHistorico(id).subscribe({
+      next: (res) => {
+        this.historico = res.data;
+        this.historicoLoading = false;
+      },
+      error: () => { this.historicoLoading = false; },
     });
   }
 

@@ -930,3 +930,265 @@ select.form-control {
   flex-shrink: 0;
 }
 
+
+// ─── Blocos do Repertório ─────────────────────────────────────────────────────
+
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.bloco-card {
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  background: var(--bg-main);
+  overflow: hidden;
+}
+
+.bloco-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.bloco-header-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.bloco-index {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--border-color);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bloco-nome-input {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 2px 4px;
+  min-width: 0;
+  flex: 1;
+
+  &:focus {
+    outline: none;
+    border-bottom-color: var(--primary);
+  }
+}
+
+.bloco-descricao-input {
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid transparent;
+  padding: 2px 4px;
+  width: 180px;
+  flex-shrink: 0;
+
+  &:focus {
+    outline: none;
+    border-bottom-color: var(--border-color);
+  }
+
+  &::placeholder {
+    font-style: italic;
+    color: var(--text-muted);
+  }
+}
+
+.bloco-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.bloco-musicas-list {
+  padding: 4px 14px;
+}
+
+.bloco-add-musica {
+  padding: 10px 14px;
+  border-top: 1px dashed var(--border-color);
+}
+
+// Tom override
+.tom-override-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-white);
+  border: 1.5px solid var(--border-color);
+  border-radius: 6px;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
+.tom-icon {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.tom-override-input {
+  width: 36px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// ─── Adicionar bloco ──────────────────────────────────────────────────────────
+
+.add-bloco-section {
+  padding-top: 8px;
+}
+
+.add-bloco-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.blocos-predefinidos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.bloco-preset-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .material-icons-outlined {
+    font-size: 15px;
+  }
+}
+
+.bloco-custom-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-top: 4px;
+
+  &:hover { color: var(--text-primary); }
+}
+
+.bloco-custom-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+
+  .form-control {
+    flex: 1;
+  }
+}
+
+.btn-primary-sm {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .material-icons-outlined { font-size: 16px; }
+}
+
+.btn-ghost-sm {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+
+  &:hover { background: var(--border-light); color: var(--text-primary); }
+}
+
+.empty-blocos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+
+  .material-icons-outlined {
+    font-size: 40px;
+    opacity: 0.3;
+  }
+
+  p {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  span {
+    font-size: 13px;
+  }
+}

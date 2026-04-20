@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MockApiService } from '../../services/mock-api.service';
-import { Musica } from '../../models';
+import { Musica, MusicaHistoricoItem } from '../../models';
 
 interface LetraGroup {
   letra: string;
@@ -21,6 +21,10 @@ export class MusicasComponent implements OnInit {
   busca = '';
   todasMusicas: Musica[] = [];
   grupos: LetraGroup[] = [];
+
+  historicoMusica: Musica | null = null;
+  historico: MusicaHistoricoItem[] = [];
+  historicoLoading = false;
 
   constructor(private api: MockApiService, private router: Router) {}
 
@@ -64,5 +68,24 @@ export class MusicasComponent implements OnInit {
 
   novaMusica(): void {
     this.router.navigate(['/musicas/nova']);
+  }
+
+  abrirHistorico(event: Event, musica: Musica): void {
+    event.stopPropagation();
+    this.historicoMusica = musica;
+    this.historico = [];
+    this.historicoLoading = true;
+    this.api.getMusicaHistorico(musica.id).subscribe({
+      next: (res) => {
+        this.historico = res.data;
+        this.historicoLoading = false;
+      },
+      error: () => { this.historicoLoading = false; },
+    });
+  }
+
+  fecharHistorico(): void {
+    this.historicoMusica = null;
+    this.historico = [];
   }
 }

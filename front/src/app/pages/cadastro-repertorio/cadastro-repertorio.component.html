@@ -175,255 +175,316 @@
 
     </div>
 
-    <!-- Músicas do Repertório -->
+    <!-- Blocos do Repertório -->
     <div class="form-card">
-      <h2 class="section-title">
-        <span class="material-icons-outlined section-icon">queue_music</span>
-        Músicas do Repertório
-        <span class="count-badge">{{ musicasSelecionadas.length }}</span>
-      </h2>
-
-      <!-- Search -->
-      <div class="musica-search-wrapper">
-        <span class="material-icons-outlined search-icon">search</span>
-        <input
-          type="text"
-          class="musica-search"
-          placeholder="Buscar música por título, artista ou tom…"
-          [(ngModel)]="buscaMusica"
-          [ngModelOptions]="{ standalone: true }"
-          (input)="filtrarMusicas()"
-          autocomplete="off"
-        />
+      <div class="section-header-row">
+        <h2 class="section-title">
+          <span class="material-icons-outlined section-icon">view_list</span>
+          Blocos do Repertório
+          <span class="count-badge">{{ getTotalMusicas() }} músicas</span>
+        </h2>
       </div>
 
-      <!-- Search Results -->
-      @if (buscaMusica.length > 0) {
-        <div class="search-results">
-          @if (isLoadingMusicas) {
-            <div class="loading-state">
-              <span class="material-icons-outlined spinning">autorenew</span>
-              Carregando músicas…
+      <!-- Blocos existentes -->
+      @for (bloco of blocos; track bloco.id; let bi = $index) {
+        <div class="bloco-card">
+          <!-- Cabeçalho do bloco -->
+          <div class="bloco-header">
+            <div class="bloco-header-main">
+              <span class="bloco-index">{{ bi + 1 }}</span>
+              <input
+                type="text"
+                class="bloco-nome-input"
+                [(ngModel)]="bloco.nome"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="Nome do bloco"
+              />
+              <input
+                type="text"
+                class="bloco-descricao-input"
+                [(ngModel)]="bloco.descricao"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="Descrição (ex: Larissa, Quarteto)"
+              />
             </div>
-          } @else if (musicasBuscadas.length === 0) {
-            <div class="empty-search">
-              <span class="material-icons-outlined">search_off</span>
-              Nenhuma música encontrada.
+            <div class="bloco-header-actions">
+              <button type="button" class="order-btn" [disabled]="bi === 0" (click)="moverBloco(bi, 'up')" title="Mover bloco para cima">
+                <span class="material-icons-outlined">keyboard_arrow_up</span>
+              </button>
+              <button type="button" class="order-btn" [disabled]="bi === blocos.length - 1" (click)="moverBloco(bi, 'down')" title="Mover bloco para baixo">
+                <span class="material-icons-outlined">keyboard_arrow_down</span>
+              </button>
+              <button type="button" class="remove-btn" (click)="removerBloco(bloco.id)" title="Remover bloco">
+                <span class="material-icons-outlined">delete_outline</span>
+              </button>
             </div>
-          } @else {
-            @for (musica of musicasBuscadas.slice(0, 6); track musica.id) {
-              <div class="search-item" (click)="adicionarMusica(musica)">
-                <div class="search-item-icon">
-                  <span class="material-icons-outlined">music_note</span>
-                </div>
-                <div class="search-item-info">
-                  <span class="search-item-title">{{ musica.titulo }}</span>
-                  <span class="search-item-meta">{{ musica.artista }} · {{ musica.tomFeminino | tomDisplay: musica.tom }} · {{ musica.bpm }} BPM</span>
-                </div>
-                <div class="search-item-tags">
-                  @for (tag of musica.tags; track tag) {
-                    <span class="tag-pill" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">
-                      {{ tag }}
-                    </span>
-                  }
-                </div>
-                <button type="button" class="add-btn">
-                  <span class="material-icons-outlined">add</span>
-                </button>
-              </div>
-            }
-          }
-        </div>
-      }
+          </div>
 
-      <!-- Selected Musicas -->
-      @if (musicasSelecionadas.length > 0) {
-        <div class="selected-list">
-          <p class="selected-label">Músicas adicionadas</p>
-          @for (musica of musicasSelecionadas; track musica.id; let i = $index) {
-            <div class="selected-item">
-              <span class="selected-order">{{ i + 1 }}</span>
-              <div class="selected-icon">
-                <span class="material-icons-outlined">music_note</span>
-              </div>
-              <div class="selected-info">
-                <span class="selected-title">{{ musica.titulo }}</span>
-                <span class="selected-meta">{{ musica.artista }} · {{ musica.tomFeminino | tomDisplay: musica.tom }} · {{ musica.bpm }} BPM</span>
-              </div>
-              <div class="selected-tags">
-                @for (tag of musica.tags; track tag) {
-                  <span class="tag-pill" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">
-                    {{ tag }}
-                  </span>
+          <!-- Músicas do bloco -->
+          @if (bloco.musicas.length > 0) {
+            <div class="bloco-musicas-list">
+              @for (bm of bloco.musicas; track bm.musica.id; let mi = $index) {
+                <div class="selected-item">
+                  <span class="selected-order">{{ mi + 1 }}</span>
+                  <div class="selected-icon">
+                    <span class="material-icons-outlined">music_note</span>
+                  </div>
+                  <div class="selected-info">
+                    <span class="selected-title">{{ bm.musica.titulo }}</span>
+                    <span class="selected-meta">{{ bm.musica.artista }}</span>
+                  </div>
+                  <!-- Tom override -->
+                  <div class="tom-override-wrapper" title="Tom usado neste culto">
+                    <span class="material-icons-outlined tom-icon">music_note</span>
+                    <input
+                      type="text"
+                      class="tom-override-input"
+                      [(ngModel)]="bm.tomOverride"
+                      [ngModelOptions]="{ standalone: true }"
+                      maxlength="5"
+                      placeholder="Tom"
+                    />
+                  </div>
+                  <div class="selected-tags">
+                    @for (tag of bm.musica.tags; track tag) {
+                      <span class="tag-pill" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">{{ tag }}</span>
+                    }
+                  </div>
+                  <div class="selected-actions">
+                    <button type="button" class="escalacao-toggle-btn"
+                      [class.active]="bm.assignment.showAssignment"
+                      (click)="toggleAssignment(bm)"
+                      title="Escalar cantores e músicos">
+                      <span class="material-icons-outlined">people</span>
+                      @if (getTotalEscalados(bm) > 0) {
+                        <span class="escalacao-count">{{ getTotalEscalados(bm) }}</span>
+                      }
+                    </button>
+                    <button type="button" class="order-btn" [disabled]="mi === 0" (click)="moverMusicaNoBloco(bloco, mi, 'up')">
+                      <span class="material-icons-outlined">keyboard_arrow_up</span>
+                    </button>
+                    <button type="button" class="order-btn" [disabled]="mi === bloco.musicas.length - 1" (click)="moverMusicaNoBloco(bloco, mi, 'down')">
+                      <span class="material-icons-outlined">keyboard_arrow_down</span>
+                    </button>
+                    <button type="button" class="remove-btn" (click)="removerMusicaDoBloco(bloco, bm.musica.id)">
+                      <span class="material-icons-outlined">close</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Painel de Escalação -->
+                @if (bm.assignment.showAssignment) {
+                  <div class="escalacao-panel">
+                    <!-- Cantores -->
+                    <div class="escalacao-section">
+                      <h4 class="escalacao-section-title">
+                        <span class="material-icons-outlined">mic</span>
+                        Cantores
+                      </h4>
+                      @if (bm.assignment.cantores.length > 0) {
+                        <div class="escalados-chips">
+                          @for (cantor of bm.assignment.cantores; track cantor.usuarioId) {
+                            <div class="escalado-chip">
+                              <span class="chip-avatar">{{ getNomeUsuario(cantor)[0] }}</span>
+                              <span class="chip-nome">{{ getNomeUsuario(cantor) }}</span>
+                              <button type="button" class="chip-remove" (click)="removerCantor(bm, cantor.usuarioId)">
+                                <span class="material-icons-outlined">close</span>
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      }
+                      <div class="escalacao-search-wrapper">
+                        <span class="material-icons-outlined escalacao-search-icon">search</span>
+                        <input type="text" class="escalacao-search" placeholder="Buscar cantor por nome…"
+                          [value]="bm.assignment.searchCantor"
+                          (input)="onSearchCantorInput(bm, $any($event.target).value)"
+                          autocomplete="off" />
+                      </div>
+                      @if (bm.assignment.searchCantor.length > 0) {
+                        <div class="escalacao-results">
+                          @if (bm.assignment.membrosBuscadosCantores.length === 0) {
+                            <div class="escalacao-empty">Nenhum membro encontrado.</div>
+                          } @else {
+                            @for (membro of bm.assignment.membrosBuscadosCantores.slice(0, 5); track membro.id) {
+                              <div class="escalacao-result-item" (click)="adicionarCantor(bm, membro)">
+                                <span class="result-avatar">{{ getNomeUsuario(membro)[0] }}</span>
+                                <span class="result-nome">{{ getNomeUsuario(membro) }}</span>
+                                <span class="result-perfil">{{ membro.perfil }}</span>
+                              </div>
+                            }
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Músicos -->
+                    <div class="escalacao-section">
+                      <h4 class="escalacao-section-title">
+                        <span class="material-icons-outlined">piano</span>
+                        Músicos
+                      </h4>
+                      @if (bm.assignment.musicos.length > 0) {
+                        <div class="escalados-chips">
+                          @for (mf of bm.assignment.musicos; track mf.membro.usuarioId) {
+                            <div class="escalado-chip escalado-chip--musico">
+                              <span class="chip-avatar">{{ getNomeUsuario(mf.membro)[0] }}</span>
+                              <div class="chip-info">
+                                <span class="chip-nome">{{ getNomeUsuario(mf.membro) }}</span>
+                                @if (getInstrumentos(mf.membro).length > 1) {
+                                  <select class="chip-instrumento-select" [(ngModel)]="mf.instrumento" [ngModelOptions]="{ standalone: true }">
+                                    @for (inst of getInstrumentos(mf.membro); track inst) {
+                                      <option [value]="inst">{{ inst }}</option>
+                                    }
+                                  </select>
+                                } @else if (getInstrumentos(mf.membro).length === 1) {
+                                  <span class="chip-instrumento-badge">{{ mf.instrumento }}</span>
+                                } @else {
+                                  <input type="text" class="chip-instrumento-input" placeholder="Instrumento"
+                                    [(ngModel)]="mf.instrumento" [ngModelOptions]="{ standalone: true }" />
+                                }
+                              </div>
+                              <button type="button" class="chip-remove" (click)="removerMusico(bm, mf.membro.usuarioId)">
+                                <span class="material-icons-outlined">close</span>
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      }
+                      <div class="escalacao-search-wrapper">
+                        <span class="material-icons-outlined escalacao-search-icon">search</span>
+                        <input type="text" class="escalacao-search" placeholder="Buscar músico por nome…"
+                          [value]="bm.assignment.searchMusico"
+                          (input)="onSearchMusicoInput(bm, $any($event.target).value)"
+                          autocomplete="off" />
+                      </div>
+                      @if (bm.assignment.searchMusico.length > 0) {
+                        <div class="escalacao-results">
+                          @if (bm.assignment.membrosBuscadosMusicos.length === 0) {
+                            <div class="escalacao-empty">Nenhum membro encontrado.</div>
+                          } @else {
+                            @for (membro of bm.assignment.membrosBuscadosMusicos.slice(0, 5); track membro.id) {
+                              <div class="escalacao-result-item" (click)="adicionarMusico(bm, membro)">
+                                <span class="result-avatar">{{ getNomeUsuario(membro)[0] }}</span>
+                                <div class="result-info">
+                                  <span class="result-nome">{{ getNomeUsuario(membro) }}</span>
+                                  @if (membro.usuario?.instrumentos?.length) {
+                                    <span class="result-instrumentos">{{ membro.usuario?.instrumentos?.join(', ') }}</span>
+                                  }
+                                </div>
+                                <span class="result-perfil">{{ membro.perfil }}</span>
+                              </div>
+                            }
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          }
+
+          <!-- Busca de músicas para este bloco -->
+          <div class="bloco-add-musica">
+            <div class="musica-search-wrapper">
+              <span class="material-icons-outlined search-icon">search</span>
+              <input
+                type="text"
+                class="musica-search"
+                [placeholder]="'Adicionar música em ' + bloco.nome + '…'"
+                [(ngModel)]="bloco.buscaMusica"
+                [ngModelOptions]="{ standalone: true }"
+                (input)="filtrarMusicasBloco(bloco)"
+                autocomplete="off"
+              />
+            </div>
+
+            @if (bloco.showBuscaPanel) {
+              <div class="search-results">
+                @if (bloco.isLoadingMusicas) {
+                  <div class="loading-state">
+                    <span class="material-icons-outlined spinning">autorenew</span>
+                    Carregando…
+                  </div>
+                } @else if (bloco.musicasBuscadas.length === 0) {
+                  <div class="empty-search">
+                    <span class="material-icons-outlined">search_off</span>
+                    Nenhuma música encontrada.
+                  </div>
+                } @else {
+                  @for (musica of bloco.musicasBuscadas.slice(0, 6); track musica.id) {
+                    <div class="search-item" (click)="adicionarMusicaAoBloco(bloco, musica)">
+                      <div class="search-item-icon">
+                        <span class="material-icons-outlined">music_note</span>
+                      </div>
+                      <div class="search-item-info">
+                        <span class="search-item-title">{{ musica.titulo }}</span>
+                        <span class="search-item-meta">{{ musica.artista }} · {{ musica.tomFeminino | tomDisplay: musica.tom }} · {{ musica.bpm }} BPM</span>
+                      </div>
+                      <div class="search-item-tags">
+                        @for (tag of musica.tags; track tag) {
+                          <span class="tag-pill" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">{{ tag }}</span>
+                        }
+                      </div>
+                      <button type="button" class="add-btn">
+                        <span class="material-icons-outlined">add</span>
+                      </button>
+                    </div>
+                  }
                 }
               </div>
-              <div class="selected-actions">
-                <button type="button" class="escalacao-toggle-btn"
-                  [class.active]="getAssignment(musica.id).showAssignment"
-                  (click)="toggleAssignment(musica.id)"
-                  title="Escalar cantores e músicos">
-                  <span class="material-icons-outlined">people</span>
-                  @if (getTotalEscalados(musica.id) > 0) {
-                    <span class="escalacao-count">{{ getTotalEscalados(musica.id) }}</span>
-                  }
-                </button>
-                <button type="button" class="order-btn" [disabled]="i === 0" (click)="moverMusica(i, 'up')">
-                  <span class="material-icons-outlined">keyboard_arrow_up</span>
-                </button>
-                <button type="button" class="order-btn" [disabled]="i === musicasSelecionadas.length - 1" (click)="moverMusica(i, 'down')">
-                  <span class="material-icons-outlined">keyboard_arrow_down</span>
-                </button>
-                <button type="button" class="remove-btn" (click)="removerMusica(musica.id)">
-                  <span class="material-icons-outlined">close</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Painel de Escalação -->
-            @if (getAssignment(musica.id).showAssignment) {
-              <div class="escalacao-panel">
-
-                <!-- Cantores -->
-                <div class="escalacao-section">
-                  <h4 class="escalacao-section-title">
-                    <span class="material-icons-outlined">mic</span>
-                    Cantores
-                  </h4>
-
-                  <!-- Cantores escalados -->
-                  @if (getAssignment(musica.id).cantores.length > 0) {
-                    <div class="escalados-chips">
-                      @for (cantor of getAssignment(musica.id).cantores; track cantor.usuarioId) {
-                        <div class="escalado-chip">
-                          <span class="chip-avatar">{{ getNomeUsuario(cantor)[0] }}</span>
-                          <span class="chip-nome">{{ getNomeUsuario(cantor) }}</span>
-                          <button type="button" class="chip-remove" (click)="removerCantor(musica.id, cantor.usuarioId)">
-                            <span class="material-icons-outlined">close</span>
-                          </button>
-                        </div>
-                      }
-                    </div>
-                  }
-
-                  <!-- Busca cantores -->
-                  <div class="escalacao-search-wrapper">
-                    <span class="material-icons-outlined escalacao-search-icon">search</span>
-                    <input
-                      type="text"
-                      class="escalacao-search"
-                      placeholder="Buscar cantor por nome…"
-                      [value]="getAssignment(musica.id).searchCantor"
-                      (input)="onSearchCantorInput(musica.id, $any($event.target).value)"
-                      autocomplete="off"
-                    />
-                  </div>
-                  @if (getAssignment(musica.id).searchCantor.length > 0) {
-                    <div class="escalacao-results">
-                      @if (getAssignment(musica.id).membrosBuscadosCantores.length === 0) {
-                        <div class="escalacao-empty">Nenhum membro encontrado.</div>
-                      } @else {
-                        @for (membro of getAssignment(musica.id).membrosBuscadosCantores.slice(0, 5); track membro.id) {
-                          <div class="escalacao-result-item" (click)="adicionarCantor(musica.id, membro)">
-                            <span class="result-avatar">{{ getNomeUsuario(membro)[0] }}</span>
-                            <span class="result-nome">{{ getNomeUsuario(membro) }}</span>
-                            <span class="result-perfil">{{ membro.perfil }}</span>
-                          </div>
-                        }
-                      }
-                    </div>
-                  }
-                </div>
-
-                <!-- Músicos -->
-                <div class="escalacao-section">
-                  <h4 class="escalacao-section-title">
-                    <span class="material-icons-outlined">piano</span>
-                    Músicos
-                  </h4>
-
-                  <!-- Músicos escalados -->
-                  @if (getAssignment(musica.id).musicos.length > 0) {
-                    <div class="escalados-chips">
-                      @for (mf of getAssignment(musica.id).musicos; track mf.membro.usuarioId) {
-                        <div class="escalado-chip escalado-chip--musico">
-                          <span class="chip-avatar">{{ getNomeUsuario(mf.membro)[0] }}</span>
-                          <div class="chip-info">
-                            <span class="chip-nome">{{ getNomeUsuario(mf.membro) }}</span>
-                            @if (getInstrumentos(mf.membro).length > 1) {
-                              <select
-                                class="chip-instrumento-select"
-                                [(ngModel)]="mf.instrumento"
-                                [ngModelOptions]="{ standalone: true }"
-                              >
-                                @for (inst of getInstrumentos(mf.membro); track inst) {
-                                  <option [value]="inst">{{ inst }}</option>
-                                }
-                              </select>
-                            } @else if (getInstrumentos(mf.membro).length === 1) {
-                              <span class="chip-instrumento-badge">{{ mf.instrumento }}</span>
-                            } @else {
-                              <input
-                                type="text"
-                                class="chip-instrumento-input"
-                                placeholder="Instrumento"
-                                [(ngModel)]="mf.instrumento"
-                                [ngModelOptions]="{ standalone: true }"
-                              />
-                            }
-                          </div>
-                          <button type="button" class="chip-remove" (click)="removerMusico(musica.id, mf.membro.usuarioId)">
-                            <span class="material-icons-outlined">close</span>
-                          </button>
-                        </div>
-                      }
-                    </div>
-                  }
-
-                  <!-- Busca músicos -->
-                  <div class="escalacao-search-wrapper">
-                    <span class="material-icons-outlined escalacao-search-icon">search</span>
-                    <input
-                      type="text"
-                      class="escalacao-search"
-                      placeholder="Buscar músico por nome…"
-                      [value]="getAssignment(musica.id).searchMusico"
-                      (input)="onSearchMusicoInput(musica.id, $any($event.target).value)"
-                      autocomplete="off"
-                    />
-                  </div>
-                  @if (getAssignment(musica.id).searchMusico.length > 0) {
-                    <div class="escalacao-results">
-                      @if (getAssignment(musica.id).membrosBuscadosMusicos.length === 0) {
-                        <div class="escalacao-empty">Nenhum membro encontrado.</div>
-                      } @else {
-                        @for (membro of getAssignment(musica.id).membrosBuscadosMusicos.slice(0, 5); track membro.id) {
-                          <div class="escalacao-result-item" (click)="adicionarMusico(musica.id, membro)">
-                            <span class="result-avatar">{{ getNomeUsuario(membro)[0] }}</span>
-                            <div class="result-info">
-                              <span class="result-nome">{{ getNomeUsuario(membro) }}</span>
-                              @if (membro.usuario?.instrumentos?.length) {
-                                <span class="result-instrumentos">{{ membro.usuario?.instrumentos?.join(', ') }}</span>
-                              }
-                            </div>
-                            <span class="result-perfil">{{ membro.perfil }}</span>
-                          </div>
-                        }
-                      }
-                    </div>
-                  }
-                </div>
-
-              </div>
             }
-          }
-        </div>
-      } @else {
-        <div class="empty-musicas">
-          <span class="material-icons-outlined">library_music</span>
-          <p>Nenhuma música adicionada ainda.</p>
-          <span>Use a busca acima para adicionar músicas ao repertório.</span>
+          </div>
         </div>
       }
+
+      <!-- Adicionar bloco -->
+      <div class="add-bloco-section">
+        <p class="add-bloco-label">Adicionar seção ao repertório</p>
+        <div class="blocos-predefinidos">
+          @for (nome of blocosPredefinidos; track nome) {
+            <button type="button" class="bloco-preset-btn" (click)="adicionarBloco(nome)">
+              <span class="material-icons-outlined">add</span>
+              {{ nome }}
+            </button>
+          }
+        </div>
+
+        @if (!showAddBloco) {
+          <button type="button" class="bloco-custom-btn" (click)="showAddBloco = true">
+            <span class="material-icons-outlined">edit</span>
+            Nome personalizado…
+          </button>
+        } @else {
+          <div class="bloco-custom-input-row">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nome do bloco (ex: Momento de Oração)"
+              [(ngModel)]="novoNomeBloco"
+              [ngModelOptions]="{ standalone: true }"
+              (keydown.enter)="adicionarBloco()"
+              autofocus
+            />
+            <button type="button" class="btn-primary-sm" (click)="adicionarBloco()" [disabled]="!novoNomeBloco.trim()">
+              <span class="material-icons-outlined">add</span>
+              Adicionar
+            </button>
+            <button type="button" class="btn-ghost-sm" (click)="showAddBloco = false; novoNomeBloco = ''">
+              Cancelar
+            </button>
+          </div>
+        }
+
+        @if (blocos.length === 0) {
+          <div class="empty-blocos">
+            <span class="material-icons-outlined">view_list</span>
+            <p>Nenhum bloco adicionado.</p>
+            <span>Clique em um dos botões acima para criar a primeira seção do repertório.</span>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- Actions -->
@@ -444,3 +505,4 @@
     </div>
   </form>
 </div>
+

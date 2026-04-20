@@ -142,6 +142,31 @@ export class MusicasService {
     return INSTRUMENTOS;
   }
 
+  async getHistorico(id: number) {
+    await this.getById(id);
+    const registros = await this.prisma.repertorioMusica.findMany({
+      where: { musicaId: id },
+      include: {
+        repertorio: {
+          select: {
+            id: true,
+            nome: true,
+            dataCulto: true,
+            tipoCulto: true,
+          },
+        },
+      },
+      orderBy: { repertorio: { dataCulto: 'desc' } },
+      take: 10,
+    });
+    return registros.map((r) => ({
+      repertorioId: r.repertorioId,
+      nome: r.repertorio.nome,
+      dataCulto: r.repertorio.dataCulto,
+      tipoCulto: r.repertorio.tipoCulto,
+    }));
+  }
+
   async seedTagsIfEmpty() {
     const count = await this.prisma.tag.count();
     if (count === 0) {

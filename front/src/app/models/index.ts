@@ -142,6 +142,13 @@ export interface Musica {
   criadoEm: string;
 }
 
+export interface MusicaHistoricoItem {
+  repertorioId: number;
+  nome: string;
+  dataCulto: string;
+  tipoCulto: string;
+}
+
 export interface MusicaForm {
   titulo: string;
   artista: string;
@@ -184,6 +191,7 @@ export interface Repertorio {
   aprovacao?: AprovacaoRepertorio;
   musicasIds: number[];
   musicas?: MusicaRepertorio[];
+  blocos?: BlocoRepertorio[];
   criadoEm: string;
 }
 
@@ -197,7 +205,8 @@ export interface RepertorioForm {
   aviso?: string;
   status: StatusRepertorio;
   igrejaId?: number;
-  musicas: MusicaRepertorioItem[];
+  blocos?: BlocoRepertorioItem[];
+  musicas?: MusicaRepertorioItem[];
 }
 
 export interface ApiResponse<T> {
@@ -234,6 +243,7 @@ export interface MusicoEscaladoItem extends CantorescaladoItem {
 
 /** Uma música dentro de um repertório, com cantores e músicos escalados. */
 export interface MusicaRepertorio extends Musica {
+  tomOverride: string | null;
   cantores: CantorescaladoItem[];
   musicos: MusicoEscaladoItem[];
 }
@@ -241,8 +251,25 @@ export interface MusicaRepertorio extends Musica {
 /** Item de música para envio no formulário de criação/edição de repertório. */
 export interface MusicaRepertorioItem {
   musicaId: number;
+  tomOverride?: string;
   cantores?: number[];
   musicos?: { usuarioId: number; instrumento: string }[];
+}
+
+/** Bloco de músicas dentro de um repertório (ex: Abertura, Adorações, Solo…). */
+export interface BlocoRepertorioItem {
+  nome: string;
+  descricao?: string;
+  musicas: MusicaRepertorioItem[];
+}
+
+/** Bloco formatado retornado pela API, com músicas completas. */
+export interface BlocoRepertorio {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  ordem: number;
+  musicas: MusicaRepertorio[];
 }
 
 /** Um item de música dentro de uma escalação de músico, com instrumento. */

@@ -31,7 +31,10 @@ export class SidebarComponent implements OnInit {
 
   private readonly allNavItems: NavItem[] = [
     { label: 'Início',       icon: 'home',               route: '/inicio' },
+    { label: 'Calendário',   icon: 'calendar_month',     route: '/calendario' },
     { label: 'Repertórios',  icon: 'queue_music',        route: '/repertorios' },
+    { label: 'Notificações', icon: 'notifications_none', route: '/notificacoes' },
+    { label: 'Aprovações',   icon: 'approval',           route: '/aprovacoes',   perfisPermitidos: ['ADM', 'Pastor'] },
     {
       label: 'Músicas',
       icon: 'library_music',
@@ -41,12 +44,8 @@ export class SidebarComponent implements OnInit {
         { label: 'Editar Música',         icon: 'edit_note',          route: '/musicas' },
       ],
     },
-    { label: 'Aprovações',   icon: 'approval',           route: '/aprovacoes',   perfisPermitidos: ['ADM', 'Pastor'] },
     { label: 'Igrejas',      icon: 'church',             route: '/igrejas',      perfisPermitidos: ['ADM'] },
     { label: 'Cultos',       icon: 'calendar_today',     route: '/cultos',       perfisPermitidos: ['ADM', 'Pastor', 'Ministro'] },
-    { label: 'Calendário',   icon: 'calendar_month',     route: '/calendario' },
-    { label: 'Notificações', icon: 'notifications_none', route: '/notificacoes' },
-    { label: 'Meu Perfil',   icon: 'person_outline',     route: '/meu-perfil' },
   ];
 
   usuario: Usuario | null = null;

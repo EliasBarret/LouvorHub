@@ -43,12 +43,12 @@
       }
       <button class="btn-confirmacoes" (click)="goToConfirmacoes()" title="Ver status de confirmações dos músicos">
         <span class="material-icons-outlined">fact_check</span>
-        Ver Confirmações
+        <span class="btn-label">Ver Confirmações</span>
       </button>
       @if (podeEditar()) {
         <button class="btn-editar" (click)="goToEditar()" title="Editar repertório">
           <span class="material-icons-outlined">edit</span>
-          Editar
+          <span class="btn-label">Editar</span>
         </button>
       }
     </div>
@@ -61,20 +61,24 @@
     }
 
     <!-- Minha Escalação: card de confirmação -->
-    @if (detalheEscalacao && detalheEscalacao.musicasComConfirmacao.length > 0) {
-      <div class="escalacao-card">
-        <div class="escalacao-card-header">
+    @if (detalheEscalacao && detalheEscalacao.musicasComConfirmacao.length > 0 && !todasMusicasConfirmadas()) {
+      <div class="escalacao-card" [class.recolhido]="escalacaoRecolhido">
+        <div class="escalacao-card-header" (click)="toggleEscalacaoCard()" style="cursor:pointer">
           <span class="material-icons-outlined escalacao-icon">check_circle</span>
-          <div>
-            <h3 class="escalacao-title">
-              Você foi escalado(a) em {{ detalheEscalacao.musicasComConfirmacao.length }} música(s)
-            </h3>
-            <p class="escalacao-subtitle">
-              Confirme se você conhece cada música. Isso ajuda a liderança a se preparar.
-            </p>
-          </div>
+          @if (escalacaoRecolhido) {
+            <span class="escalacao-title" style="flex:1">Escalação confirmada · {{ detalheEscalacao.musicasComConfirmacao.length }} música(s)</span>
+          } @else {
+            <div style="flex:1">
+              <h3 class="escalacao-title">Você foi escalado(a) em {{ detalheEscalacao.musicasComConfirmacao.length }} música(s)</h3>
+              <p class="escalacao-subtitle">Confirme se você conhece cada música. Isso ajuda a liderança a se preparar.</p>
+            </div>
+          }
+          <span class="material-icons-outlined escalacao-toggle-icon">
+            {{ escalacaoRecolhido ? 'expand_more' : 'expand_less' }}
+          </span>
         </div>
-        <div class="escalacao-musicas">
+        @if (!escalacaoRecolhido) {
+          <div class="escalacao-musicas">
           @for (mc of detalheEscalacao.musicasComConfirmacao; track mc.musica.id) {
             <div class="escalacao-musica-item">
               <div class="escalacao-musica-info">
@@ -106,6 +110,7 @@
             </div>
           }
         </div>
+        }
       </div>
     }
 
@@ -113,13 +118,91 @@
     <div class="detail-musicas">
       <div class="detail-section-header">
         <h3>Músicas do Repertório</h3>
-        <!-- <button class="btn-outline-sm" (click)="goToNovaMusica()">
-          <span class="material-icons-outlined">add</span>
-          Adicionar
-        </button> -->
       </div>
 
-      @if (repertorio.musicas && repertorio.musicas.length > 0) {
+      @if (repertorio.blocos && repertorio.blocos.length > 0) {
+        <!-- Exibição por blocos -->
+        @for (bloco of repertorio.blocos; track bloco.id) {
+          <div class="detail-bloco">
+            <div class="detail-bloco-header">
+              <span class="material-icons-outlined bloco-icon">label</span>
+              <span class="detail-bloco-nome">{{ bloco.nome }}</span>
+              @if (bloco.descricao) {
+                <span class="detail-bloco-descricao">{{ bloco.descricao }}</span>
+              }
+            </div>
+            @if (bloco.musicas.length > 0) {
+              <div class="detail-music-list">
+                @for (musica of bloco.musicas; track musica.id; let i = $index) {
+                  <div class="detail-music-item">
+                    <span class="music-order">{{ i + 1 }}</span>
+                    <div class="music-icon">
+                      <span class="material-icons-outlined">music_note</span>
+                    </div>
+                    <div class="music-info">
+                      <span class="music-name">{{ musica.titulo }}</span>
+                      <span class="music-artist">{{ musica.artista }}</span>
+                      @if ((musica.cantores?.length ?? 0) > 0 || (musica.musicos?.length ?? 0) > 0) {
+                        <div class="music-musicians">
+                          @for (c of musica.cantores; track c.id) {
+                            <span class="musician-chip"><span class="chip-role">Cantor</span> {{ c.nome.split(' ')[0] }}</span>
+                          }
+                          @for (m of musica.musicos; track m.id) {
+                            <span class="musician-chip"><span class="chip-role">{{ m.instrumento }}</span> {{ m.nome.split(' ')[0] }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <div class="music-meta">
+                      <span class="meta-tom">Tom: {{ (musica.tomOverride ?? musica.tom) }}</span>
+                      @if (musica.tomOverride && musica.tomOverride !== musica.tom) {
+                        <span class="meta-tom-original" title="Tom original da música">(original: {{ musica.tomFeminino | tomDisplay: musica.tom }})</span>
+                      }
+                    </div>
+                    <div class="music-tags">
+                      @for (tag of musica.tags; track tag) {
+                        <span class="tag" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">{{ tag }}</span>
+                      }
+                    </div>
+                    <!-- Desktop actions -->
+                    <div class="music-desktop-actions">
+                      @if (musica.linkYoutube) {
+                        <a class="music-yt-btn" [href]="musica.linkYoutube" target="_blank" rel="noopener noreferrer" title="Abrir no YouTube">
+                          <span class="material-icons-outlined">play_circle</span>
+                        </a>
+                      }
+                      <button class="music-actions-btn" (click)="goToEditarMusica(musica.id)" title="Editar música">
+                        <span class="material-icons-outlined">edit</span>
+                      </button>
+                    </div>
+                    <!-- Mobile actions menu -->
+                    <div class="music-mobile-actions">
+                      <button class="music-menu-btn" (click)="toggleMusicMenu(musica.id, $event)" title="Mais opções">
+                        <span class="material-icons-outlined">more_vert</span>
+                      </button>
+                      @if (openMenuMusicaId === musica.id) {
+                        <div class="music-menu-dropdown">
+                          @if (musica.linkYoutube) {
+                            <a class="music-menu-item" [href]="musica.linkYoutube" target="_blank" rel="noopener noreferrer">
+                              <span class="material-icons-outlined">play_circle</span>
+                              Ouvir no YouTube
+                            </a>
+                          }
+                          <button class="music-menu-item" (click)="goToEditarMusica(musica.id)">
+                            <span class="material-icons-outlined">edit</span>
+                            Editar
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      } @else if (repertorio.musicas && repertorio.musicas.length > 0) {
+        <!-- Fallback: lista plana sem blocos -->
         <div class="detail-music-list">
           @for (musica of repertorio.musicas; track musica.id; let i = $index) {
             <div class="detail-music-item">
@@ -130,6 +213,16 @@
               <div class="music-info">
                 <span class="music-name">{{ musica.titulo }}</span>
                 <span class="music-artist">{{ musica.artista }}</span>
+                @if ((musica.cantores?.length ?? 0) > 0 || (musica.musicos?.length ?? 0) > 0) {
+                  <div class="music-musicians">
+                    @for (c of musica.cantores; track c.id) {
+                      <span class="musician-chip"><span class="chip-role">Cantor</span> {{ c.nome.split(' ')[0] }}</span>
+                    }
+                    @for (m of musica.musicos; track m.id) {
+                      <span class="musician-chip"><span class="chip-role">{{ m.instrumento }}</span> {{ m.nome.split(' ')[0] }}</span>
+                    }
+                  </div>
+                }
               </div>
               <div class="music-meta">
                 <span class="meta-tom">Tom: {{ musica.tomFeminino | tomDisplay: musica.tom }}</span>
@@ -140,14 +233,37 @@
                   <span class="tag" [style.background]="getTagCor(tag) + '18'" [style.color]="getTagCor(tag)">{{ tag }}</span>
                 }
               </div>
-              @if (musica.linkYoutube) {
-                <a class="music-yt-btn" [href]="musica.linkYoutube" target="_blank" rel="noopener noreferrer" title="Abrir no YouTube">
-                  <span class="material-icons-outlined">play_circle</span>
-                </a>
-              }
-              <button class="music-actions-btn" (click)="goToEditarMusica(musica.id)" title="Editar música">
-                <span class="material-icons-outlined">edit</span>
-              </button>
+              <!-- Desktop actions -->
+              <div class="music-desktop-actions">
+                @if (musica.linkYoutube) {
+                  <a class="music-yt-btn" [href]="musica.linkYoutube" target="_blank" rel="noopener noreferrer" title="Abrir no YouTube">
+                    <span class="material-icons-outlined">play_circle</span>
+                  </a>
+                }
+                <button class="music-actions-btn" (click)="goToEditarMusica(musica.id)" title="Editar música">
+                  <span class="material-icons-outlined">edit</span>
+                </button>
+              </div>
+              <!-- Mobile actions menu -->
+              <div class="music-mobile-actions">
+                <button class="music-menu-btn" (click)="toggleMusicMenu(musica.id, $event)" title="Mais opções">
+                  <span class="material-icons-outlined">more_vert</span>
+                </button>
+                @if (openMenuMusicaId === musica.id) {
+                  <div class="music-menu-dropdown">
+                    @if (musica.linkYoutube) {
+                      <a class="music-menu-item" [href]="musica.linkYoutube" target="_blank" rel="noopener noreferrer">
+                        <span class="material-icons-outlined">play_circle</span>
+                        Ouvir no YouTube
+                      </a>
+                    }
+                    <button class="music-menu-item" (click)="goToEditarMusica(musica.id)">
+                      <span class="material-icons-outlined">edit</span>
+                      Editar
+                    </button>
+                  </div>
+                }
+              </div>
             </div>
           }
         </div>

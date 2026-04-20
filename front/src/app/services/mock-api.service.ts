@@ -7,6 +7,7 @@ import {
   Tag,
   Musica,
   MusicaForm,
+  MusicaHistoricoItem,
   Repertorio,
   RepertorioForm,
   ApiResponse,
@@ -72,6 +73,10 @@ export class MockApiService {
 
   deleteMusica(id: number): Observable<ApiResponse<void>> {
     return this.musicaService.deleteMusica(id);
+  }
+
+  getMusicaHistorico(id: number): Observable<ApiResponse<MusicaHistoricoItem[]>> {
+    return this.musicaService.getMusicaHistorico(id);
   }
 
   // ─── Repertórios ──────────────────────────────────────────────────────────

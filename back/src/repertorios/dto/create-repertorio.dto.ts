@@ -26,6 +26,11 @@ export class MusicaRepertorioDto {
   @IsInt()
   musicaId: number;
 
+  @ApiPropertyOptional({ example: 'G', description: 'Tom usado neste culto (sobrescreve o tom padrão da música)' })
+  @IsOptional()
+  @IsString()
+  tomOverride?: string;
+
   @ApiPropertyOptional({ type: [Number], description: 'IDs dos cantores escalados para esta música' })
   @IsOptional()
   @IsArray()
@@ -38,6 +43,23 @@ export class MusicaRepertorioDto {
   @ValidateNested({ each: true })
   @Type(() => MusicoEscaladoDto)
   musicos?: MusicoEscaladoDto[];
+}
+
+export class BlocoRepertorioDto {
+  @ApiProperty({ example: 'Adorações', description: 'Nome do bloco (Abertura, Adorações, Ofertório, Solo, Apelo…)' })
+  @IsString()
+  nome: string;
+
+  @ApiPropertyOptional({ example: 'Larissa', description: 'Descrição adicional, ex: nome do solista ou grupo' })
+  @IsOptional()
+  @IsString()
+  descricao?: string;
+
+  @ApiProperty({ type: [MusicaRepertorioDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MusicaRepertorioDto)
+  musicas: MusicaRepertorioDto[];
 }
 
 export class CreateRepertorioDto {
@@ -83,11 +105,20 @@ export class CreateRepertorioDto {
   @IsInt()
   igrejaId?: number;
 
-  @ApiProperty({ type: [MusicaRepertorioDto], description: 'Músicas do repertório com cantores e músicos escalados' })
+  @ApiPropertyOptional({ type: [BlocoRepertorioDto], description: 'Blocos do repertório organizados por seção (Abertura, Adorações, etc.)' })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BlocoRepertorioDto)
+  blocos?: BlocoRepertorioDto[];
+
+  @ApiPropertyOptional({ type: [MusicaRepertorioDto], description: 'Lista plana de músicas (legado — use blocos quando possível)' })
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => MusicaRepertorioDto)
-  musicas: MusicaRepertorioDto[];
+  musicas?: MusicaRepertorioDto[];
 }
 
 export class UpdateRepertorioDto extends CreateRepertorioDto {}
+

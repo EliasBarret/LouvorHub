@@ -61,6 +61,12 @@ export class MusicasController {
     return this.musicasService.getById(id);
   }
 
+  @Get(':id/historico')
+  @ApiOperation({ summary: 'Histórico de uso da música em repertórios (últimos 10)' })
+  getHistorico(@Param('id', ParseIntPipe) id: number) {
+    return this.musicasService.getHistorico(id);
+  }
+
   @Post()
   @ApiOperation({ summary: 'Criar nova música' })
   create(@Body() dto: CreateMusicaDto, @CurrentUser() user: any) {

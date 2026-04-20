@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TomDisplayPipe } from '../../pipes/tom-display.pipe';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -19,6 +19,18 @@ export class RepertorioDetailComponent implements OnInit {
   tags: Tag[] = [];
   usuarioLogado: Usuario | null = null;
   isLoading = true;
+  escalacaoRecolhido = false;
+  openMenuMusicaId: number | null = null;
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.openMenuMusicaId = null;
+  }
+
+  toggleMusicMenu(id: number, event: MouseEvent): void {
+    event.stopPropagation();
+    this.openMenuMusicaId = this.openMenuMusicaId === id ? null : id;
+  }
 
   constructor(
     private api: MockApiService,
@@ -43,7 +55,9 @@ export class RepertorioDetailComponent implements OnInit {
       this.isLoading = false;
 
       this.escalacaoService.getDetalheEscalacao(id).subscribe(det => {
-        if (det.sucesso) this.detalheEscalacao = det.data;
+        if (det.sucesso) {
+          this.detalheEscalacao = det.data;
+        }
       });
     });
   }
@@ -59,14 +73,24 @@ export class RepertorioDetailComponent implements OnInit {
     this.escalacaoService.confirmarMusica(form).subscribe(res => {
       this.confirmandoMap.set(musicaId, false);
       if (res.sucesso && this.detalheEscalacao) {
+        const atualizadas = this.detalheEscalacao.musicasComConfirmacao.map(mc =>
+          mc.musica.id === musicaId ? { ...mc, confirmacao: status } : mc,
+        );
         this.detalheEscalacao = {
           ...this.detalheEscalacao,
-          musicasComConfirmacao: this.detalheEscalacao.musicasComConfirmacao.map(mc =>
-            mc.musica.id === musicaId ? { ...mc, confirmacao: status } : mc,
-          ),
+          musicasComConfirmacao: atualizadas,
         };
       }
     });
+  }
+
+  todasMusicasConfirmadas(): boolean {
+    return !!this.detalheEscalacao?.musicasComConfirmacao.every(mc => mc.confirmacao !== 'pendente');
+  }
+
+  toggleEscalacaoCard(): void {
+    if (!this.escalacaoRecolhido && !this.todasMusicasConfirmadas()) return;
+    this.escalacaoRecolhido = !this.escalacaoRecolhido;
   }
 
   goBack(): void {
