@@ -11,6 +11,8 @@
             "matchCommandLine": true
         },
         "npx tsx": true,
-        "New-Item": true
+        "New-Item": true,
+        "npm run build": true,
+        "node_modules/.bin/tsc": true
     }
 }
