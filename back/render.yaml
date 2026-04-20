@@ -2,7 +2,6 @@ services:
   - type: web
     name: louvourhub-back
     runtime: node
-    rootDir: back
     buildCommand: npm install && npm run build
     startCommand: node --max-old-space-size=400 dist/main
     envVars:
