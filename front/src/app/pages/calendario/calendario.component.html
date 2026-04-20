@@ -1,0 +1,86 @@
+<div class="calendario-page">
+
+  <!-- Header -->
+  <div class="cal-header">
+    <h1 class="month-title">{{ monthLabel }}</h1>
+    <div class="nav-controls">
+      <button class="nav-btn" (click)="prevMonth()" aria-label="Mês anterior">
+        <span class="material-icons-outlined">chevron_left</span>
+      </button>
+      <button class="today-btn" (click)="goToToday()">Hoje</button>
+      <button class="nav-btn" (click)="nextMonth()" aria-label="Próximo mês">
+        <span class="material-icons-outlined">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <span class="material-icons-outlined loading-icon">calendar_month</span>
+      <span>Carregando calendário...</span>
+    </div>
+  } @else {
+    <!-- Calendar Grid -->
+    <div class="cal-grid-wrapper">
+      <div class="cal-grid">
+
+        <!-- Day-of-week headers -->
+        @for (h of dayHeaders; track h) {
+          <div class="day-header">{{ h }}</div>
+        }
+
+        <!-- Calendar cells -->
+        @for (week of weeks; track $index) {
+          @for (day of week; track $index) {
+            <div
+              class="cal-cell"
+              [class.empty]="!day.date"
+              [class.today-cell]="isToday(day)"
+            >
+              @if (day.date) {
+                <span class="day-number" [class.today-number]="isToday(day)">
+                  {{ day.date.getDate() }}
+                </span>
+                <div class="events-list">
+                  @for (event of day.events; track event.repertorioId) {
+                    <a
+                      class="event-chip"
+                      [class.minha-escala]="event.tipo === 'minha-escala' && !event.passado"
+                      [class.outros-cultos]="event.tipo === 'outros-cultos' && !event.passado"
+                      [class.passado]="event.passado"
+                      [routerLink]="['/repertorios', event.repertorioId]"
+                      [title]="(event.horario ? event.horario + ' — ' : '') + event.titulo"
+                    >
+                      @if (event.horario) {
+                        <span class="event-time">{{ event.horario }}</span>
+                      }
+                      {{ event.titulo }}
+                    </a>
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot minha-escala-dot"></div>
+        <span>Minha escala</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot outros-cultos-dot"></div>
+        <span>Outros cultos</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot passados-dot"></div>
+        <span>Passados</span>
+      </div>
+    </div>
+  }
+
+</div>

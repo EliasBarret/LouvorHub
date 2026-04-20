@@ -12,6 +12,7 @@ import { StatusConfirmacoesComponent } from './pages/status-confirmacoes/status-
 import { AprovacoesComponent } from './pages/aprovacoes/aprovacoes.component';
 import { GestaoIgrejasComponent } from './pages/gestao-igrejas/gestao-igrejas.component';
 import { GestaoCultosComponent } from './pages/gestao-cultos/gestao-cultos.component';
+import { CalendarioComponent } from './pages/calendario/calendario.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -33,6 +34,7 @@ export const routes: Routes = [
       { path: 'aprovacoes', component: AprovacoesComponent },
       { path: 'igrejas', component: GestaoIgrejasComponent },
       { path: 'cultos', component: GestaoCultosComponent },
+      { path: 'calendario', component: CalendarioComponent },
       { path: 'meu-perfil', component: MeuPerfilComponent },
     ]
   },

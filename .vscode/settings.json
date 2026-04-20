@@ -5,6 +5,11 @@
             "matchCommandLine": true
         },
         "npx prisma": true,
-        "npx tsc": true
+        "npx tsc": true,
+        "/^cd /c/project_personal/LouvorHub/back && node -e \"\nconst \\{ PrismaClient \\} = require\\('@prisma/client'\\);\nconst prisma = new PrismaClient\\(\\);\nasync function main\\(\\) \\{\n  const \\[esc, me, cm, rep\\] = await Promise\\.all\\(\\[\n    prisma\\.escalacaoMusico\\.count\\(\\),\n    prisma\\.musicaEscalada\\.count\\(\\),\n    prisma\\.confirmacaoMusica\\.count\\(\\),\n    prisma\\.repertorio\\.count\\(\\{ where: \\{ dataCulto: \\{ gte: new Date\\(\\) \\} \\} \\}\\),\n  \\]\\);\n  console\\.log\\(\\{ escalacoes: esc, musicasEscaladas: me, confirmacoes: cm, repertoriosFuturos: rep \\}\\);\n  await prisma\\.\\\\\\$disconnect\\(\\);\n\\}\nmain\\(\\)\\.catch\\(console\\.error\\);\n\" 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "npx tsx": true
     }
 }

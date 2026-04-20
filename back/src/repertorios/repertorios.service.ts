@@ -237,10 +237,15 @@ export class RepertoriosService {
       create: { repertorioId, usuarioId },
       update: {},
     });
-    await this.prisma.musicaEscalada.upsert({
+    const musicaEscalada = await this.prisma.musicaEscalada.upsert({
       where: { escalacaoId_musicaId: { escalacaoId: escalacao.id, musicaId } },
       create: { escalacaoId: escalacao.id, musicaId, instrumento },
       update: { instrumento },
+    });
+    await this.prisma.confirmacaoMusica.upsert({
+      where: { musicaEscaladaId: musicaEscalada.id },
+      create: { musicaEscaladaId: musicaEscalada.id, musicaId, status: 'pendente' },
+      update: {},
     });
   }
 

@@ -1,0 +1,26 @@
+@if (visivel() && toast(); as t) {
+  <div
+    class="pn-toast"
+    [class.pn-toast--visible]="animado()"
+    role="alert"
+    aria-live="polite"
+    (click)="navegar()"
+  >
+    <div class="pn-toast__icon">
+      <span class="material-icons-outlined">notifications</span>
+    </div>
+
+    <div class="pn-toast__body">
+      <span class="pn-toast__titulo">{{ t.titulo }}</span>
+      <span class="pn-toast__mensagem">{{ t.mensagem }}</span>
+    </div>
+
+    <button
+      class="pn-toast__fechar"
+      title="Fechar"
+      (click)="dispensar($event)"
+    >
+      <span class="material-icons-outlined">close</span>
+    </button>
+  </div>
+}

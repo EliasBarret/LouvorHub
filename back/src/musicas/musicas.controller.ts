@@ -31,6 +31,12 @@ export class MusicasController {
     return this.musicasService.getAll(pagina, tamanhoPagina);
   }
 
+  @Get('buscar')
+  @ApiOperation({ summary: 'Buscar músicas por título, artista ou tom' })
+  buscar(@Query('q') q = '') {
+    return this.musicasService.buscar(q);
+  }
+
   @Get('tags')
   @ApiOperation({ summary: 'Listar tags disponíveis' })
   getTags() {

@@ -20,6 +20,11 @@ export class MusicaService {
     );
   }
 
+  buscarMusicas(q: string): Observable<ApiResponse<Musica[]>> {
+    const params = q.trim() ? `?q=${encodeURIComponent(q.trim())}` : '';
+    return this.http.get<ApiResponse<Musica[]>>(`${this.api}/buscar${params}`);
+  }
+
   getMusicaById(id: number): Observable<ApiResponse<Musica>> {
     return this.http.get<ApiResponse<Musica>>(`${this.api}/${id}`);
   }

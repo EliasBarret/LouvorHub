@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { MockApiService } from '../../services/mock-api.service';
 import { IgrejaService } from '../../services/igreja.service';
 import { TiposCultoService } from '../../services/tipos-culto.service';
@@ -30,10 +32,9 @@ interface MusicaAssignment {
   templateUrl: './cadastro-repertorio.component.html',
   styleUrl: './cadastro-repertorio.component.scss',
 })
-export class CadastroRepertorioComponent implements OnInit {
+export class CadastroRepertorioComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   tiposCulto: TipoCulto[] = [];
-  todasMusicas: Musica[] = [];
   tags: Tag[] = [];
   minhasIgrejas: Igreja[] = [];
   membrosIgreja: MembroIgreja[] = [];
@@ -41,6 +42,9 @@ export class CadastroRepertorioComponent implements OnInit {
   musicasBuscadas: Musica[] = [];
   musicasSelecionadas: Musica[] = [];
   buscaMusica = '';
+
+  private buscaSubject = new Subject<string>();
+  private buscaSub?: Subscription;
 
   // Map: musicaId -> MusicaAssignment
   musicaAssignments: Map<number, MusicaAssignment> = new Map();
@@ -69,6 +73,19 @@ export class CadastroRepertorioComponent implements OnInit {
   ngOnInit(): void {
     this.buildForm();
     this.loadMetadata();
+    this.buscaSub = this.buscaSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(q => {
+        this.isLoadingMusicas = true;
+        return this.api.buscarMusicas(q);
+      }),
+    ).subscribe(res => {
+      this.musicasBuscadas = res.data.filter(
+        m => !this.musicasSelecionadas.some(s => s.id === m.id),
+      );
+      this.isLoadingMusicas = false;
+    });
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -98,36 +115,27 @@ export class CadastroRepertorioComponent implements OnInit {
       aviso: rep.aviso ?? '',
     });
 
-    // Aguarda musicas carregarem e então pre-seleciona
-    const preencherMusicas = () => {
-      if (this.isLoadingMusicas) {
-        setTimeout(preencherMusicas, 100);
-        return;
+    // Pré-seleciona músicas do repertório diretamente dos dados retornados
+    (rep.musicas ?? []).forEach(mr => {
+      if (!this.musicasSelecionadas.some(m => m.id === mr.id)) {
+        this.musicasSelecionadas = [...this.musicasSelecionadas, mr];
+        const cantoresMemb: MembroIgreja[] = mr.cantores.map(c => this.toMembro(c, rep.igrejaId));
+        const musicosForm: MusicoForm[] = mr.musicos.map(mu => ({
+          membro: this.toMembro(mu, rep.igrejaId),
+          instrumento: mu.instrumento,
+        }));
+        this.musicaAssignments.set(mr.id, {
+          cantores: cantoresMemb,
+          musicos: musicosForm,
+          searchCantor: '',
+          searchMusico: '',
+          instrumentoInput: '',
+          showAssignment: false,
+          membrosBuscadosCantores: [...this.membrosIgreja],
+          membrosBuscadosMusicos: [...this.membrosIgreja],
+        });
       }
-      (rep.musicas ?? []).forEach(mr => {
-        const musica = this.todasMusicas.find(m => m.id === mr.id);
-        if (musica && !this.musicasSelecionadas.some(m => m.id === musica.id)) {
-          this.musicasSelecionadas = [...this.musicasSelecionadas, musica];
-          const cantoresMemb: MembroIgreja[] = mr.cantores.map(c => this.toMembro(c, rep.igrejaId));
-          const musicosForm: MusicoForm[] = mr.musicos.map(mu => ({
-            membro: this.toMembro(mu, rep.igrejaId),
-            instrumento: mu.instrumento,
-          }));
-          this.musicaAssignments.set(musica.id, {
-            cantores: cantoresMemb,
-            musicos: musicosForm,
-            searchCantor: '',
-            searchMusico: '',
-            instrumentoInput: '',
-            showAssignment: false,
-            membrosBuscadosCantores: [...this.membrosIgreja],
-            membrosBuscadosMusicos: [...this.membrosIgreja],
-          });
-        }
-      });
-      this.filtrarMusicas();
-    };
-    preencherMusicas();
+    });
   }
 
   /** Converte CantorescaladoItem / MusicoEscaladoItem em MembroIgreja sintético */
@@ -174,6 +182,10 @@ export class CadastroRepertorioComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.buscaSub?.unsubscribe();
+  }
+
   private loadMetadata(): void {
     this.tiposCultoService.getAll().subscribe(res => {
       this.tiposCulto = res.data;
@@ -183,11 +195,7 @@ export class CadastroRepertorioComponent implements OnInit {
       this.tags = res.data;
     });
 
-    this.api.getMusicas().subscribe(res => {
-      this.todasMusicas = res.data.conteudo;
-      this.musicasBuscadas = [...this.todasMusicas];
-      this.isLoadingMusicas = false;
-    });
+    this.isLoadingMusicas = false;
 
     this.api.getUsuarioLogado().subscribe(userRes => {
       if (userRes.data.perfil === 'ADM') {
@@ -239,14 +247,7 @@ export class CadastroRepertorioComponent implements OnInit {
   }
 
   filtrarMusicas(): void {
-    const query = this.buscaMusica.toLowerCase().trim();
-    this.musicasBuscadas = this.todasMusicas.filter(m =>
-      !this.musicasSelecionadas.some(s => s.id === m.id) &&
-      (query === '' ||
-        m.titulo.toLowerCase().includes(query) ||
-        m.artista.toLowerCase().includes(query) ||
-        m.tom.toLowerCase().includes(query))
-    );
+    this.buscaSubject.next(this.buscaMusica);
   }
 
   adicionarMusica(musica: Musica): void {

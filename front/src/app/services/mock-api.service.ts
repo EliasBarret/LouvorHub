@@ -54,6 +54,10 @@ export class MockApiService {
     return this.musicaService.getMusicas();
   }
 
+  buscarMusicas(q: string): Observable<ApiResponse<Musica[]>> {
+    return this.musicaService.buscarMusicas(q);
+  }
+
   getMusicaById(id: number): Observable<ApiResponse<Musica>> {
     return this.musicaService.getMusicaById(id);
   }

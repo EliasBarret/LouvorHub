@@ -11,7 +11,7 @@ export class DashboardService {
 
   async getStats(userId: number) {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setUTCHours(0, 0, 0, 0);
     const [proximosCultos, musicasEscaladas, aguardandoConfirmacao] = await Promise.all([
       this.prisma.escalacaoMusico.count({
         where: {

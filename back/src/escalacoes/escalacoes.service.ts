@@ -17,8 +17,10 @@ export class EscalacoesService {
   ) {}
 
   async getMinhasEscalacoes(userId: number) {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
     const escalacoes = await this.prisma.escalacaoMusico.findMany({
-      where: { usuarioId: userId },
+      where: { usuarioId: userId, repertorio: { dataCulto: { gte: today } } },
       include: {
         repertorio: true,
         musicasEscaladas: {
@@ -250,7 +252,7 @@ export class EscalacoesService {
   }
 
   async getPendentesCount(userId: number, fromDate?: Date): Promise<number> {
-    const date = fromDate ?? (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })();
+    const date = fromDate ?? (() => { const d = new Date(); d.setUTCHours(0, 0, 0, 0); return d; })();
     const result = await this.prisma.confirmacaoMusica.count({
       where: {
         status: StatusConfirmacao.pendente,

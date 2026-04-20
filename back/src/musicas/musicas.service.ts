@@ -48,6 +48,25 @@ export class MusicasService {
     };
   }
 
+  async buscar(q: string) {
+    const termo = q?.trim() ?? '';
+    const musicas = await this.prisma.musica.findMany({
+      where: termo
+        ? {
+            OR: [
+              { titulo: { contains: termo, mode: 'insensitive' } },
+              { artista: { contains: termo, mode: 'insensitive' } },
+              { tom: { contains: termo, mode: 'insensitive' } },
+            ],
+          }
+        : undefined,
+      include: { tags: { include: { tag: true } } },
+      orderBy: { titulo: 'asc' },
+      take: 100,
+    });
+    return musicas.map(this.format);
+  }
+
   async getById(id: number) {
     const musica = await this.prisma.musica.findUnique({
       where: { id },
