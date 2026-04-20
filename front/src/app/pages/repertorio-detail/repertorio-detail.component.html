@@ -142,7 +142,7 @@
                     <div class="music-info">
                       <span class="music-name">{{ musica.titulo }}</span>
                       <span class="music-artist">{{ musica.artista }}</span>
-                      @if ((musica.cantores?.length ?? 0) > 0 || (musica.musicos?.length ?? 0) > 0) {
+                      @if (musica.cantores.length > 0 || musica.musicos.length > 0) {
                         <div class="music-musicians">
                           @for (c of musica.cantores; track c.id) {
                             <span class="musician-chip"><span class="chip-role">Cantor</span> {{ c.nome.split(' ')[0] }}</span>
@@ -213,7 +213,7 @@
               <div class="music-info">
                 <span class="music-name">{{ musica.titulo }}</span>
                 <span class="music-artist">{{ musica.artista }}</span>
-                @if ((musica.cantores?.length ?? 0) > 0 || (musica.musicos?.length ?? 0) > 0) {
+                @if (musica.cantores.length > 0 || musica.musicos.length > 0) {
                   <div class="music-musicians">
                     @for (c of musica.cantores; track c.id) {
                       <span class="musician-chip"><span class="chip-role">Cantor</span> {{ c.nome.split(' ')[0] }}</span>
