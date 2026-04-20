@@ -5,6 +5,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { PrismaModule } from './prisma/prisma.module';
+import { EmailModule } from './email/email.module';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { IgrejasModule } from './igrejas/igrejas.module';
@@ -26,6 +27,7 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     ScheduleModule.forRoot(),
     PrismaModule,
+    EmailModule,
     AuthModule,
     UsuariosModule,
     IgrejasModule,

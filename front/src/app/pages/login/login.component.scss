@@ -213,3 +213,147 @@
   animation: spin 0.8s linear infinite;
   font-size: 18px !important;
 }
+
+// Tab switcher
+.tab-switcher {
+  display: flex;
+  background: var(--bg-main);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 28px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 9px 0;
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background 0.2s, color 0.2s;
+
+  &.active {
+    background: var(--bg-white);
+    color: var(--primary);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  &:hover:not(.active) {
+    color: var(--text-primary);
+  }
+}
+
+.field-optional {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+// "Esqueci minha senha" inline link next to label
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+
+  .field-label {
+    margin-bottom: 0;
+  }
+}
+
+.link-btn {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover {
+    color: var(--primary-dark);
+  }
+}
+
+// Back button (forgot password)
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+
+  &:hover { color: var(--text-primary); }
+
+  .material-icons-outlined { font-size: 18px; }
+}
+
+// Email-sent confirmation panel
+.email-sent-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 0;
+  gap: 12px;
+}
+
+.email-sent-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(107, 63, 160, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .material-icons-outlined {
+    font-size: 32px;
+    color: var(--primary);
+  }
+}
+
+.email-sent-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.email-sent-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.email-sent-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.link-btn-center {
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  margin-top: 4px;
+
+  &:hover { color: var(--primary-dark); }
+}

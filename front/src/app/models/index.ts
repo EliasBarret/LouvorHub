@@ -15,6 +15,11 @@ export interface RegisterForm {
   ministerio?: string;
 }
 
+export interface ChangePasswordForm {
+  senhaAtual: string;
+  novaSenha: string;
+}
+
 export interface AuthData {
   token: string;
   usuario: Usuario;

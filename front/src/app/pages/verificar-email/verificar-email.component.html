@@ -1,0 +1,46 @@
+<div class="verify-wrapper">
+  <div class="verify-card">
+    <!-- Logo -->
+    <div class="verify-logo">
+      <div class="logo-icon">
+        <span class="material-icons-outlined">music_note</span>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">LouvorHub</span>
+        <span class="logo-subtitle">MINISTÉRIO</span>
+      </div>
+    </div>
+
+    @if (state === 'loading') {
+      <div class="verify-state">
+        <div class="state-icon loading-icon">
+          <span class="material-icons-outlined spinning">autorenew</span>
+        </div>
+        <h2 class="state-title">Verificando seu e-mail…</h2>
+        <p class="state-desc">Aguarde um momento.</p>
+      </div>
+    }
+
+    @if (state === 'success') {
+      <div class="verify-state">
+        <div class="state-icon success-icon">
+          <span class="material-icons-outlined">check_circle</span>
+        </div>
+        <h2 class="state-title">E-mail confirmado!</h2>
+        <p class="state-desc">Sua conta foi ativada com sucesso. Você será redirecionado automaticamente.</p>
+        <button class="btn-primary" (click)="goToLogin()">Acessar o LouvorHub</button>
+      </div>
+    }
+
+    @if (state === 'error') {
+      <div class="verify-state">
+        <div class="state-icon error-icon">
+          <span class="material-icons-outlined">error_outline</span>
+        </div>
+        <h2 class="state-title">Falha na verificação</h2>
+        <p class="state-desc">{{ errorMessage }}</p>
+        <button class="btn-primary" (click)="goToLogin()">Voltar ao login</button>
+      </div>
+    }
+  </div>
+</div>

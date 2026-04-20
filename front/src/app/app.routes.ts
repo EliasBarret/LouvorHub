@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { LoginComponent } from './pages/login/login.component';
+import { VerificarEmailComponent } from './pages/verificar-email/verificar-email.component';
 import { HomeComponent } from './pages/home/home.component';
 import { RepertoriosComponent } from './pages/repertorios/repertorios.component';
 import { RepertorioDetailComponent } from './pages/repertorio-detail/repertorio-detail.component';
@@ -17,6 +18,7 @@ import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'verificar-email', component: VerificarEmailComponent },
   {
     path: '',
     component: MainLayoutComponent,

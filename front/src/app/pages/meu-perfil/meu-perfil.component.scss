@@ -536,3 +536,154 @@
     font-size: 26px;
   }
 }
+
+// ─── Header actions ───────────────────────────────────────────────────────────
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+// ─── Modal: Alterar Senha ─────────────────────────────────────────────────────
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  padding: 32px 28px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+
+  .material-icons-outlined {
+    font-size: 22px;
+    color: var(--primary);
+  }
+}
+
+.modal-close {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  .material-icons-outlined {
+    font-size: 22px;
+  }
+}
+
+.pw-form {
+  .field-input {
+    max-width: 100%;
+    padding-right: 44px;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+
+    .material-icons-outlined {
+      font-size: 18px;
+    }
+
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+}
+
+.pw-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(5, 150, 105, 0.08);
+  border: 1px solid rgba(5, 150, 105, 0.25);
+  border-radius: var(--radius-sm);
+  color: #059669;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+
+  .material-icons-outlined {
+    font-size: 18px;
+  }
+}
+
+.pw-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: var(--radius-sm);
+  color: #dc2626;
+  font-size: 13px;
+  margin-bottom: 20px;
+
+  .material-icons-outlined {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+  .modal-card {
+    padding: 24px 18px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+
+    .btn-cancel,
+    .btn-save {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

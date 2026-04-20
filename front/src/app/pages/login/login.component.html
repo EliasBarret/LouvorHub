@@ -11,76 +11,215 @@
       </div>
     </div>
 
-    <div class="login-header">
-      <h1 class="login-title">Bem-vindo de volta</h1>
-      <p class="login-desc">Entre com sua conta para acessar o ministério.</p>
-    </div>
-
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-      <!-- Email -->
-      <div class="field-group">
-        <label class="field-label" for="email">E-mail</label>
-        <div class="input-wrapper">
-          <span class="input-icon material-icons-outlined">mail_outline</span>
-          <input
-            id="email"
-            type="email"
-            class="field-input"
-            [class.invalid]="emailControl?.invalid && emailControl?.touched"
-            formControlName="email"
-            placeholder="seu@email.com"
-            autocomplete="email"
-          />
-        </div>
-        @if (emailControl?.invalid && emailControl?.touched) {
-          <span class="field-error">
-            @if (emailControl?.errors?.['required']) { E-mail é obrigatório. }
-            @else if (emailControl?.errors?.['email']) { E-mail inválido. }
-          </span>
-        }
+    <!-- Tab switcher (login / register only) -->
+    @if (mode !== 'forgot') {
+      <div class="tab-switcher">
+        <button class="tab-btn" [class.active]="mode === 'login'" (click)="switchMode('login')" type="button">Entrar</button>
+        <button class="tab-btn" [class.active]="mode === 'register'" (click)="switchMode('register')" type="button">Criar conta</button>
       </div>
+    }
 
-      <!-- Senha -->
-      <div class="field-group">
-        <label class="field-label" for="senha">Senha</label>
-        <div class="input-wrapper">
-          <span class="input-icon material-icons-outlined">lock_outline</span>
-          <input
-            id="senha"
-            [type]="showPassword ? 'text' : 'password'"
-            class="field-input"
-            [class.invalid]="senhaControl?.invalid && senhaControl?.touched"
-            formControlName="senha"
-            placeholder="Mínimo 6 caracteres"
-            autocomplete="current-password"
-          />
-          <button type="button" class="toggle-password" (click)="togglePassword()">
-            <span class="material-icons-outlined">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
-          </button>
-        </div>
-        @if (senhaControl?.invalid && senhaControl?.touched) {
-          <span class="field-error">
-            @if (senhaControl?.errors?.['required']) { Senha é obrigatória. }
-            @else if (senhaControl?.errors?.['minlength']) { Mínimo de 6 caracteres. }
-          </span>
-        }
+    <!-- LOGIN -->
+    @if (mode === 'login') {
+      <div class="login-header">
+        <h1 class="login-title">Bem-vindo de volta</h1>
+        <p class="login-desc">Entre com sua conta para acessar o ministério.</p>
       </div>
-
-      @if (errorMessage) {
-        <div class="login-error">
-          <span class="material-icons-outlined">error_outline</span>
-          {{ errorMessage }}
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="field-group">
+          <label class="field-label" for="email">E-mail</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">mail_outline</span>
+            <input id="email" type="email" class="field-input"
+              [class.invalid]="emailControl?.invalid && emailControl?.touched"
+              formControlName="email" placeholder="seu@email.com" autocomplete="email" />
+          </div>
+          @if (emailControl?.invalid && emailControl?.touched) {
+            <span class="field-error">
+              @if (emailControl?.errors?.['required']) { E-mail é obrigatório. }
+              @else if (emailControl?.errors?.['email']) { E-mail inválido. }
+            </span>
+          }
         </div>
-      }
-
-      <button type="submit" class="btn-login" [disabled]="isSubmitting">
-        @if (isSubmitting) {
-          <span class="material-icons-outlined spinning">autorenew</span>
-          Entrando…
-        } @else {
-          Entrar
+        <div class="field-group">
+          <div class="field-label-row">
+            <label class="field-label" for="senha">Senha</label>
+            <button type="button" class="link-btn" (click)="switchMode('forgot')">Esqueci minha senha</button>
+          </div>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">lock_outline</span>
+            <input id="senha" [type]="showPassword ? 'text' : 'password'" class="field-input"
+              [class.invalid]="senhaControl?.invalid && senhaControl?.touched"
+              formControlName="senha" placeholder="Mínimo 6 caracteres" autocomplete="current-password" />
+            <button type="button" class="toggle-password" (click)="togglePassword()">
+              <span class="material-icons-outlined">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if (senhaControl?.invalid && senhaControl?.touched) {
+            <span class="field-error">
+              @if (senhaControl?.errors?.['required']) { Senha é obrigatória. }
+              @else if (senhaControl?.errors?.['minlength']) { Mínimo de 6 caracteres. }
+            </span>
+          }
+        </div>
+        @if (errorMessage) {
+          <div class="login-error">
+            <span class="material-icons-outlined">error_outline</span>
+            {{ errorMessage }}
+          </div>
         }
+        <button type="submit" class="btn-login" [disabled]="isSubmitting">
+          @if (isSubmitting) { <span class="material-icons-outlined spinning">autorenew</span> Entrando… }
+          @else { Entrar }
+        </button>
+      </form>
+    }
+
+    <!-- REGISTER: form -->
+    @if (mode === 'register' && !registerEmailSent) {
+      <div class="login-header">
+        <h1 class="login-title">Criar nova conta</h1>
+        <p class="login-desc">Preencha os dados abaixo para se cadastrar.</p>
+      </div>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="field-group">
+          <label class="field-label" for="reg-nome">Nome completo</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">person_outline</span>
+            <input id="reg-nome" type="text" class="field-input"
+              [class.invalid]="nomeControl?.invalid && nomeControl?.touched"
+              formControlName="nome" placeholder="Seu nome completo" autocomplete="name" />
+          </div>
+          @if (nomeControl?.invalid && nomeControl?.touched) {
+            <span class="field-error">
+              @if (nomeControl?.errors?.['required']) { Nome é obrigatório. }
+              @else if (nomeControl?.errors?.['minlength']) { Mínimo de 2 caracteres. }
+            </span>
+          }
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="reg-email">E-mail</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">mail_outline</span>
+            <input id="reg-email" type="email" class="field-input"
+              [class.invalid]="emailControl?.invalid && emailControl?.touched"
+              formControlName="email" placeholder="seu@email.com" autocomplete="email" />
+          </div>
+          @if (emailControl?.invalid && emailControl?.touched) {
+            <span class="field-error">
+              @if (emailControl?.errors?.['required']) { E-mail é obrigatório. }
+              @else if (emailControl?.errors?.['email']) { E-mail inválido. }
+            </span>
+          }
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="reg-senha">Senha</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">lock_outline</span>
+            <input id="reg-senha" [type]="showPasswordReg ? 'text' : 'password'" class="field-input"
+              [class.invalid]="senhaControl?.invalid && senhaControl?.touched"
+              formControlName="senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+            <button type="button" class="toggle-password" (click)="togglePasswordReg()">
+              <span class="material-icons-outlined">{{ showPasswordReg ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if (senhaControl?.invalid && senhaControl?.touched) {
+            <span class="field-error">
+              @if (senhaControl?.errors?.['required']) { Senha é obrigatória. }
+              @else if (senhaControl?.errors?.['minlength']) { Mínimo de 6 caracteres. }
+            </span>
+          }
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="reg-funcao">Função <span class="field-optional">(opcional)</span></label>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">music_note</span>
+            <input id="reg-funcao" type="text" class="field-input" formControlName="funcao" placeholder="Ex: Violonista, Cantor…" />
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="reg-ministerio">Ministério <span class="field-optional">(opcional)</span></label>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">church</span>
+            <input id="reg-ministerio" type="text" class="field-input" formControlName="ministerio" placeholder="Nome do seu ministério" />
+          </div>
+        </div>
+        @if (errorMessage) {
+          <div class="login-error">
+            <span class="material-icons-outlined">error_outline</span>
+            {{ errorMessage }}
+          </div>
+        }
+        <button type="submit" class="btn-login" [disabled]="isSubmitting">
+          @if (isSubmitting) { <span class="material-icons-outlined spinning">autorenew</span> Criando conta… }
+          @else { Criar conta }
+        </button>
+      </form>
+    }
+
+    <!-- REGISTER: e-mail enviado -->
+    @if (mode === 'register' && registerEmailSent) {
+      <div class="email-sent-panel">
+        <div class="email-sent-icon">
+          <span class="material-icons-outlined">mark_email_read</span>
+        </div>
+        <h2 class="email-sent-title">Verifique seu e-mail</h2>
+        <p class="email-sent-desc">
+          Enviamos um link de confirmação para<br />
+          <strong>{{ registeredEmail }}</strong>
+        </p>
+        <p class="email-sent-hint">Após confirmar, você já poderá acessar o LouvorHub.</p>
+        <button class="btn-login" (click)="switchMode('login')">Ir para o login</button>
+        <button type="button" class="link-btn-center" (click)="resendVerification()">Reenviar e-mail</button>
+      </div>
+    }
+
+    <!-- FORGOT PASSWORD: form -->
+    @if (mode === 'forgot' && !forgotEmailSent) {
+      <button type="button" class="back-btn" (click)="switchMode('login')">
+        <span class="material-icons-outlined">arrow_back</span>
+        Voltar ao login
       </button>
-    </form>
+      <div class="login-header">
+        <h1 class="login-title">Esqueci minha senha</h1>
+        <p class="login-desc">Informe seu e-mail e enviaremos uma senha provisória.</p>
+      </div>
+      <form [formGroup]="forgotForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="field-group">
+          <label class="field-label" for="forgot-email">E-mail</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">mail_outline</span>
+            <input id="forgot-email" type="email" class="field-input"
+              [class.invalid]="emailControl?.invalid && emailControl?.touched"
+              formControlName="email" placeholder="seu@email.com" autocomplete="email" />
+          </div>
+          @if (emailControl?.invalid && emailControl?.touched) {
+            <span class="field-error">
+              @if (emailControl?.errors?.['required']) { E-mail é obrigatório. }
+              @else if (emailControl?.errors?.['email']) { E-mail inválido. }
+            </span>
+          }
+        </div>
+        <button type="submit" class="btn-login" [disabled]="isSubmitting">
+          @if (isSubmitting) { <span class="material-icons-outlined spinning">autorenew</span> Enviando… }
+          @else { Enviar senha provisória }
+        </button>
+      </form>
+    }
+
+    <!-- FORGOT PASSWORD: enviado -->
+    @if (mode === 'forgot' && forgotEmailSent) {
+      <div class="email-sent-panel">
+        <div class="email-sent-icon">
+          <span class="material-icons-outlined">mark_email_read</span>
+        </div>
+        <h2 class="email-sent-title">E-mail enviado!</h2>
+        <p class="email-sent-desc">
+          Se este endereço estiver cadastrado, você receberá uma senha provisória em breve.
+        </p>
+        <p class="email-sent-hint">Após o login, troque a senha em <strong>Meu Perfil → Alterar senha</strong>.</p>
+        <button class="btn-login" (click)="switchMode('login')">Ir para o login</button>
+      </div>
+    }
   </div>
 </div>

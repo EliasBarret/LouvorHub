@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { AuthData, LoginForm, RegisterForm, Usuario, ApiResponse } from '../models';
+import { AuthData, LoginForm, RegisterForm, ChangePasswordForm, Usuario, ApiResponse } from '../models';
 
 const TOKEN_KEY = 'louvorhub_token';
 const USER_KEY  = 'louvorhub_user';
@@ -66,6 +66,33 @@ export class AuthService {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     this.router.navigate(['/login']);
+  }
+
+  changePassword(form: ChangePasswordForm): Observable<ApiResponse<null>> {
+    return this.http.post<ApiResponse<null>>(`${this.api}/auth/change-password`, form);
+  }
+
+  forgotPassword(email: string): Observable<ApiResponse<null>> {
+    return this.http.post<ApiResponse<null>>(`${this.api}/auth/forgot-password`, { email });
+  }
+
+  verifyEmail(token: string): Observable<ApiResponse<AuthData>> {
+    return this.http.get<ApiResponse<{ token: string; usuario: any }>>(`${this.api}/auth/verify-email`, {
+      params: { token },
+    }).pipe(
+      map(res => {
+        const data: AuthData = {
+          token: res.data.token,
+          usuario: enrichUsuario(res.data.usuario),
+        };
+        this.saveSession(data);
+        return { ...res, data };
+      }),
+    );
+  }
+
+  resendVerification(email: string): Observable<ApiResponse<null>> {
+    return this.http.post<ApiResponse<null>>(`${this.api}/auth/resend-verification`, { email });
   }
 
   getToken(): string | null {

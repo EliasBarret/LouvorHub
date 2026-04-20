@@ -2,12 +2,18 @@
   <!-- Header -->
   <div class="page-header">
     <h1 class="page-title">Meu Perfil</h1>
-    @if (!editMode) {
-      <button class="btn-outline" (click)="enterEditMode()">
-        <span class="material-icons-outlined">edit</span>
-        Editar perfil
-      </button>
-    }
+    <div class="header-actions">
+      @if (!editMode) {
+        <button class="btn-outline" (click)="openChangePassword()">
+          <span class="material-icons-outlined">lock_reset</span>
+          Alterar senha
+        </button>
+        <button class="btn-outline" (click)="enterEditMode()">
+          <span class="material-icons-outlined">edit</span>
+          Editar perfil
+        </button>
+      }
+    </div>
   </div>
 
   @if (saveSuccess) {
@@ -19,8 +25,7 @@
 
   @if (usuario) {
     <!-- Profile Card (dados do Google — somente leitura) -->
-    <div class="profile-card" [class.edit-active]="editMode">
-      <div class="profile-avatar-wrap">
+    <div class="profile-card" [class.edit-active]="editMode">      <div class="profile-avatar-wrap">
         @if (usuario.avatar) {
           <img class="profile-avatar-img" [src]="usuario.avatar" [alt]="usuario.nome" />
         } @else {
@@ -159,3 +164,98 @@
     }
   }
 </div>
+
+<!-- Modal: Alterar senha -->
+@if (showChangePassword) {
+  <div class="modal-overlay" (click)="closeChangePassword()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons-outlined">lock_reset</span>
+          Alterar senha
+        </h2>
+        <button class="modal-close" (click)="closeChangePassword()">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+
+      @if (pwSuccess) {
+        <div class="pw-success-banner">
+          <span class="material-icons-outlined">check_circle</span>
+          Senha alterada com sucesso!
+        </div>
+      }
+
+      @if (pwErrorMessage) {
+        <div class="pw-error-banner">
+          <span class="material-icons-outlined">error_outline</span>
+          {{ pwErrorMessage }}
+        </div>
+      }
+
+      <form [formGroup]="pwForm" (ngSubmit)="submitChangePassword()" novalidate class="pw-form">
+        <!-- Senha atual -->
+        <div class="field-group">
+          <label class="field-label" for="senhaAtual">Senha atual</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">lock_outline</span>
+            <input
+              id="senhaAtual"
+              [type]="showPwAtual ? 'text' : 'password'"
+              class="field-input"
+              [class.invalid]="pwForm.get('senhaAtual')?.invalid && pwForm.get('senhaAtual')?.touched"
+              formControlName="senhaAtual"
+              placeholder="Digite sua senha atual"
+              autocomplete="current-password"
+            />
+            <button type="button" class="toggle-password" (click)="showPwAtual = !showPwAtual">
+              <span class="material-icons-outlined">{{ showPwAtual ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if (pwForm.get('senhaAtual')?.invalid && pwForm.get('senhaAtual')?.touched) {
+            <span class="field-error">Informe sua senha atual.</span>
+          }
+        </div>
+
+        <!-- Nova senha -->
+        <div class="field-group">
+          <label class="field-label" for="novaSenha">Nova senha</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-icons-outlined">lock_outline</span>
+            <input
+              id="novaSenha"
+              [type]="showPwNova ? 'text' : 'password'"
+              class="field-input"
+              [class.invalid]="pwForm.get('novaSenha')?.invalid && pwForm.get('novaSenha')?.touched"
+              formControlName="novaSenha"
+              placeholder="Mínimo 6 caracteres"
+              autocomplete="new-password"
+            />
+            <button type="button" class="toggle-password" (click)="showPwNova = !showPwNova">
+              <span class="material-icons-outlined">{{ showPwNova ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if (pwForm.get('novaSenha')?.invalid && pwForm.get('novaSenha')?.touched) {
+            <span class="field-error">
+              @if (pwForm.get('novaSenha')?.errors?.['required']) { Nova senha é obrigatória. }
+              @else if (pwForm.get('novaSenha')?.errors?.['minlength']) { Mínimo de 6 caracteres. }
+            </span>
+          }
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeChangePassword()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="isSavingPw">
+            @if (isSavingPw) {
+              <span class="material-icons-outlined spinning">autorenew</span>
+              Salvando…
+            } @else {
+              <span class="material-icons-outlined">check</span>
+              Salvar
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

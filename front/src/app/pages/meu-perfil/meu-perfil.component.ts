@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MockApiService } from '../../services/mock-api.service';
+import { AuthService } from '../../services/auth.service';
 import { Usuario } from '../../models';
 
 @Component({
@@ -18,6 +19,15 @@ export class MeuPerfilComponent implements OnInit {
   noInstrumentoError = false;
   form!: FormGroup;
 
+  // Change password
+  showChangePassword = false;
+  pwForm!: FormGroup;
+  isSavingPw = false;
+  pwSuccess = false;
+  pwErrorMessage = '';
+  showPwAtual = false;
+  showPwNova = false;
+
   readonly INSTRUMENTOS_DISPONIVEIS = [
     'Violão', 'Guitarra', 'Baixo', 'Bateria', 'Teclado',
     'Voz', 'Flauta', 'Saxofone', 'Trompete', 'Violino', 'Percussão',
@@ -29,12 +39,16 @@ export class MeuPerfilComponent implements OnInit {
     { label: 'Repertórios', value: 15 },
   ];
 
-  constructor(private api: MockApiService, private fb: FormBuilder) {}
+  constructor(private api: MockApiService, private fb: FormBuilder, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.api.getUsuarioLogado().subscribe(res => {
       this.usuario = res.data;
       this.buildForm();
+    });
+    this.pwForm = this.fb.group({
+      senhaAtual: ['', Validators.required],
+      novaSenha: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
@@ -104,6 +118,43 @@ export class MeuPerfilComponent implements OnInit {
       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
     ];
     return `${meses[month - 1]} ${year}`;
+  }
+
+  openChangePassword(): void {
+    this.pwForm.reset();
+    this.pwErrorMessage = '';
+    this.pwSuccess = false;
+    this.showPwAtual = false;
+    this.showPwNova = false;
+    this.showChangePassword = true;
+  }
+
+  closeChangePassword(): void {
+    this.showChangePassword = false;
+  }
+
+  submitChangePassword(): void {
+    if (this.pwForm.invalid) {
+      this.pwForm.markAllAsTouched();
+      return;
+    }
+    this.isSavingPw = true;
+    this.pwErrorMessage = '';
+    this.authService.changePassword(this.pwForm.value).subscribe({
+      next: () => {
+        this.isSavingPw = false;
+        this.pwSuccess = true;
+        this.pwForm.reset();
+        setTimeout(() => {
+          this.pwSuccess = false;
+          this.showChangePassword = false;
+        }, 2500);
+      },
+      error: (err: any) => {
+        this.isSavingPw = false;
+        this.pwErrorMessage = err?.error?.mensagem ?? 'Erro ao alterar senha. Tente novamente.';
+      },
+    });
   }
 }
 
