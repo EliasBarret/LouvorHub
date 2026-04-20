@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MockApiService } from '../../services/mock-api.service';
-import { Tag } from '../../models';
+import { TipoMusica } from '../../models';
 
 @Component({
   selector: 'app-cadastro-musica',
@@ -14,27 +14,48 @@ import { Tag } from '../../models';
 export class CadastroMusicaComponent implements OnInit {
   form!: FormGroup;
   tons: string[] = [];
-  tags: Tag[] = [];
   isSubmitting = false;
+  isLoading = false;
   submitError = '';
   submitSuccess = false;
+
+  modoEdicao = false;
+  musicaId: number | null = null;
+
+  readonly tiposMusica: { valor: TipoMusica; label: string }[] = [
+    { valor: 'Adoracao',              label: 'Adoração' },
+    { valor: 'Solo',                  label: 'Solo' },
+    { valor: 'Ofertorio',             label: 'Ofertório' },
+    { valor: 'Abertura',              label: 'Abertura' },
+    { valor: 'DistribuicaoElementos', label: 'Distribuição dos Elementos' },
+    { valor: 'Apelo',                 label: 'Apelo' },
+  ];
 
   constructor(
     private fb: FormBuilder,
     private api: MockApiService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
     this.buildForm();
     this.loadMetadata();
+
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.modoEdicao = true;
+      this.musicaId = Number(id);
+      this.carregarMusica(this.musicaId);
+    }
   }
 
   private buildForm(): void {
     this.form = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(2)]],
       artista: ['', [Validators.required, Validators.minLength(2)]],
-      tom: ['', Validators.required],
+      tomFeminino: ['', Validators.required],
+      tom: [''],
       bpm: [null, [Validators.min(20), Validators.max(300)]],
       linkYoutube: [''],
       linkSpotify: [''],
@@ -46,23 +67,45 @@ export class CadastroMusicaComponent implements OnInit {
     this.api.getTons().subscribe(res => {
       this.tons = res.data;
     });
-    this.api.getTags().subscribe(res => {
-      this.tags = res.data;
+  }
+
+  private carregarMusica(id: number): void {
+    this.isLoading = true;
+    this.api.getMusicaById(id).subscribe({
+      next: (res) => {
+        const m = res.data;
+        this.form.patchValue({
+          titulo: m.titulo,
+          artista: m.artista,
+          tomFeminino: m.tomFeminino,
+          tom: m.tom,
+          bpm: m.bpm || null,
+          linkYoutube: m.linkYoutube,
+          linkSpotify: m.linkSpotify,
+          observacoes: m.observacoes,
+        });
+        this.selectedTipos = new Set<TipoMusica>(m.tipos ?? []);
+        this.isLoading = false;
+      },
+      error: () => {
+        this.submitError = 'Erro ao carregar os dados da música.';
+        this.isLoading = false;
+      },
     });
   }
 
-  selectedTags = new Set<number>();
+  selectedTipos = new Set<TipoMusica>();
 
-  toggleTag(tagId: number): void {
-    if (this.selectedTags.has(tagId)) {
-      this.selectedTags.delete(tagId);
+  toggleTipo(tipo: TipoMusica): void {
+    if (this.selectedTipos.has(tipo)) {
+      this.selectedTipos.delete(tipo);
     } else {
-      this.selectedTags.add(tagId);
+      this.selectedTipos.add(tipo);
     }
   }
 
-  isTagSelected(tagId: number): boolean {
-    return this.selectedTags.has(tagId);
+  isTipoSelected(tipo: TipoMusica): boolean {
+    return this.selectedTipos.has(tipo);
   }
 
   get f() {
@@ -80,10 +123,15 @@ export class CadastroMusicaComponent implements OnInit {
 
     const payload = {
       ...this.form.value,
-      tagIds: Array.from(this.selectedTags),
+      tags: [],
+      tipos: Array.from(this.selectedTipos),
     };
 
-    this.api.createMusica(payload).subscribe({
+    const request$ = this.modoEdicao && this.musicaId
+      ? this.api.updateMusica(this.musicaId, payload)
+      : this.api.createMusica(payload);
+
+    request$.subscribe({
       next: (res) => {
         if (res.sucesso) {
           this.submitSuccess = true;

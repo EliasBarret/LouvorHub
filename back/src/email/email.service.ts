@@ -27,27 +27,16 @@ export class EmailService {
     await this.transporter.sendMail({
       from,
       to: email,
-      subject: '✅ Confirme seu e-mail — LouvorHub',
-      html: `
-        <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px 24px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;">
-          <div style="text-align:center;margin-bottom:24px;">
-            <span style="font-size:32px">🎵</span>
-            <h2 style="margin:8px 0 0;color:#1a1a2e;font-size:20px;">LouvorHub</h2>
-          </div>
-          <h3 style="color:#1a1a2e;font-size:18px;margin-bottom:8px;">Olá, ${nome}!</h3>
-          <p style="color:#4b5563;font-size:14px;line-height:1.6;margin-bottom:24px;">
-            Obrigado por se cadastrar no <strong>LouvorHub</strong>. Clique no botão abaixo para confirmar seu e-mail e ativar sua conta.
-          </p>
-          <div style="text-align:center;margin-bottom:24px;">
-            <a href="${link}" style="display:inline-block;padding:12px 28px;background:#6b3fa0;color:#fff;border-radius:8px;font-size:15px;font-weight:700;text-decoration:none;">
-              Confirmar e-mail
-            </a>
-          </div>
-          <p style="color:#6b7280;font-size:12px;line-height:1.6;margin:0;">
-            Este link expira em <strong>24 horas</strong>. Se você não criou uma conta, ignore este e-mail.
-          </p>
-        </div>
-      `,
+      subject: 'Confirme seu e-mail - LouvorHub',
+      text: `Olá, ${nome}!
+
+        Obrigado por se cadastrar no LouvorHub. Acesse o link abaixo para confirmar seu e-mail e ativar sua conta:
+
+        ${link}
+
+        Este link expira em 24 horas. Se você não criou uma conta, ignore este e-mail.
+
+        LouvorHub`,
     }).catch(err => {
       this.logger.error(`Falha ao enviar e-mail de verificação para ${email}: ${err.message}`);
     });
@@ -60,31 +49,18 @@ export class EmailService {
     await this.transporter.sendMail({
       from,
       to: email,
-      subject: '🔑 Sua senha provisória — LouvorHub',
-      html: `
-        <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px 24px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;">
-          <div style="text-align:center;margin-bottom:24px;">
-            <span style="font-size:32px">🎵</span>
-            <h2 style="margin:8px 0 0;color:#1a1a2e;font-size:20px;">LouvorHub</h2>
-          </div>
-          <h3 style="color:#1a1a2e;font-size:18px;margin-bottom:8px;">Olá, ${nome}!</h3>
-          <p style="color:#4b5563;font-size:14px;line-height:1.6;margin-bottom:16px;">
-            Recebemos uma solicitação de redefinição de senha. Use a senha provisória abaixo para acessar sua conta e, em seguida, altere-a em <strong>Meu Perfil</strong>.
-          </p>
-          <div style="background:#f3f4f6;border-radius:8px;padding:16px;text-align:center;margin-bottom:24px;">
-            <p style="margin:0 0 4px;color:#6b7280;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Senha provisória</p>
-            <p style="margin:0;font-size:24px;font-weight:800;color:#6b3fa0;letter-spacing:2px;">${senhaProvisoria}</p>
-          </div>
-          <div style="text-align:center;margin-bottom:24px;">
-            <a href="${appUrl}/login" style="display:inline-block;padding:12px 28px;background:#6b3fa0;color:#fff;border-radius:8px;font-size:15px;font-weight:700;text-decoration:none;">
-              Acessar o LouvorHub
-            </a>
-          </div>
-          <p style="color:#6b7280;font-size:12px;line-height:1.6;margin:0;">
-            Esta senha expira em <strong>2 horas</strong>. Se você não solicitou a redefinição, ignore este e-mail.
-          </p>
-        </div>
-      `,
+      subject: 'Sua senha provisoria - LouvorHub',
+      text: `Olá, ${nome}!
+
+        Recebemos uma solicitacao de redefinicao de senha. Use a senha provisoria abaixo para acessar sua conta e, em seguida, altere-a em Meu Perfil.
+
+        Senha provisoria: ${senhaProvisoria}
+
+        Acesse: ${appUrl}/login
+
+        Esta senha expira em 2 horas. Se voce nao solicitou a redefinicao, ignore este e-mail.
+
+        LouvorHub`,
     }).catch(err => {
       this.logger.error(`Falha ao enviar e-mail de redefinição para ${email}: ${err.message}`);
     });

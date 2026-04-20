@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
+import { TomDisplayPipe } from '../../pipes/tom-display.pipe';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -28,7 +29,7 @@ interface MusicaAssignment {
 
 @Component({
   selector: 'app-cadastro-repertorio',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TomDisplayPipe],
   templateUrl: './cadastro-repertorio.component.html',
   styleUrl: './cadastro-repertorio.component.scss',
 })

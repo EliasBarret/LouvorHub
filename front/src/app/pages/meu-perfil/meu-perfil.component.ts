@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MockApiService } from '../../services/mock-api.service';
 import { AuthService } from '../../services/auth.service';
-import { Usuario } from '../../models';
+import { UsuarioService } from '../../services/usuario.service';
+import { Usuario, PerfilStats } from '../../models';
 
 @Component({
   selector: 'app-meu-perfil',
@@ -33,18 +34,25 @@ export class MeuPerfilComponent implements OnInit {
     'Voz', 'Flauta', 'Saxofone', 'Trompete', 'Violino', 'Percussão',
   ];
 
-  readonly stats = [
-    { label: 'Cultos participados', value: 42 },
-    { label: 'Músicas confirmadas', value: 128 },
-    { label: 'Repertórios', value: 15 },
+  stats: { label: string; value: number }[] = [
+    { label: 'Cultos participados', value: 0 },
+    { label: 'Músicas confirmadas', value: 0 },
+    { label: 'Repertórios', value: 0 },
   ];
 
-  constructor(private api: MockApiService, private fb: FormBuilder, private authService: AuthService) {}
+  constructor(private api: MockApiService, private fb: FormBuilder, private authService: AuthService, private usuarioService: UsuarioService) {}
 
   ngOnInit(): void {
     this.api.getUsuarioLogado().subscribe(res => {
       this.usuario = res.data;
       this.buildForm();
+    });
+    this.usuarioService.getPerfilStats().subscribe(s => {
+      this.stats = [
+        { label: 'Cultos participados', value: s.cultosParticipados },
+        { label: 'Músicas confirmadas', value: s.musicasConfirmadas },
+        { label: 'Repertórios', value: s.repertorios },
+      ];
     });
     this.pwForm = this.fb.group({
       senhaAtual: ['', Validators.required],

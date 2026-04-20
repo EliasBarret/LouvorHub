@@ -103,12 +103,23 @@ model Tag {
 
 // ─── Musicas ─────────────────────────────────────────────────────────────────
 
+enum TipoMusica {
+  Adoracao
+  Solo
+  Ofertorio
+  Abertura
+  DistribuicaoElementos
+  Apelo
+}
+
 model Musica {
   id          Int      @id @default(autoincrement())
   titulo      String
   artista     String   @default("")
   tom         String   @default("")
+  tomFeminino String   @default("") @map("tom_feminino")
   bpm         Int      @default(0)
+  tipos       TipoMusica[] @default([])
   linkYoutube String   @default("") @map("link_youtube")
   linkSpotify String   @default("") @map("link_spotify")
   observacoes String   @default("")

@@ -218,7 +218,7 @@
                 </div>
                 <div class="search-item-info">
                   <span class="search-item-title">{{ musica.titulo }}</span>
-                  <span class="search-item-meta">{{ musica.artista }} · {{ musica.tom }} · {{ musica.bpm }} BPM</span>
+                  <span class="search-item-meta">{{ musica.artista }} · {{ musica.tomFeminino | tomDisplay: musica.tom }} · {{ musica.bpm }} BPM</span>
                 </div>
                 <div class="search-item-tags">
                   @for (tag of musica.tags; track tag) {
@@ -248,7 +248,7 @@
               </div>
               <div class="selected-info">
                 <span class="selected-title">{{ musica.titulo }}</span>
-                <span class="selected-meta">{{ musica.artista }} · {{ musica.tom }} · {{ musica.bpm }} BPM</span>
+                <span class="selected-meta">{{ musica.artista }} · {{ musica.tomFeminino | tomDisplay: musica.tom }} · {{ musica.bpm }} BPM</span>
               </div>
               <div class="selected-tags">
                 @for (tag of musica.tags; track tag) {

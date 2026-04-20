@@ -95,6 +95,12 @@ export interface Stat {
   color: string;
 }
 
+export interface PerfilStats {
+  cultosParticipados: number;
+  musicasConfirmadas: number;
+  repertorios: number;
+}
+
 export interface Escalacao {
   id: number;
   mes: string;
@@ -112,13 +118,23 @@ export interface Tag {
   cor: string;
 }
 
+export type TipoMusica =
+  | 'Adoracao'
+  | 'Solo'
+  | 'Ofertorio'
+  | 'Abertura'
+  | 'DistribuicaoElementos'
+  | 'Apelo';
+
 export interface Musica {
   id: number;
   titulo: string;
   artista: string;
   tom: string;
+  tomFeminino: string;
   bpm: number;
   tags: string[];
+  tipos: TipoMusica[];
   linkYoutube: string;
   linkSpotify: string;
   observacoes: string;
@@ -130,8 +146,10 @@ export interface MusicaForm {
   titulo: string;
   artista: string;
   tom: string;
+  tomFeminino: string;
   bpm: number | null;
   tags: string[];
+  tipos: TipoMusica[];
   linkYoutube: string;
   linkSpotify: string;
   observacoes: string;

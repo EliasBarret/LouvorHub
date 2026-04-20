@@ -10,6 +10,7 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "npx tsx": true
+        "npx tsx": true,
+        "New-Item": true
     }
 }

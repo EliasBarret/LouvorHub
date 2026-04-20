@@ -68,6 +68,22 @@
   }
 }
 
+// ─── Loading ──────────────────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  justify-content: center;
+}
+
+.hidden {
+  display: none;
+}
+
 // ─── Form Card ────────────────────────────────────────────────────────────────
 .form-card {
   background: var(--bg-white);
@@ -177,20 +193,20 @@ select.form-control {
   margin-top: 2px;
 }
 
-// ─── Tags Grid ────────────────────────────────────────────────────────────────
-.tags-grid {
+// ─── Tipos de Música ──────────────────────────────────────────────────────────
+.tipos-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.tag-btn {
+.tipo-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 7px 14px;
   border: 1.5px solid var(--border-color);
-  border-radius: 20px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
@@ -198,31 +214,31 @@ select.form-control {
   cursor: pointer;
   transition: all 0.2s;
 
+  .tipo-check {
+    font-size: 18px !important;
+    color: var(--border-color);
+    transition: color 0.2s;
+  }
+
   &:hover {
-    border-color: var(--tag-cor, var(--primary-light));
-    color: var(--tag-cor, var(--primary));
-    background: color-mix(in srgb, var(--tag-cor, var(--primary-light)) 8%, white);
+    border-color: var(--primary-light);
+    color: var(--primary);
+
+    .tipo-check {
+      color: var(--primary-light);
+    }
   }
 
   &.selected {
-    background: color-mix(in srgb, var(--tag-cor, var(--primary-light)) 12%, white);
-    border-color: var(--tag-cor, var(--primary-light));
-    color: var(--tag-cor, var(--primary));
+    background: color-mix(in srgb, var(--primary) 10%, white);
+    border-color: var(--primary);
+    color: var(--primary);
     font-weight: 600;
+
+    .tipo-check {
+      color: var(--primary);
+    }
   }
-}
-
-.tag-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--tag-cor, var(--primary-light));
-  flex-shrink: 0;
-}
-
-.tag-check {
-  font-size: 14px !important;
-  margin-left: 2px;
 }
 
 // ─── Link Icons ───────────────────────────────────────────────────────────────

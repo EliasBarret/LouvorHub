@@ -8,6 +8,7 @@ import { RepertorioDetailComponent } from './pages/repertorio-detail/repertorio-
 import { NotificacoesComponent } from './pages/notificacoes/notificacoes.component';
 import { MeuPerfilComponent } from './pages/meu-perfil/meu-perfil.component';
 import { CadastroMusicaComponent } from './pages/cadastro-musica/cadastro-musica.component';
+import { MusicasComponent } from './pages/musicas/musicas.component';
 import { CadastroRepertorioComponent } from './pages/cadastro-repertorio/cadastro-repertorio.component';
 import { StatusConfirmacoesComponent } from './pages/status-confirmacoes/status-confirmacoes.component';
 import { AprovacoesComponent } from './pages/aprovacoes/aprovacoes.component';
@@ -15,6 +16,7 @@ import { GestaoIgrejasComponent } from './pages/gestao-igrejas/gestao-igrejas.co
 import { GestaoCultosComponent } from './pages/gestao-cultos/gestao-cultos.component';
 import { CalendarioComponent } from './pages/calendario/calendario.component';
 import { authGuard } from './guards/auth.guard';
+import { musicaAdminGuard } from './guards/perfil.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -31,7 +33,9 @@ export const routes: Routes = [
       { path: 'repertorios/:id/editar', component: CadastroRepertorioComponent },
       { path: 'repertorios/:id', component: RepertorioDetailComponent },
       { path: 'repertorios/:id/confirmacoes', component: StatusConfirmacoesComponent },
-      { path: 'musicas/nova', component: CadastroMusicaComponent },
+      { path: 'musicas', component: MusicasComponent, canActivate: [musicaAdminGuard] },
+      { path: 'musicas/nova', component: CadastroMusicaComponent, canActivate: [musicaAdminGuard] },
+      { path: 'musicas/:id/editar', component: CadastroMusicaComponent, canActivate: [musicaAdminGuard] },
       { path: 'notificacoes', component: NotificacoesComponent },
       { path: 'aprovacoes', component: AprovacoesComponent },
       { path: 'igrejas', component: GestaoIgrejasComponent },

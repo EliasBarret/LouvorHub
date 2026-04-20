@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TomDisplayPipe } from '../../pipes/tom-display.pipe';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MockApiService } from '../../services/mock-api.service';
 import { EscalacaoService } from '../../services/escalacao.service';
@@ -7,7 +8,7 @@ import { DetalheEscalacao, Repertorio, Tag, Usuario } from '../../models';
 
 @Component({
   selector: 'app-repertorio-detail',
-  imports: [CommonModule],
+  imports: [CommonModule, TomDisplayPipe],
   templateUrl: './repertorio-detail.component.html',
   styleUrl: './repertorio-detail.component.scss',
 })
@@ -70,6 +71,10 @@ export class RepertorioDetailComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/repertorios']);
+  }
+
+  goToEditarMusica(musicaId: number): void {
+    this.router.navigate(['/musicas', musicaId, 'editar']);
   }
 
   goToNovaMusica(): void {

@@ -1,0 +1,74 @@
+<div class="musicas-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Músicas</h1>
+      <p class="page-subtitle">Selecione uma música para editar.</p>
+    </div>
+    <button class="btn-primary" (click)="novaMusica()">
+      <span class="material-icons-outlined">add</span>
+      Nova Música
+    </button>
+  </div>
+
+  <!-- Busca -->
+  <div class="search-bar">
+    <span class="material-icons-outlined search-icon">search</span>
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Buscar por título ou artista…"
+      [(ngModel)]="busca"
+      (ngModelChange)="onBusca()"
+      autocomplete="off"
+    />
+    @if (busca) {
+      <button class="clear-btn" (click)="busca = ''; onBusca()">
+        <span class="material-icons-outlined">close</span>
+      </button>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <span class="material-icons-outlined spinning">autorenew</span>
+      Carregando músicas…
+    </div>
+  }
+
+  <!-- Lista agrupada por letra -->
+  @if (!isLoading) {
+    @if (grupos.length === 0) {
+      <div class="empty-state">
+        <span class="material-icons-outlined empty-icon">library_music</span>
+        <p>Nenhuma música encontrada.</p>
+      </div>
+    } @else {
+      <div class="musicas-list">
+        @for (grupo of grupos; track grupo.letra) {
+          <div class="letra-group">
+            <div class="letra-header">{{ grupo.letra }}</div>
+            @for (musica of grupo.musicas; track musica.id) {
+              <button class="musica-row" (click)="editarMusica(musica.id)">
+                <div class="musica-info">
+                  <span class="musica-titulo">{{ musica.titulo }}</span>
+                  <span class="musica-artista">{{ musica.artista }}</span>
+                </div>
+                <div class="musica-meta">
+                  @if (musica.tomFeminino) {
+                    <span class="meta-chip">{{ musica.tomFeminino }}</span>
+                  }
+                  @if (musica.bpm) {
+                    <span class="meta-chip">{{ musica.bpm }} BPM</span>
+                  }
+                </div>
+                <span class="material-icons-outlined edit-icon">chevron_right</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

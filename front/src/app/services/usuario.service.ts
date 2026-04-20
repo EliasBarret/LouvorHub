@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Usuario, UpdatePerfilForm, ApiResponse, PageResponse } from '../models';
+import { Usuario, UpdatePerfilForm, ApiResponse, PageResponse, PerfilStats } from '../models';
 
 function enrich(u: any): Usuario {
   if (!u) return u;
@@ -46,5 +46,9 @@ export class UsuarioService {
 
   updatePerfilEditavel(id: number, changes: Partial<Usuario>): Observable<ApiResponse<Usuario>> {
     return this.updatePerfil(changes as UpdatePerfilForm);
+  }
+
+  getPerfilStats(): Observable<PerfilStats> {
+    return this.http.get<PerfilStats>(`${this.api}/me/stats`);
   }
 }

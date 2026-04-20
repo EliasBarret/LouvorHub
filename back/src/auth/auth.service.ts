@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   UnauthorizedException,
   ConflictException,
   BadRequestException,
@@ -17,6 +18,8 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
@@ -111,6 +114,7 @@ export class AuthService {
     }
 
     const senhaProvisoria = crypto.randomBytes(4).toString('hex');
+    this.logger.debug(`[DEV] Senha provisória para ${usuario.email}: ${senhaProvisoria}`);
     const senhaHash = await bcrypt.hash(senhaProvisoria, 10);
     const tokenExpiracao = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2h
 

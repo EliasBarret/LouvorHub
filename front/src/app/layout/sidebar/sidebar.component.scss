@@ -141,6 +141,77 @@
   color: var(--text-muted);
 }
 
+// Grouped nav
+.nav-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-group-header {
+  width: 100%;
+  justify-content: flex-start;
+  cursor: pointer;
+  background: none;
+  border: none;
+
+  .nav-chevron {
+    font-size: 18px !important;
+    margin-left: auto;
+    color: var(--text-muted);
+  }
+
+  &.expanded {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+
+    .nav-icon,
+    .nav-chevron {
+      color: var(--primary);
+    }
+  }
+}
+
+.nav-children {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 4px 16px;
+}
+
+.nav-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-left: 2px solid var(--border-light);
+
+  &:hover {
+    background: var(--border-light);
+    color: var(--text-primary);
+    border-left-color: var(--primary-light);
+  }
+
+  &.active {
+    background: var(--primary);
+    color: white;
+    border-left-color: var(--primary);
+
+    .nav-child-icon {
+      color: white;
+    }
+  }
+}
+
+.nav-child-icon {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
 // User section
 .sidebar-bottom {
   display: flex;

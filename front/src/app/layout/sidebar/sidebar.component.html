@@ -18,16 +18,50 @@
 
     <!-- Navigation -->
     <nav class="nav-menu">
-      @for (item of navItems; track item.route) {
-        <a
-          class="nav-item"
-          [routerLink]="item.route"
-          routerLinkActive="active"
-          (click)="closed.emit()"
-        >
-          <span class="material-icons-outlined nav-icon">{{ item.icon }}</span>
-          <span class="nav-label">{{ item.label }}</span>
-        </a>
+      @for (item of navItems; track item.label) {
+        @if (item.children) {
+          <!-- Group with submenu -->
+          <div class="nav-group">
+            <button
+              class="nav-item nav-group-header"
+              [class.expanded]="isGroupExpanded(item.label)"
+              (click)="toggleGroup(item.label)"
+            >
+              <span class="material-icons-outlined nav-icon">{{ item.icon }}</span>
+              <span class="nav-label">{{ item.label }}</span>
+              <span class="material-icons-outlined nav-chevron">
+                {{ isGroupExpanded(item.label) ? 'expand_less' : 'expand_more' }}
+              </span>
+            </button>
+            @if (isGroupExpanded(item.label)) {
+              <div class="nav-children">
+                @for (child of item.children; track child.route) {
+                  <a
+                    class="nav-child"
+                    [routerLink]="child.route"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="closed.emit()"
+                  >
+                    <span class="material-icons-outlined nav-child-icon">{{ child.icon }}</span>
+                    {{ child.label }}
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Regular nav item -->
+          <a
+            class="nav-item"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            (click)="closed.emit()"
+          >
+            <span class="material-icons-outlined nav-icon">{{ item.icon }}</span>
+            <span class="nav-label">{{ item.label }}</span>
+          </a>
+        }
       }
     </nav>
   </div>

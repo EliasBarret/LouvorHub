@@ -132,7 +132,7 @@
                           <span class="musica-titulo">{{ musica.titulo }}</span>
                           <span class="musica-artista">{{ musica.artista }}</span>
                         </div>
-                        <span class="musica-tom">Tom: {{ musica.tom }}</span>
+                        <span class="musica-tom">Tom: {{ musica.tomFeminino | tomDisplay: musica.tom }}</span>
                         <span class="musica-bpm">{{ musica.bpm }} BPM</span>
                         <div class="musica-tags">
                           @for (tag of musica.tags; track tag) {

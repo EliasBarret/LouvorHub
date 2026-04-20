@@ -80,7 +80,7 @@
               <div class="escalacao-musica-info">
                 <span class="escalacao-musica-nome">{{ mc.musica.titulo }}</span>
                 <span class="escalacao-musica-meta">
-                  {{ mc.instrumento }} · Tom: {{ mc.musica.tom }}
+                  {{ mc.instrumento }} · Tom: {{ mc.musica.tomFeminino | tomDisplay: mc.musica.tom }}
                 </span>
               </div>
               <div class="escalacao-actions">
@@ -132,7 +132,7 @@
                 <span class="music-artist">{{ musica.artista }}</span>
               </div>
               <div class="music-meta">
-                <span class="meta-tom">Tom: {{ musica.tom }}</span>
+                <span class="meta-tom">Tom: {{ musica.tomFeminino | tomDisplay: musica.tom }}</span>
                 <span class="meta-bpm">{{ musica.bpm }} BPM</span>
               </div>
               <div class="music-tags">
@@ -145,8 +145,8 @@
                   <span class="material-icons-outlined">play_circle</span>
                 </a>
               }
-              <button class="music-actions-btn">
-                <span class="material-icons-outlined">more_vert</span>
+              <button class="music-actions-btn" (click)="goToEditarMusica(musica.id)" title="Editar música">
+                <span class="material-icons-outlined">edit</span>
               </button>
             </div>
           }

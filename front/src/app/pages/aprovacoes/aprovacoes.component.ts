@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TomDisplayPipe } from '../../pipes/tom-display.pipe';
 import { Router } from '@angular/router';
 
 import { RepertorioService } from '../../services/repertorio.service';
@@ -23,7 +24,7 @@ interface RepertorioComConfirmacoes {
 
 @Component({
   selector: 'app-aprovacoes',
-  imports: [CommonModule, FormsModule, KeyValuePipe],
+  imports: [CommonModule, FormsModule, KeyValuePipe, TomDisplayPipe],
   templateUrl: './aprovacoes.component.html',
   styleUrl: './aprovacoes.component.scss',
 })

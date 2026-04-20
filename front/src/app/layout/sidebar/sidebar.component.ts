@@ -5,11 +5,18 @@ import { MockApiService } from '../../services/mock-api.service';
 import { AuthService } from '../../services/auth.service';
 import { Perfil, Usuario } from '../../models';
 
-interface NavItem {
+interface NavChild {
   label: string;
   icon: string;
   route: string;
+}
+
+interface NavItem {
+  label: string;
+  icon: string;
+  route?: string;
   perfisPermitidos?: Perfil[];
+  children?: NavChild[];
 }
 
 @Component({
@@ -25,15 +32,25 @@ export class SidebarComponent implements OnInit {
   private readonly allNavItems: NavItem[] = [
     { label: 'Início',       icon: 'home',               route: '/inicio' },
     { label: 'Repertórios',  icon: 'queue_music',        route: '/repertorios' },
+    {
+      label: 'Músicas',
+      icon: 'library_music',
+      perfisPermitidos: ['ADM', 'Pastor', 'Ministro'],
+      children: [
+        { label: 'Cadastrar Nova Música', icon: 'add_circle_outline', route: '/musicas/nova' },
+        { label: 'Editar Música',         icon: 'edit_note',          route: '/musicas' },
+      ],
+    },
     { label: 'Aprovações',   icon: 'approval',           route: '/aprovacoes',   perfisPermitidos: ['ADM', 'Pastor'] },
     { label: 'Igrejas',      icon: 'church',             route: '/igrejas',      perfisPermitidos: ['ADM'] },
     { label: 'Cultos',       icon: 'calendar_today',     route: '/cultos',       perfisPermitidos: ['ADM', 'Pastor', 'Ministro'] },
-    { label: 'Calendário',   icon: 'calendar_month',    route: '/calendario' },
+    { label: 'Calendário',   icon: 'calendar_month',     route: '/calendario' },
     { label: 'Notificações', icon: 'notifications_none', route: '/notificacoes' },
     { label: 'Meu Perfil',   icon: 'person_outline',     route: '/meu-perfil' },
   ];
 
   usuario: Usuario | null = null;
+  expandedGroups = new Set<string>();
 
   constructor(private api: MockApiService, private authService: AuthService) {}
 
@@ -48,6 +65,18 @@ export class SidebarComponent implements OnInit {
       !item.perfisPermitidos ||
       (this.usuario?.perfil && item.perfisPermitidos.includes(this.usuario.perfil))
     );
+  }
+
+  toggleGroup(label: string): void {
+    if (this.expandedGroups.has(label)) {
+      this.expandedGroups.delete(label);
+    } else {
+      this.expandedGroups.add(label);
+    }
+  }
+
+  isGroupExpanded(label: string): boolean {
+    return this.expandedGroups.has(label);
   }
 
   get perfilLabel(): string {

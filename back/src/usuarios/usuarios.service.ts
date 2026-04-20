@@ -53,6 +53,31 @@ export class UsuariosService {
     return this.sanitize(usuario);
   }
 
+  async getPerfilStats(userId: number) {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const [cultosParticipados, musicasConfirmadas, repertorios] = await Promise.all([
+      this.prisma.escalacaoMusico.count({
+        where: {
+          usuarioId: userId,
+          repertorio: { dataCulto: { lt: today } },
+        },
+      }),
+      this.prisma.confirmacaoMusica.count({
+        where: {
+          status: 'conhece',
+          musicaEscalada: { escalacao: { usuarioId: userId } },
+        },
+      }),
+      this.prisma.repertorio.count({
+        where: { criadorId: userId },
+      }),
+    ]);
+
+    return { cultosParticipados, musicasConfirmadas, repertorios };
+  }
+
   private sanitize(usuario: any) {
     const { senhaHash: _, ...rest } = usuario;
     const primeiroNome = rest.nome?.split(' ')[0] ?? '';

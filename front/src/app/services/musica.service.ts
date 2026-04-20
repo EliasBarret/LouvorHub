@@ -36,8 +36,9 @@ export class MusicaService {
   }
 
   updateMusica(id: number, form: MusicaForm): Observable<ApiResponse<Musica>> {
-    const tagIds = this.resolveTagIds(form.tags);
-    const payload = { ...form, tagIds };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { tags, ...rest } = form;
+    const payload = { ...rest };
     return this.http.put<ApiResponse<Musica>>(`${this.api}/${id}`, payload);
   }
 

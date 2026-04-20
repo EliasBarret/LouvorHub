@@ -5,8 +5,8 @@
       <span class="material-icons-outlined">arrow_back</span>
     </button>
     <div>
-      <h1 class="page-title">Nova Música</h1>
-      <p class="page-subtitle">Adicione uma música ao banco do ministério.</p>
+      <h1 class="page-title">{{ modoEdicao ? 'Editar Música' : 'Nova Música' }}</h1>
+      <p class="page-subtitle">{{ modoEdicao ? 'Atualize as informações da música.' : 'Adicione uma música ao banco do ministério.' }}</p>
     </div>
   </div>
 
@@ -14,7 +14,14 @@
   @if (submitSuccess) {
     <div class="alert alert-success">
       <span class="material-icons-outlined">check_circle</span>
-      Música cadastrada com sucesso! Redirecionando…
+      {{ modoEdicao ? 'Música atualizada com sucesso! Redirecionando…' : 'Música cadastrada com sucesso! Redirecionando…' }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <span class="material-icons-outlined spinning">autorenew</span>
+      Carregando dados da música…
     </div>
   }
 
@@ -26,7 +33,7 @@
     </div>
   }
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate [class.hidden]="isLoading">
     <div class="form-card">
       <h2 class="section-title">
         <span class="material-icons-outlined section-icon">music_note</span>
@@ -74,15 +81,35 @@
       </div>
 
       <div class="form-row">
-        <!-- Tom -->
+        <!-- Tom Feminino -->
+        <div class="form-group col-3">
+          <label class="form-label" for="tomFeminino">
+            Tom Feminino <span class="required">*</span>
+          </label>
+          <select
+            id="tomFeminino"
+            class="form-control"
+            [class.error]="f['tomFeminino'].invalid && f['tomFeminino'].touched"
+            formControlName="tomFeminino"
+          >
+            <option value="">Selecione o tom</option>
+            @for (ton of tons; track ton) {
+              <option [value]="ton">{{ ton }}</option>
+            }
+          </select>
+          @if (f['tomFeminino'].invalid && f['tomFeminino'].touched) {
+            <span class="field-error">Tom feminino obrigatório.</span>
+          }
+        </div>
+
+        <!-- Tom Masculino -->
         <div class="form-group col-3">
           <label class="form-label" for="tom">
-            Tom <span class="required">*</span>
+            Tom Masculino
           </label>
           <select
             id="tom"
             class="form-control"
-            [class.error]="f['tom'].invalid && f['tom'].touched"
             formControlName="tom"
           >
             <option value="">Selecione o tom</option>
@@ -90,9 +117,6 @@
               <option [value]="ton">{{ ton }}</option>
             }
           </select>
-          @if (f['tom'].invalid && f['tom'].touched) {
-            <span class="field-error">Tom obrigatório.</span>
-          }
         </div>
 
         <!-- BPM -->
@@ -114,23 +138,26 @@
         </div>
       </div>
 
-      <!-- Tags -->
+      <!-- Tipos de Música -->
       <div class="form-group">
-        <label class="form-label">Tags</label>
-        <div class="tags-grid">
-          @for (tag of tags; track tag.id) {
+        <label class="form-label">
+          <span class="material-icons-outlined" style="font-size:16px">category</span>
+          Tipos da Música
+        </label>
+        <div class="tipos-grid">
+          @for (tipo of tiposMusica; track tipo.valor) {
             <button
               type="button"
-              class="tag-btn"
-              [class.selected]="isTagSelected(tag.id)"
-              [style.--tag-cor]="tag.cor"
-              (click)="toggleTag(tag.id)"
+              class="tipo-btn"
+              [class.selected]="isTipoSelected(tipo.valor)"
+              (click)="toggleTipo(tipo.valor)"
             >
-              <span class="tag-dot"></span>
-              {{ tag.nome }}
-              @if (isTagSelected(tag.id)) {
-                <span class="material-icons-outlined tag-check">check</span>
+              @if (isTipoSelected(tipo.valor)) {
+                <span class="material-icons-outlined tipo-check">check_box</span>
+              } @else {
+                <span class="material-icons-outlined tipo-check">check_box_outline_blank</span>
               }
+              {{ tipo.label }}
             </button>
           }
         </div>
@@ -195,7 +222,7 @@
           Salvando…
         } @else {
           <span class="material-icons-outlined">save</span>
-          Salvar Música
+          {{ modoEdicao ? 'Salvar Alterações' : 'Salvar Música' }}
         }
       </button>
     </div>

@@ -4,7 +4,9 @@ import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { EscalacaoService } from '../../services/escalacao.service';
 import { RepertorioService } from '../../services/repertorio.service';
-import { Repertorio } from '../../models';
+import { AuthService } from '../../services/auth.service';
+import { IgrejaService } from '../../services/igreja.service';
+import { Repertorio, Usuario } from '../../models';
 
 interface CalendarEvent {
   titulo: string;
@@ -33,6 +35,7 @@ export class CalendarioComponent implements OnInit {
 
   private minhasEscalacoesIds = new Set<number>();
   private repertorios: Repertorio[] = [];
+  private usuario: Usuario | null = null;
 
   readonly dayHeaders = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
 
@@ -44,24 +47,57 @@ export class CalendarioComponent implements OnInit {
   constructor(
     private escalacaoService: EscalacaoService,
     private repertorioService: RepertorioService,
+    private authService: AuthService,
+    private igrejaService: IgrejaService,
   ) {}
 
   ngOnInit(): void {
+    this.usuario = this.authService.getUsuarioLogado();
+
     forkJoin({
       escalacoes: this.escalacaoService.getMinhasEscalacoes(),
       repertorios: this.repertorioService.getRepertorios(0, 500),
     }).subscribe({
       next: ({ escalacoes, repertorios }) => {
         this.minhasEscalacoesIds = new Set(escalacoes.data.map(e => e.repertorioId));
-        this.repertorios = repertorios.data.conteudo;
-        this.loading = false;
-        this.buildCalendar();
+        this.applyRoleFilter(repertorios.data.conteudo);
       },
       error: () => {
         this.loading = false;
         this.buildCalendar();
       },
     });
+  }
+
+  private applyRoleFilter(allReps: Repertorio[]): void {
+    const perfil = this.usuario?.perfil;
+
+    if (perfil === 'ADM') {
+      // Administrador vê todos os repertórios
+      this.repertorios = allReps;
+      this.loading = false;
+      this.buildCalendar();
+    } else if (perfil === 'Musico' || perfil === 'Cantor') {
+      // Músico/Cantor vê apenas repertórios onde está escalado
+      this.repertorios = allReps.filter(r => this.minhasEscalacoesIds.has(r.id));
+      this.loading = false;
+      this.buildCalendar();
+    } else {
+      // Pastor/Ministro vê todos os repertórios da(s) sua(s) igreja(s)
+      this.igrejaService.getIgrejasByUsuarioId(this.usuario!.id).subscribe({
+        next: res => {
+          const igrejaIds = new Set(res.data.map(m => m.id));
+          this.repertorios = allReps.filter(r => !r.igrejaId || igrejaIds.has(r.igrejaId));
+          this.loading = false;
+          this.buildCalendar();
+        },
+        error: () => {
+          this.repertorios = allReps;
+          this.loading = false;
+          this.buildCalendar();
+        },
+      });
+    }
   }
 
   get monthLabel(): string {

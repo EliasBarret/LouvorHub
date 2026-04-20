@@ -85,7 +85,14 @@ export class StatusConfirmacoesComponent implements OnInit {
           map.set(id, {
             musicaId: id,
             musicaTitulo: mc.musica.titulo,
-            musicaTom: mc.musica.tom,
+            musicaTom: (() => {
+              const fem = mc.musica.tomFeminino?.trim();
+              const masc = mc.musica.tom?.trim();
+              if (fem && masc) return `👩‍🎤 ${fem} · 👨‍🎤 ${masc}`;
+              if (fem) return `👩‍🎤 ${fem}`;
+              if (masc) return `👨‍🎤 ${masc}`;
+              return '—';
+            })(),
             confirmacoes: [],
             totalConhece: 0,
             totalNaoConhece: 0,

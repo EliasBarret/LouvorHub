@@ -25,6 +25,12 @@ export class UsuariosController {
     return this.usuariosService.getMe(user.id);
   }
 
+  @Get('me/stats')
+  @ApiOperation({ summary: 'Estatísticas de perfil do usuário autenticado' })
+  getPerfilStats(@CurrentUser() user: any) {
+    return this.usuariosService.getPerfilStats(user.id);
+  }
+
   @Put('me')
   @ApiOperation({ summary: 'Atualiza perfil do usuário autenticado' })
   updateMe(@CurrentUser() user: any, @Body() dto: UpdatePerfilDto) {
