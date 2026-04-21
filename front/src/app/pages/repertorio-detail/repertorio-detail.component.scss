@@ -477,6 +477,28 @@
     color: var(--text-secondary);
     text-transform: capitalize;
   }
+
+  // Destaque para o próprio usuário logado
+  &.is-me {
+    background: rgba(245, 158, 11, 0.14);
+    color: #92400e;
+    font-weight: 700;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+
+    .chip-role {
+      color: #b45309;
+    }
+  }
+}
+
+:host-context([data-theme="dark"]) .musician-chip.is-me {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.35);
+
+  .chip-role {
+    color: #fcd34d;
+  }
 }
 
 .music-meta {

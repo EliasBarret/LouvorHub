@@ -145,10 +145,10 @@
                       @if (musica.cantores.length > 0 || musica.musicos.length > 0) {
                         <div class="music-musicians">
                           @for (c of musica.cantores; track c.id) {
-                            <span class="musician-chip"><span class="chip-role">Cantor</span> {{ c.nome.split(' ')[0] }}</span>
+                            <span class="musician-chip" [class.is-me]="usuarioLogado?.id === c.id"><span class="chip-role">Cantor</span> {{ c.nome.split(' ')[0] }}</span>
                           }
                           @for (m of musica.musicos; track m.id) {
-                            <span class="musician-chip"><span class="chip-role">{{ m.instrumento }}</span> {{ m.nome.split(' ')[0] }}</span>
+                            <span class="musician-chip" [class.is-me]="usuarioLogado?.id === m.id"><span class="chip-role">{{ m.instrumento }}</span> {{ m.nome.split(' ')[0] }}</span>
                           }
                         </div>
                       }
