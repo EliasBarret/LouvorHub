@@ -612,6 +612,110 @@ select.form-control {
     width: 100%;
     justify-content: center;
   }
+
+  // ── Bloco header: evitar overflow dos inputs ──────────────────────────────
+  .bloco-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  .bloco-header-main {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .bloco-nome-input {
+    // Impede que o input de nome fique com 6px de largura quando descricao
+    // tem width fixo — agora ambos dividem uma linha cada
+    flex: 1 1 auto;
+    min-width: 60px;
+  }
+
+  .bloco-descricao-input {
+    width: auto;
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .bloco-header-actions {
+    flex-shrink: 0;
+  }
+
+  // ── Selected item: compactar para mobile ──────────────────────────────────
+  .selected-item {
+    gap: 6px;
+    padding: 8px 8px;
+    flex-wrap: wrap;
+  }
+
+  // Número de ordem e ícone de nota musical são decorativos — esconder para ganhar espaço
+  .selected-order {
+    display: none;
+  }
+
+  .selected-icon {
+    display: none;
+  }
+
+  // Tags (ex: "Louvor", "Adoração") escondem no mobile — informação acessória
+  .selected-tags {
+    display: none;
+  }
+
+  .selected-info {
+    // Garante que o texto não ultrapasse o container
+    min-width: 0;
+    flex: 1 1 80px;
+  }
+
+  .selected-title {
+    font-size: 13px;
+  }
+
+  .selected-meta {
+    font-size: 11px;
+  }
+
+  // Botões de ação: reduzir tamanho e espaçamento
+  .selected-actions {
+    gap: 2px;
+  }
+
+  .order-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .remove-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .escalacao-toggle-btn {
+    width: 28px;
+    height: 26px;
+  }
+
+  // ── Search results: esconder tags para não quebrar layout ─────────────────
+  .search-item-tags {
+    display: none;
+  }
+
+  .search-item-meta {
+    white-space: normal;
+    line-height: 1.4;
+  }
+
+  // ── Bloco custom input row: empilhar no mobile ────────────────────────────
+  .bloco-custom-input-row {
+    flex-wrap: wrap;
+
+    .form-control {
+      flex: 1 1 100%;
+    }
+  }
 }
 
 // ─── Escalação por Música ────────────────────────────────────────────────────
