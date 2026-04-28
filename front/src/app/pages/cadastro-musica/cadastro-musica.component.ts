@@ -137,7 +137,6 @@ export class CadastroMusicaComponent implements OnInit {
 
     const payload = {
       ...this.form.value,
-      tags: [],
       tipos: Array.from(this.selectedTipos),
     };
 
