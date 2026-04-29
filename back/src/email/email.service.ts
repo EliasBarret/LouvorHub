@@ -12,6 +12,7 @@ export class EmailService {
       host: this.config.get<string>('SMTP_HOST', 'smtp.gmail.com'),
       port: this.config.get<number>('SMTP_PORT', 587),
       secure: this.config.get<number>('SMTP_PORT', 587) === 465,
+      family: 4,
       auth: {
         user: this.config.get<string>('SMTP_USER'),
         pass: this.config.get<string>('SMTP_PASS'),
