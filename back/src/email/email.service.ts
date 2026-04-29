@@ -17,7 +17,7 @@ export class EmailService {
         user: this.config.get<string>('SMTP_USER'),
         pass: this.config.get<string>('SMTP_PASS'),
       },
-    });
+    } as any);
   }
 
   async sendVerificationEmail(nome: string, email: string, token: string): Promise<void> {
