@@ -29,21 +29,23 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger
-  const config = new DocumentBuilder()
-    .setTitle('LouvorHub API')
-    .setDescription('API completa para gestão de louvor e música de igrejas')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+  // Swagger (apenas em desenvolvimento)
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('LouvorHub API')
+      .setDescription('API completa para gestão de louvor e música de igrejas')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+    logger.log(`📚 Swagger disponível em http://localhost:${process.env.PORT ?? 3000}/api/docs`);
+  }
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
   logger.log(`🚀 LouvorHub API rodando em http://localhost:${port}`);
-  logger.log(`📚 Swagger disponível em http://localhost:${port}/api/docs`);
 }
 bootstrap();
 
