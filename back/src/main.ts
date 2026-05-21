@@ -44,8 +44,8 @@ async function bootstrap() {
   }
 
   const port = process.env.PORT ?? 3000;
-  await app.listen(port);
-  logger.log(`🚀 LouvorHub API rodando em http://localhost:${port}`);
+  await app.listen(port, '0.0.0.0');
+  logger.log(`🚀 LouvorHub API rodando em http://0.0.0.0:${port}`);
 }
 bootstrap();
 
