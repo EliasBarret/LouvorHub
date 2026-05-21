@@ -14,6 +14,7 @@
         "New-Item": true,
         "npm run build": true,
         "node_modules/.bin/tsc": true,
-        "mv": true
+        "mv": true,
+        "mkdir": true
     }
 }
